@@ -1,21 +1,23 @@
 "use client";
 
 import Link from "next/link";
-
+import { usePathname } from "next/navigation";
 export default function HeaderTabs() {
+  const path = usePathname();
   return (
-    <>
-      <nav className="flex justify-center font-bold">
-        <Link className="text-center text-xl p-6" href={"/cards"}>
-          卡牌
-        </Link>
-        <Link className="text-center text-xl p-6" href={"/decks-list"}>
-          牌組一欄
-        </Link>
-        <Link className="text-center text-xl p-6" href={"/search"}>
-          搜尋
-        </Link>
-      </nav>
-    </>
+    <div className="flex justify-center font-bold header-tabs">
+      <Link className={path === "/cards" ? "active" : ""} href={"/cards"}>
+        卡牌
+      </Link>
+      <Link
+        className={path === "/decks-list" ? "active" : ""}
+        href={"/decks-list"}
+      >
+        牌組一欄
+      </Link>
+      <Link className={path === "/search" ? "active" : ""} href={"/search"}>
+        搜尋
+      </Link>
+    </div>
   );
 }

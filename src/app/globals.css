@@ -25,3 +25,11 @@ body {
   color: var(--primary);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+div.header-tabs > * {
+  @apply text-center text-xl p-6;
+}
+
+div.header-tabs > *.active {
+  border-bottom: 4px solid var(--primary);
+}
