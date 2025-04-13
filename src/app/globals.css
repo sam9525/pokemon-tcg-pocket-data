@@ -27,7 +27,7 @@ body {
 }
 
 div.header-tabs > * {
-  @apply text-center text-xl p-6;
+  @apply text-center text-lg p-6;
 }
 
 div.header-tabs > *.active {
