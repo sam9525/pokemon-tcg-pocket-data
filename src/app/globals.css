@@ -27,6 +27,7 @@ body {
 }
 
 div.header-tabs > * {
+  border-bottom: 4px solid transparent;
   @apply text-center text-lg p-6;
 }
 
