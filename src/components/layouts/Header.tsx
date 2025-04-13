@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import HeaderTabs from "./HeaderTabs";
+import User from "../icons/user";
 
 export default function Header() {
   return (
@@ -12,6 +13,9 @@ export default function Header() {
             <Link className="text-primary text-3xl font-bold" href={"/"}>
               POKEMON TCG POCKET
             </Link>
+            <button className="w-9 absolute right-13 cursor-pointer">
+              <User />
+            </button>
           </div>
           <hr className="text-primary w-full border-primary border-2"></hr>
           <HeaderTabs />
