@@ -34,3 +34,22 @@ div.header-tabs > * {
 div.header-tabs > *.active {
   border-bottom: 4px solid var(--primary);
 }
+
+input[type="email"],
+input[type="password"] {
+  border: 1px solid var(--primary);
+  border-radius: 10px;
+  @apply p-2 focus:outline-none focus:ring-2 focus:border-transparent;
+}
+
+button[type="submit"] {
+  background-color: var(--primary);
+  @apply p-2 text-background rounded-md cursor-pointer;
+}
+
+button[type="button"] {
+  border: 1px solid var(--primary);
+  border-radius: 10px;
+  color: var(--primary);
+  @apply p-2 text-sm rounded-md w-62 flex justify-center items-center gap-2 cursor-pointer;
+}
