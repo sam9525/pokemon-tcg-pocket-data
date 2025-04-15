@@ -5,16 +5,32 @@ import HeaderTabs from "./HeaderTabs";
 import User from "../icons/user";
 import Earth from "../icons/earth";
 import Login from "../icons/login";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { usePathname } from "next/navigation";
 
 export default function Header() {
   const [showUserMenu, setShowUserMenu] = useState(false);
   const pathname = usePathname();
+  const menuRef = useRef<HTMLDivElement>(null);
+  const buttonRef = useRef<HTMLButtonElement>(null);
 
-  // Hide user menu when pathname changes (page navigation)
   useEffect(() => {
+    // Hide user menu when pathname changes (page navigation)
     setShowUserMenu(false);
+
+    // Handle clicks outside the user menu
+    const handleClickOutside = (event: MouseEvent) => {
+      if (!menuRef.current) return;
+      if (
+        !menuRef.current.contains(event.target as Node) &&
+        !buttonRef.current?.contains(event.target as Node)
+      ) {
+        setShowUserMenu(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [pathname]);
 
   return (
@@ -26,13 +42,17 @@ export default function Header() {
               POKEMON TCG POCKET
             </Link>
             <button
+              ref={buttonRef}
               className="w-9 absolute right-13 cursor-pointer"
               onClick={() => setShowUserMenu(!showUserMenu)}
             >
               <User />
             </button>
             {showUserMenu && (
-              <div className="w-42 absolute top-20 right-11 border-1 border-primary bg-background rounded-md px-4 py-2 flex flex-col items-start justify-start">
+              <div
+                ref={menuRef}
+                className="w-42 absolute top-20 right-11 border-1 border-primary bg-background rounded-md px-4 py-2 flex flex-col items-start justify-start"
+              >
                 <div className="flex items-center justify-start mb-2 cursor-pointer">
                   <div className="w-6">
                     <Earth />
