@@ -35,6 +35,7 @@ div.header-tabs > *.active {
   border-bottom: 4px solid var(--primary);
 }
 
+input[type="text"],
 input[type="email"],
 input[type="password"] {
   border: 1px solid var(--primary);
