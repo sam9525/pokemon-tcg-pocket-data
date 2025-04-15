@@ -5,10 +5,18 @@ import HeaderTabs from "./HeaderTabs";
 import User from "../icons/user";
 import Earth from "../icons/earth";
 import Login from "../icons/login";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { usePathname } from "next/navigation";
 
 export default function Header() {
   const [showUserMenu, setShowUserMenu] = useState(false);
+  const pathname = usePathname();
+
+  // Hide user menu when pathname changes (page navigation)
+  useEffect(() => {
+    setShowUserMenu(false);
+  }, [pathname]);
+
   return (
     <>
       <header className="w-full bg-foreground">
