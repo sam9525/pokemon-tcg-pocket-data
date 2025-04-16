@@ -4,6 +4,7 @@ import { ZodError } from "zod";
 import { signInSchema } from "@/lib/zod";
 import { saltAndHashPassword } from "@/utils/password";
 import mongoose from "mongoose";
+import { User } from "@/app/models/User";
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
   providers: [
@@ -19,8 +20,6 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       },
       authorize: async (credentials) => {
         try {
-          let user = null;
-
           const { email, password } = await signInSchema.parseAsync(
             credentials
           );
@@ -36,7 +35,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
             });
 
           // logic to verify if the user exists
-          user = await getUserFromDb(email, pwHash);
+          const user = await User.findOne({ email });
 
           if (!user) {
             // No user found, so this is their first attempt to login
