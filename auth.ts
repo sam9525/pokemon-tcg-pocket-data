@@ -3,6 +3,7 @@ import Credentials from "next-auth/providers/credentials";
 import { ZodError } from "zod";
 import { signInSchema } from "@/lib/zod";
 import { saltAndHashPassword } from "@/utils/password";
+import mongoose from "mongoose";
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
   providers: [
@@ -22,6 +23,13 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
 
           // logic to salt and hash password
           const pwHash = saltAndHashPassword(password);
+
+          await mongoose
+            .connect(process.env.MONGO_URL as string)
+            .catch((err) => {
+              console.error("Failed to connect to MongoDB:", err);
+              throw new Error("Database connection failed");
+            });
 
           // logic to verify if the user exists
           user = await getUserFromDb(email, pwHash);
