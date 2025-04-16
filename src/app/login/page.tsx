@@ -2,13 +2,20 @@
 
 import Image from "next/image";
 import Link from "next/link";
+import { signIn } from "@/../auth";
 
 export default function LoginPage() {
   return (
     <section className="w-125 h-150 flex flex-col items-center justify-center border-2 border-primary rounded-xl mx-auto my-10 bg-foreground">
       <h2 className="text-2xl font-bold">WELCOME BACK</h2>
       <h3 className="text-xl mb-4">Log in</h3>
-      <form className="flex flex-col gap-4 w-62">
+      <form
+        className="flex flex-col gap-4 w-62"
+        action={async (formData) => {
+          "use server";
+          await signIn("credentials", formData);
+        }}
+      >
         <input type="email" placeholder="Email" />
         <input type="password" placeholder="Password" />
         <button type="submit">Log in</button>
