@@ -8,10 +8,13 @@ import { useState } from "react";
 export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [loginInProgress, setLoginInProgress] = useState(false);
 
   async function handleFormSubmit(ev: React.FormEvent<HTMLFormElement>) {
     ev.preventDefault();
+    setLoginInProgress(true);
     await signIn("credentials", { email, password, callbackUrl: "/" });
+    setLoginInProgress(false);
   }
 
   return (
@@ -31,12 +34,14 @@ export default function LoginPage() {
           placeholder="Email"
           value={email}
           onChange={(ev) => setEmail(ev.target.value)}
+          disabled={loginInProgress}
         />
         <input
           type="password"
           placeholder="Password"
           value={password}
           onChange={(ev) => setPassword(ev.target.value)}
+          disabled={loginInProgress}
         />
         <button type="submit">Log in</button>
       </form>
