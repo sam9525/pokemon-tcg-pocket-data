@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Roboto } from "next/font/google";
 import "./globals.css";
 import Header from "@/components/layouts/Header";
+import { AppProvider } from "@/components/Appcontext";
 
 export const metadata: Metadata = {
   title: "Pokemon tcg pocket",
@@ -19,8 +20,10 @@ export default function RootLayout({
     <html lang="en">
       <body className={roboto.className}>
         <main>
-          <Header />
-          {children}
+          <AppProvider>
+            <Header />
+            {children}
+          </AppProvider>
         </main>
       </body>
     </html>
