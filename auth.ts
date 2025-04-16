@@ -7,6 +7,7 @@ import { User } from "@/app/models/User";
 import bcryptjs from "bcryptjs";
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
+  secret: process.env.AUTH_SECRET,
   providers: [
     Credentials({
       // Specify which fields should be submitted, by adding keys to the `credentials` object.
