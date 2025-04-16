@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { Roboto } from "next/font/google";
 import "./globals.css";
 import Header from "@/components/layouts/Header";
-import { AppProvider } from "@/components/Appcontext";
+import { AppProvider } from "@/components/AppContext";
 
 export const metadata: Metadata = {
   title: "Pokemon tcg pocket",
