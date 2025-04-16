@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { signIn } from "@/../auth";
+import { signIn } from "next-auth/react";
 import { useState } from "react";
 
 export default function LoginPage() {
@@ -21,14 +21,7 @@ export default function LoginPage() {
     <section className="w-125 h-150 flex flex-col items-center justify-center border-2 border-primary rounded-xl mx-auto my-10 bg-foreground">
       <h2 className="text-2xl font-bold">WELCOME BACK</h2>
       <h3 className="text-xl mb-4">Log in</h3>
-      <form
-        className="flex flex-col gap-4 w-62"
-        // action={async (formData) => {
-        //   "use server";
-        //   await signIn("credentials", formData);
-        // }}
-        onSubmit={handleFormSubmit}
-      >
+      <form className="flex flex-col gap-4 w-62" onSubmit={handleFormSubmit}>
         <input
           type="email"
           placeholder="Email"
