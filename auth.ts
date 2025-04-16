@@ -1,6 +1,7 @@
 import NextAuth from "next-auth";
 import Credentials from "next-auth/providers/credentials";
 import { ZodError } from "zod";
+import { signInSchema } from "@/lib/zod";
 import { saltAndHashPassword } from "@/utils/password";
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
@@ -15,11 +16,15 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         try {
           let user = null;
 
+          const { email, password } = await signInSchema.parseAsync(
+            credentials
+          );
+
           // logic to salt and hash password
-          const pwHash = saltAndHashPassword(credentials.password);
+          const pwHash = saltAndHashPassword(password);
 
           // logic to verify if the user exists
-          user = await getUserFromDb(credentials.email, pwHash);
+          user = await getUserFromDb(email, pwHash);
 
           if (!user) {
             // No user found, so this is their first attempt to login
