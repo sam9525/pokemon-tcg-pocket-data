@@ -2,9 +2,9 @@ import NextAuth from "next-auth";
 import Credentials from "next-auth/providers/credentials";
 import { ZodError } from "zod";
 import { signInSchema } from "@/lib/zod";
-import { saltAndHashPassword } from "@/utils/password";
 import mongoose from "mongoose";
 import { User } from "@/app/models/User";
+import bcryptjs from "bcryptjs";
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
   providers: [
@@ -24,9 +24,6 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
             credentials
           );
 
-          // logic to salt and hash password
-          const pwHash = saltAndHashPassword(password);
-
           await mongoose
             .connect(process.env.MONGO_URL as string)
             .catch((err) => {
@@ -40,6 +37,13 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           if (!user) {
             // No user found, so this is their first attempt to login
             throw new Error("Invalid credentials.");
+          }
+
+          const passwordOk =
+            user && bcryptjs.compareSync(password, user.password);
+
+          if (passwordOk) {
+            return user;
           }
 
           // return user object with their profile data
