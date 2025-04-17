@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 export default function Register() {
@@ -10,6 +11,7 @@ export default function Register() {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [creatingUser, setCreatingUser] = useState(false);
+  const router = useRouter();
 
   async function handleFormSubmit(ev: React.FormEvent<HTMLFormElement>) {
     ev.preventDefault();
@@ -29,6 +31,7 @@ export default function Register() {
     }
 
     setCreatingUser(false);
+    router.push("/");
   }
 
   return (
