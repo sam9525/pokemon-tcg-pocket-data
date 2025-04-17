@@ -7,6 +7,7 @@ import { NextResponse } from "next/server";
 export async function POST(req: Request) {
   try {
     const body = await req.json();
+    const confirmPassword = body.confirmPassword;
 
     // Connecting to database
     await mongoose.connect(process.env.MONGO_URL as string).catch((err) => {
@@ -22,6 +23,14 @@ export async function POST(req: Request) {
     if (existingUser) {
       return NextResponse.json(
         { error: "User with this email already exists" },
+        { status: 400 }
+      );
+    }
+
+    // Check if password and confirmPassword match
+    if (password !== confirmPassword) {
+      return NextResponse.json(
+        { error: "Passwords do not match" },
         { status: 400 }
       );
     }
