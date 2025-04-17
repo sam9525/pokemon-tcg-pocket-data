@@ -40,10 +40,22 @@ export async function POST(req: Request) {
     const salt = bcryptjs.genSaltSync(10);
     const hashedPassword = bcryptjs.hashSync(password, salt);
 
+    // Create the user
+    const createdUser = await User.create({
+      username,
+      email,
+      password: hashedPassword,
+    });
+
     // Return success response (without password)
     return NextResponse.json(
       {
         success: true,
+        user: {
+          id: createdUser._id.toString(),
+          username: createdUser.username,
+          email: createdUser.email,
+        },
       },
       { status: 201 }
     );
