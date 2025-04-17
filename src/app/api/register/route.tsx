@@ -1,6 +1,7 @@
 import { registerSchema } from "@/lib/zod";
 import mongoose from "mongoose";
 import { ZodError } from "zod";
+import { User } from "@/app/models/User";
 import { NextResponse } from "next/server";
 
 export async function POST(req: Request) {
@@ -15,6 +16,15 @@ export async function POST(req: Request) {
 
     // Parsing the body
     const { username, email, password } = await registerSchema.parseAsync(body);
+
+    // Check if user is exist
+    const existingUser = await User.findOne({ email });
+    if (existingUser) {
+      return NextResponse.json(
+        { error: "User with this email already exists" },
+        { status: 400 }
+      );
+    }
 
     // Return success response (without password)
     return NextResponse.json(
