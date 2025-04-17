@@ -1,6 +1,7 @@
 import { registerSchema } from "@/lib/zod";
 import mongoose from "mongoose";
 import { ZodError } from "zod";
+import bcryptjs from "bcryptjs";
 import { User } from "@/app/models/User";
 import { NextResponse } from "next/server";
 
@@ -34,6 +35,10 @@ export async function POST(req: Request) {
         { status: 400 }
       );
     }
+
+    // Salt and hash the password
+    const salt = bcryptjs.genSaltSync(10);
+    const hashedPassword = bcryptjs.hashSync(password, salt);
 
     // Return success response (without password)
     return NextResponse.json(
