@@ -80,16 +80,15 @@ export default function Header() {
                   </Link>
                 )}
                 {status === "authenticated" && (
-                  <Link
+                  <button
                     className="flex items-center justify-start cursor-pointer"
-                    href="/"
-                    onClick={() => signOut()}
+                    onClick={() => signOut({ callbackUrl: "/" })}
                   >
                     <div className="w-6">
                       <Logout />
                     </div>
                     <span className="ml-2 text-sm">登出</span>
-                  </Link>
+                  </button>
                 )}
               </div>
             )}
