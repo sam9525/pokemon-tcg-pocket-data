@@ -12,6 +12,10 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     Credentials({
       // Specify which fields should be submitted, by adding keys to the `credentials` object.
       credentials: {
+        name: {
+          label: "Username",
+          type: "text",
+        },
         email: {
           label: "Email",
           type: "email",

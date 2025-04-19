@@ -17,7 +17,7 @@ export async function POST(req: Request) {
     });
 
     // Parsing the body
-    const { username, email, password } = await registerSchema.parseAsync(body);
+    const { name, email, password } = await registerSchema.parseAsync(body);
 
     // Check if user is exist
     const existingUser = await User.findOne({ email });
@@ -42,7 +42,7 @@ export async function POST(req: Request) {
 
     // Create the user
     const createdUser = await User.create({
-      username,
+      name,
       email,
       password: hashedPassword,
     });
@@ -53,7 +53,7 @@ export async function POST(req: Request) {
         success: true,
         user: {
           id: createdUser._id.toString(),
-          username: createdUser.username,
+          name: createdUser.name,
           email: createdUser.email,
         },
       },

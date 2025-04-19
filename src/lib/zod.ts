@@ -11,7 +11,7 @@ export const signInSchema = object({
 });
 
 export const registerSchema = object({
-  username: string({ required_error: "Username is required" })
+  name: string({ required_error: "Username is required" })
     .min(1, "Username is required")
     .min(3, "Username must be more than 3 characters")
     .max(32, "Username must be less than 32 characters"),

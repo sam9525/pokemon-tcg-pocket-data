@@ -6,7 +6,7 @@ import Link from "next/link";
 import { useState } from "react";
 
 export default function Register() {
-  const [username, setUsername] = useState("");
+  const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -18,7 +18,7 @@ export default function Register() {
     const response = await fetch("/api/register", {
       method: "POST",
       credentials: "include",
-      body: JSON.stringify({ username, email, password, confirmPassword }),
+      body: JSON.stringify({ name, email, password, confirmPassword }),
       headers: {
         "Content-Type": "application/json",
       },
@@ -30,7 +30,11 @@ export default function Register() {
       throw new Error(data.error || "Registration failed");
     }
 
-    await signIn("credentials", { email, password, callbackUrl: "/" });
+    await signIn("credentials", {
+      email,
+      password,
+      callbackUrl: "/",
+    });
 
     setCreatingUser(false);
   }
@@ -43,8 +47,8 @@ export default function Register() {
         <input
           type="text"
           placeholder="Username"
-          value={username}
-          onChange={(ev) => setUsername(ev.target.value)}
+          value={name}
+          onChange={(ev) => setName(ev.target.value)}
           disabled={creatingUser}
         />
         <input
