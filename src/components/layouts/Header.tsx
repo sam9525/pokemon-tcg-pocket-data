@@ -12,6 +12,7 @@ import Logout from "../icons/logout";
 
 export default function Header() {
   const session = useSession();
+  const status = session?.status;
   const userData = session.data?.user;
   const userName = userData?.name;
   const [showUserMenu, setShowUserMenu] = useState(false);
@@ -56,18 +57,18 @@ export default function Header() {
             {showUserMenu && (
               <div
                 ref={menuRef}
-                className="w-42 absolute top-20 right-11 border-1 border-primary bg-background rounded-md px-4 py-2 flex flex-col items-start justify-start"
+                className="w-42 absolute top-20 right-11 border-1 border-primary bg-background rounded-md px-4 py-2 flex flex-col items-start justify-start gap-2"
               >
-                {session.status === "authenticated" && (
-                  <div className="text-sm">Hello, {userName}</div>
+                {status === "authenticated" && (
+                  <div className="text-md mx-auto">Hello, {userName}</div>
                 )}
-                <div className="flex items-center justify-start mb-2 cursor-pointer">
+                <div className="flex items-center justify-start cursor-pointer">
                   <div className="w-6">
                     <Earth />
                   </div>
                   <span className="ml-2 text-sm">語言：繁體中文</span>
                 </div>
-                {session.status !== "authenticated" && (
+                {status !== "authenticated" && (
                   <Link
                     className="flex items-center justify-start cursor-pointer"
                     href="/login"
@@ -78,7 +79,7 @@ export default function Header() {
                     <span className="ml-2 text-sm">登入</span>
                   </Link>
                 )}
-                {session.status === "authenticated" && (
+                {status === "authenticated" && (
                   <Link
                     className="flex items-center justify-start cursor-pointer"
                     href="/"
