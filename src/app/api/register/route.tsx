@@ -45,6 +45,7 @@ export async function POST(req: Request) {
       name,
       email,
       password: hashedPassword,
+      provider: "credentials",
     });
 
     // Return success response (without password)
