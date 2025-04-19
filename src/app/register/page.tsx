@@ -75,9 +75,12 @@ export default function Register() {
         <button type="submit">Register</button>
       </form>
       <hr className="text-primary w-62 border-primary border-1 my-4"></hr>
-      <button type="button">
+      <button
+        type="button"
+        onClick={() => signIn("google", { callbackUrl: "/" })}
+      >
         <Image src="/google-icon.svg" alt="Google" width={20} height={20} />
-        Log in with Google
+        Sign up with Google
       </button>
       <label htmlFor="" className="text-sm my-4">
         Already have an account?{" "}

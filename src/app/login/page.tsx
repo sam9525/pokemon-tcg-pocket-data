@@ -42,7 +42,10 @@ export default function LoginPage() {
         Forgot password?
       </Link>
       <hr className="text-primary w-62 border-primary border-1 my-4"></hr>
-      <button type="button">
+      <button
+        type="button"
+        onClick={() => signIn("google", { callbackUrl: "/" })}
+      >
         <Image src="/google-icon.svg" alt="Google" width={20} height={20} />
         Log in with Google
       </button>
