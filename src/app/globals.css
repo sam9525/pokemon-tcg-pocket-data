@@ -35,6 +35,15 @@ div.header-tabs > *.active {
   border-bottom: 4px solid var(--primary);
 }
 
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active {
+  -webkit-text-fill-color: var(--primary) !important;
+  --tw-ring-color: var(--primary);
+  transition: background-color 5000s ease-in-out 0s;
+}
+
 input[type="text"],
 input[type="email"],
 input[type="password"] {
