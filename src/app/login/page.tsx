@@ -5,12 +5,13 @@ import Link from "next/link";
 import { signIn } from "next-auth/react";
 import { useState } from "react";
 import toast from "react-hot-toast";
+import { useRouter } from "next/navigation";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loginInProgress, setLoginInProgress] = useState(false);
-
+  const router = useRouter();
   async function handleFormSubmit(ev: React.FormEvent<HTMLFormElement>) {
     ev.preventDefault();
     setLoginInProgress(true);
@@ -20,14 +21,14 @@ export default function LoginPage() {
         const signInResult = await signIn("credentials", {
           email,
           password,
-          callbackUrl: "/",
+          redirect: false,
         });
 
         if (signInResult?.error) {
           reject(signInResult.error);
+        } else {
+          resolve(true);
         }
-
-        resolve(true);
       });
 
       await toast.promise(loginPromise, {
@@ -45,8 +46,11 @@ export default function LoginPage() {
           return "Login failed";
         },
       });
+
+      router.push("/");
     } catch (error) {
       console.error("Login error:", error);
+    } finally {
       setLoginInProgress(false);
     }
   }
