@@ -12,6 +12,7 @@ export default function LoginPage() {
   const [password, setPassword] = useState("");
   const [loginInProgress, setLoginInProgress] = useState(false);
   const router = useRouter();
+
   async function handleFormSubmit(ev: React.FormEvent<HTMLFormElement>) {
     ev.preventDefault();
     setLoginInProgress(true);
@@ -55,6 +56,17 @@ export default function LoginPage() {
     }
   }
 
+  const handleGoogleSignIn = async () => {
+    toast.loading("Connecting to Google...");
+    try {
+      await signIn("google", { callbackUrl: "/" });
+      toast.success("Google login successful");
+    } catch (error) {
+      console.error("Google login error:", error);
+      toast.error("Failed to login with Google");
+    }
+  };
+
   return (
     <section className="w-125 h-150 flex flex-col items-center justify-center border-2 border-primary rounded-xl mx-auto my-10 bg-foreground">
       <h2 className="text-2xl font-bold">WELCOME BACK</h2>
@@ -80,10 +92,7 @@ export default function LoginPage() {
         Forgot password?
       </Link>
       <hr className="text-primary w-62 border-primary border-1 my-4"></hr>
-      <button
-        type="button"
-        onClick={() => signIn("google", { callbackUrl: "/" })}
-      >
+      <button type="button" onClick={handleGoogleSignIn}>
         <Image src="/google-icon.svg" alt="Google" width={20} height={20} />
         Log in with Google
       </button>
