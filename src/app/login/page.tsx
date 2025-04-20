@@ -4,6 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { signIn } from "next-auth/react";
 import { useState } from "react";
+import toast from "react-hot-toast";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
@@ -13,8 +14,41 @@ export default function LoginPage() {
   async function handleFormSubmit(ev: React.FormEvent<HTMLFormElement>) {
     ev.preventDefault();
     setLoginInProgress(true);
-    await signIn("credentials", { email, password, callbackUrl: "/" });
-    setLoginInProgress(false);
+
+    try {
+      const loginPromise = new Promise(async (resolve, reject) => {
+        const signInResult = await signIn("credentials", {
+          email,
+          password,
+          callbackUrl: "/",
+        });
+
+        if (signInResult?.error) {
+          reject(signInResult.error);
+        }
+
+        resolve(true);
+      });
+
+      await toast.promise(loginPromise, {
+        loading: "Logging in",
+        success: "Login successful",
+        error: (err) => {
+          if (err.details) {
+            return err.details[0]?.message;
+          }
+
+          if (err.error) {
+            return err.error;
+          }
+
+          return "Login failed";
+        },
+      });
+    } catch (error) {
+      console.error("Login error:", error);
+      setLoginInProgress(false);
+    }
   }
 
   return (
