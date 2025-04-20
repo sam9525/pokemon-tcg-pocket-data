@@ -4,6 +4,7 @@ import { signIn } from "next-auth/react";
 import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
+import toast from "react-hot-toast";
 
 export default function Register() {
   const [name, setName] = useState("");
@@ -15,28 +16,53 @@ export default function Register() {
   async function handleFormSubmit(ev: React.FormEvent<HTMLFormElement>) {
     ev.preventDefault();
     setCreatingUser(true);
-    const response = await fetch("/api/register", {
-      method: "POST",
-      credentials: "include",
-      body: JSON.stringify({ name, email, password, confirmPassword }),
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
 
-    const data = await response.json();
+    try {
+      const registerPromise = new Promise(async (resolve, reject) => {
+        const response = await fetch("/api/register", {
+          method: "POST",
+          credentials: "include",
+          body: JSON.stringify({ name, email, password, confirmPassword }),
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
 
-    if (!response.ok) {
-      throw new Error(data.error || "Registration failed");
+        const data = await response.json();
+
+        if (!response.ok) {
+          setCreatingUser(false);
+          reject(data);
+        }
+
+        resolve(data);
+      });
+
+      await toast.promise(registerPromise, {
+        loading: "Registering",
+        success: "Registration successful",
+        error: (err) => {
+          if (err.details) {
+            return err.details[0]?.message;
+          }
+
+          if (err.error) {
+            return err.error;
+          }
+
+          return "Registration failed";
+        },
+      });
+
+      await signIn("credentials", {
+        email,
+        password,
+        callbackUrl: "/",
+      });
+    } catch (error) {
+      console.error("Registration error:", error);
+      setCreatingUser(false);
     }
-
-    await signIn("credentials", {
-      email,
-      password,
-      callbackUrl: "/",
-    });
-
-    setCreatingUser(false);
   }
 
   return (
@@ -78,6 +104,7 @@ export default function Register() {
       <button
         type="button"
         onClick={() => signIn("google", { callbackUrl: "/" })}
+        disabled={creatingUser}
       >
         <Image src="/google-icon.svg" alt="Google" width={20} height={20} />
         Sign up with Google

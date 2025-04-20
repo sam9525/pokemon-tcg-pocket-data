@@ -3,6 +3,7 @@ import { Roboto } from "next/font/google";
 import "./globals.css";
 import Header from "@/components/layouts/Header";
 import { AppProvider } from "@/components/AppContext";
+import { Toaster } from "react-hot-toast";
 
 export const metadata: Metadata = {
   title: "Pokemon tcg pocket",
@@ -21,6 +22,7 @@ export default function RootLayout({
       <body className={roboto.className}>
         <main>
           <AppProvider>
+            <Toaster />
             <Header />
             {children}
           </AppProvider>
