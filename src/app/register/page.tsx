@@ -54,11 +54,16 @@ export default function Register() {
         },
       });
 
-      await signIn("credentials", {
+      const signInResult = await signIn("credentials", {
         email,
         password,
         callbackUrl: "/",
       });
+
+      if (signInResult?.error) {
+        toast.error(signInResult.error);
+        setCreatingUser(false);
+      }
     } catch (error) {
       console.error("Registration error:", error);
       setCreatingUser(false);
