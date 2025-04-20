@@ -4,8 +4,8 @@ import { ZodError } from "zod";
 import { signInSchema } from "@/lib/zod";
 import mongoose from "mongoose";
 import { User } from "@/app/models/User";
-import bcryptjs from "bcryptjs";
 import GoogleProvider from "next-auth/providers/google";
+import { verifyPassword } from "@/utils/password";
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
   secret: process.env.AUTH_SECRET,
@@ -49,8 +49,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
             throw new Error("Invalid credentials.");
           }
 
-          const passwordOk =
-            user && bcryptjs.compareSync(password, user.password);
+          const passwordOk = verifyPassword(password, user.password);
 
           if (passwordOk) {
             return user;
