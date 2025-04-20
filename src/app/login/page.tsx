@@ -57,13 +57,17 @@ export default function LoginPage() {
   }
 
   const handleGoogleSignIn = async () => {
-    toast.loading("Connecting to Google...");
+    const toastId = toast.loading("Connecting to Google...");
     try {
-      await signIn("google", { callbackUrl: "/" });
-      toast.success("Google login successful");
+      const result = await signIn("google", { callbackUrl: "/" });
+      if (result?.error) {
+        toast.error("Failed to login with Google", { id: toastId });
+      } else {
+        toast.success("Google login successful", { id: toastId });
+      }
     } catch (error) {
       console.error("Google login error:", error);
-      toast.error("Failed to login with Google");
+      toast.error("Failed to login with Google", { id: toastId });
     }
   };
 
