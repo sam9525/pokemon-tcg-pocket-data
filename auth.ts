@@ -56,8 +56,8 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
             return user;
           }
 
-          // return user object with their profile data
-          return user;
+          // Return null if password doesn't match
+          return null;
         } catch (error) {
           if (error instanceof ZodError) {
             // Return `null` to indicate that the credentials are invalid
