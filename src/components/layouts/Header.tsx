@@ -9,6 +9,8 @@ import { useState, useEffect, useRef } from "react";
 import { usePathname } from "next/navigation";
 import { signOut, useSession } from "next-auth/react";
 import Logout from "../icons/logout";
+import { useRouter } from "next/navigation";
+import toast from "react-hot-toast";
 
 export default function Header() {
   const session = useSession();
@@ -19,6 +21,7 @@ export default function Header() {
   const pathname = usePathname();
   const menuRef = useRef<HTMLDivElement>(null);
   const buttonRef = useRef<HTMLButtonElement>(null);
+  const router = useRouter();
 
   useEffect(() => {
     // Hide user menu when pathname changes (page navigation)
@@ -38,6 +41,18 @@ export default function Header() {
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [pathname]);
+
+  const handleLogout = async () => {
+    try {
+      await signOut({ redirect: false });
+
+      toast.success("Logout successful");
+
+      router.push("/");
+    } catch (error) {
+      console.error("Logout error:", error);
+    }
+  };
 
   return (
     <>
@@ -82,7 +97,7 @@ export default function Header() {
                 {status === "authenticated" && (
                   <button
                     className="flex items-center justify-start cursor-pointer"
-                    onClick={() => signOut({ callbackUrl: "/" })}
+                    onClick={handleLogout}
                   >
                     <div className="w-6">
                       <Logout />
