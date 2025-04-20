@@ -1,9 +1,9 @@
 import { registerSchema } from "@/lib/zod";
 import mongoose from "mongoose";
 import { ZodError } from "zod";
-import bcryptjs from "bcryptjs";
 import { User } from "@/app/models/User";
 import { NextResponse } from "next/server";
+import { saltAndHashPassword } from "@/utils/password";
 
 export async function POST(req: Request) {
   try {
@@ -37,8 +37,7 @@ export async function POST(req: Request) {
     }
 
     // Salt and hash the password
-    const salt = bcryptjs.genSaltSync(10);
-    const hashedPassword = bcryptjs.hashSync(password, salt);
+    const hashedPassword = saltAndHashPassword(password);
 
     // Create the user
     const createdUser = await User.create({
