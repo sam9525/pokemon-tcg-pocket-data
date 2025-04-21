@@ -44,12 +44,20 @@ input:-webkit-autofill:active {
   transition: background-color 5000s ease-in-out 0s;
 }
 
-input[type="text"],
-input[type="email"],
-input[type="password"] {
+form.login > input[type="text"],
+form.login > input[type="email"],
+form.login > input[type="password"],
+form.register > input[type="text"],
+form.register > input[type="email"],
+form.register > input[type="password"] {
   border: 1px solid var(--primary);
   border-radius: 10px;
   @apply p-2 focus:outline-none focus:ring-2 focus:border-transparent;
+}
+
+div.profile > input {
+  border-bottom: 1px solid var(--primary);
+  @apply w-60 focus:outline-none focus:border-b-2;
 }
 
 button[type="submit"] {
@@ -62,4 +70,9 @@ button[type="button"] {
   border-radius: 10px;
   color: var(--primary);
   @apply p-2 text-sm rounded-md w-62 flex justify-center items-center gap-2 cursor-pointer;
+}
+
+button.profile-button {
+  background-color: var(--primary);
+  @apply text-black font-semibold rounded-md cursor-pointer;
 }

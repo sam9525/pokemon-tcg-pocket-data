@@ -82,7 +82,10 @@ export default function Register() {
     <section className="w-125 h-150 flex flex-col items-center justify-center border-2 border-primary rounded-xl mx-auto my-10 bg-foreground">
       <h2 className="text-2xl font-bold">WELCOME</h2>
       <h3 className="text-xl mb-4">Sign up</h3>
-      <form className="flex flex-col gap-4 w-62" onSubmit={handleFormSubmit}>
+      <form
+        className="register flex flex-col gap-4 w-62"
+        onSubmit={handleFormSubmit}
+      >
         <input
           type="text"
           placeholder="Username"
