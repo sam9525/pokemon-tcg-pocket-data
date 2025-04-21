@@ -11,12 +11,14 @@ import { signOut, useSession } from "next-auth/react";
 import Logout from "../icons/logout";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
+import Image from "next/image";
 
 export default function Header() {
   const session = useSession();
   const status = session?.status;
   const userData = session.data?.user;
   const userName = userData?.name;
+  const [image, setImage] = useState(userData?.image || "");
   const [showUserMenu, setShowUserMenu] = useState(false);
   const pathname = usePathname();
   const menuRef = useRef<HTMLDivElement>(null);
@@ -24,6 +26,15 @@ export default function Header() {
   const router = useRouter();
 
   useEffect(() => {
+    // Fetch user data
+    if (status === "authenticated") {
+      fetch("/api/profile")
+        .then((res) => res.json())
+        .then((data) => {
+          setImage(data.image);
+        });
+    }
+
     // Hide user menu when pathname changes (page navigation)
     setShowUserMenu(false);
 
@@ -40,7 +51,7 @@ export default function Header() {
 
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, [pathname]);
+  }, [pathname, status]);
 
   const handleLogout = async () => {
     try {
@@ -75,7 +86,17 @@ export default function Header() {
                 className="w-42 absolute top-20 right-11 border-1 border-primary bg-background rounded-md px-4 py-2 flex flex-col items-start justify-start gap-2"
               >
                 {status === "authenticated" && (
-                  <div className="text-md mx-auto">Hello, {userName}</div>
+                  <>
+                    {/* <EditableAvatar link={image} setLink={setImage} /> */}
+                    <Image
+                      src={image}
+                      alt="avatar"
+                      width={80}
+                      height={80}
+                      className="rounded-full mx-auto"
+                    />
+                    <div className="text-md mx-auto">Hello, {userName}</div>
+                  </>
                 )}
                 <div className="flex items-center justify-start cursor-pointer">
                   <div className="w-6">
