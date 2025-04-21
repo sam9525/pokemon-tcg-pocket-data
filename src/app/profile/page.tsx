@@ -7,21 +7,25 @@ import { useEffect, useState } from "react";
 export default function Profile() {
   const session = useSession();
   const status = session?.status;
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [image, setImage] = useState("");
+  const [userData, setUserData] = useState({
+    name: "",
+    email: "",
+    image: "",
+  });
+  const name = userData.name;
+  const email = userData.email;
+  const image = userData.image;
 
   useEffect(() => {
     if (status === "authenticated") {
       fetch("/api/profile")
         .then((res) => res.json())
         .then((data) => {
-          setName(data.name);
-          setEmail(data.email);
-          setImage(data.image);
+          setUserData(data);
         });
     }
   }, [status]);
+
   return (
     <div className="flex items-center justify-center gap-10 my-auto mx-auto min-h-150">
       <div className="flex flex-col items-center gap-10">
