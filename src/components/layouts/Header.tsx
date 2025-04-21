@@ -83,7 +83,7 @@ export default function Header() {
             {showUserMenu && (
               <div
                 ref={menuRef}
-                className="w-42 absolute top-20 right-11 border-1 border-primary bg-background rounded-md px-4 py-2 flex flex-col items-start justify-start gap-2"
+                className="w-42 absolute top-20 right-11 border-1 border-primary bg-background rounded-md px-4 py-2 flex flex-col items-start  gap-2"
               >
                 {status === "authenticated" && (
                   <>
@@ -98,32 +98,32 @@ export default function Header() {
                     <div className="text-md mx-auto">Hello, {userName}</div>
                   </>
                 )}
-                <div className="flex items-center justify-start cursor-pointer">
+                <div className=" w-full flex items-center gap-2 cursor-pointer">
                   <div className="w-6">
                     <Earth />
                   </div>
-                  <span className="ml-2 text-sm">語言：繁體中文</span>
+                  <span className="text-sm">語言：繁體中文</span>
                 </div>
                 {status !== "authenticated" && (
                   <Link
-                    className="flex items-center justify-start cursor-pointer"
+                    className=" w-full flex items-center gap-2 cursor-pointer"
                     href="/login"
                   >
                     <div className="w-6">
                       <Login />
                     </div>
-                    <span className="ml-2 text-sm">登入</span>
+                    <span className="text-sm">登入</span>
                   </Link>
                 )}
                 {status === "authenticated" && (
                   <button
-                    className="flex items-center justify-start cursor-pointer"
+                    className=" w-full flex items-center gap-2 cursor-pointer"
                     onClick={handleLogout}
                   >
                     <div className="w-6">
                       <Logout />
                     </div>
-                    <span className="ml-2 text-sm">登出</span>
+                    <span className="text-sm">登出</span>
                   </button>
                 )}
               </div>
