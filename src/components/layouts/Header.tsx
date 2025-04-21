@@ -12,6 +12,7 @@ import Logout from "../icons/logout";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 import Image from "next/image";
+import Profile from "../icons/profile";
 
 export default function Header() {
   const session = useSession();
@@ -96,9 +97,18 @@ export default function Header() {
                       className="rounded-full mx-auto"
                     />
                     <div className="text-md mx-auto">Hello, {userName}</div>
+                    <Link
+                      className="w-full flex items-center gap-2 cursor-pointer"
+                      href="/profile"
+                    >
+                      <div className="w-6">
+                        <Profile />
+                      </div>
+                      <span className="text-sm">個人資料</span>
+                    </Link>
                   </>
                 )}
-                <div className=" w-full flex items-center gap-2 cursor-pointer">
+                <div className="w-full flex items-center gap-2 cursor-pointer">
                   <div className="w-6">
                     <Earth />
                   </div>
@@ -106,7 +116,7 @@ export default function Header() {
                 </div>
                 {status !== "authenticated" && (
                   <Link
-                    className=" w-full flex items-center gap-2 cursor-pointer"
+                    className="w-full flex items-center gap-2 cursor-pointer"
                     href="/login"
                   >
                     <div className="w-6">
@@ -117,7 +127,7 @@ export default function Header() {
                 )}
                 {status === "authenticated" && (
                   <button
-                    className=" w-full flex items-center gap-2 cursor-pointer"
+                    className="w-full flex items-center gap-2 cursor-pointer"
                     onClick={handleLogout}
                   >
                     <div className="w-6">
