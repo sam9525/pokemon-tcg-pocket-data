@@ -10,6 +10,8 @@ export default function Register() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const image =
+    "https://pokemon-tcg-pocket-data.s3.ap-southeast-2.amazonaws.com/avatar.jpg";
   const [confirmPassword, setConfirmPassword] = useState("");
   const [creatingUser, setCreatingUser] = useState(false);
 
@@ -22,7 +24,13 @@ export default function Register() {
         const response = await fetch("/api/register", {
           method: "POST",
           credentials: "include",
-          body: JSON.stringify({ name, email, password, confirmPassword }),
+          body: JSON.stringify({
+            name,
+            email,
+            password,
+            confirmPassword,
+            image,
+          }),
           headers: {
             "Content-Type": "application/json",
           },

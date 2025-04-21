@@ -17,7 +17,9 @@ export async function POST(req: Request) {
     });
 
     // Parsing the body
-    const { name, email, password } = await registerSchema.parseAsync(body);
+    const { name, email, password, image } = await registerSchema.parseAsync(
+      body
+    );
 
     // Check if user is exist
     const existingUser = await User.findOne({ email });
@@ -44,6 +46,7 @@ export async function POST(req: Request) {
       name,
       email,
       password: hashedPassword,
+      image,
       provider: "credentials",
     });
 

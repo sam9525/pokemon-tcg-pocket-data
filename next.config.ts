@@ -9,7 +9,7 @@ const nextConfig: NextConfig = {
       },
       {
         protocol: "https",
-        hostname: "pokemon-tcg-pocket-data.s3.amazonaws.com",
+        hostname: "pokemon-tcg-pocket-data.s3.ap-southeast-2.amazonaws.com",
       },
     ],
   },
