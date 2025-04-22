@@ -50,6 +50,30 @@ export default function Profile() {
     }
   };
 
+  const handleNameChange = async (newName: string) => {
+    try {
+      const res = await fetch("/api/profile", {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ name: newName }),
+      });
+
+      if (!res.ok) throw new Error("Failed to update name");
+
+      const data = await res.json();
+      if (data && data.name) {
+        setUsername(data.name);
+      } else {
+        setUsername(newName);
+      }
+    } catch (err) {
+      console.log(err);
+      setUsername(newName);
+    }
+  };
+
   return (
     <div className="flex items-center justify-center gap-10 my-auto mx-auto min-h-150">
       <EditableAvatar link={image} setLink={handleAvatarChange} />
@@ -67,7 +91,10 @@ export default function Profile() {
               onChange={(ev) => setUsername(ev.target.value)}
             />
           </div>
-          <button className="profile-button w-30 h-8 rounded-md text-sm">
+          <button
+            className="profile-button w-30 h-8 rounded-md text-sm"
+            onClick={() => handleNameChange(username)}
+          >
             變更名稱
           </button>
         </div>
