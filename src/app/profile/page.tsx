@@ -3,6 +3,8 @@
 import EditableAvatar from "@/components/layouts/EditableAvatar";
 import { useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import toast from "react-hot-toast";
 
 export default function Profile() {
   const session = useSession();
@@ -10,6 +12,8 @@ export default function Profile() {
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [image, setImage] = useState("");
+  const router = useRouter();
+  const [profileFetched, setProfileFetched] = useState(false);
 
   useEffect(() => {
     if (status === "authenticated") {
@@ -19,6 +23,7 @@ export default function Profile() {
           setUsername(data.name || "");
           setEmail(data.email || "");
           setImage(data.image || "");
+          setProfileFetched(true);
         });
     }
   }, [status]);
@@ -36,15 +41,27 @@ export default function Profile() {
       const data = await res.json();
       setImage(data.url);
 
-      const putRes = await fetch("/api/profile", {
-        method: "PUT",
-        body: JSON.stringify({ image: data.url }),
+      const putPromise = new Promise(async (resolve, reject) => {
+        const putRes = await fetch("/api/profile", {
+          method: "PUT",
+          body: JSON.stringify({ image: data.url }),
+        });
+
+        const putData = await putRes.json();
+        console.log(putData);
+
+        if (!putRes.ok) {
+          reject(putData);
+        } else {
+          resolve(putData);
+        }
       });
 
-      if (!putRes.ok) throw new Error("Failed to update image");
-
-      const putData = await putRes.json();
-      console.log(putData);
+      await toast.promise(putPromise, {
+        loading: "Updating image...",
+        success: "Image updated successfully",
+        error: "Failed to update image",
+      });
     } catch (err) {
       console.log(err);
     }
@@ -52,27 +69,49 @@ export default function Profile() {
 
   const handleNameChange = async (newName: string) => {
     try {
-      const res = await fetch("/api/profile", {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ name: newName }),
+      const putPromise = new Promise(async (resolve, reject) => {
+        const res = await fetch("/api/profile", {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ name: newName }),
+        });
+
+        const data = await res.json();
+        if (data && data.name) {
+          setUsername(data.name);
+        } else {
+          setUsername(newName);
+        }
+
+        if (!res.ok) {
+          reject(data);
+        } else {
+          resolve(data);
+        }
       });
 
-      if (!res.ok) throw new Error("Failed to update name");
-
-      const data = await res.json();
-      if (data && data.name) {
-        setUsername(data.name);
-      } else {
-        setUsername(newName);
-      }
+      await toast.promise(putPromise, {
+        loading: "Updating name...",
+        success: "Name updated successfully",
+        error: "Failed to update name",
+      });
     } catch (err) {
       console.log(err);
-      setUsername(newName);
     }
   };
+
+  if (status === "loading" || !profileFetched) {
+    toast.loading("Loading...", { id: "loading-toast" });
+  }
+  if (status === "unauthenticated") {
+    toast.error("Please login to continue", { id: "loading-toast" });
+    router.push("/login");
+  }
+  if (status === "authenticated") {
+    toast.dismiss("loading-toast");
+  }
 
   return (
     <div className="flex items-center justify-center gap-10 my-auto mx-auto min-h-150">
