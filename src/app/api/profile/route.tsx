@@ -28,3 +28,31 @@ export async function GET(req: Request) {
 
   return Response.json(user);
 }
+
+export async function PUT(req: Request) {
+  // Connecting to database
+  await mongoose.connect(process.env.MONGO_URL as string).catch((err) => {
+    console.error("Failed to connect to MongoDB:", err);
+    throw new Error("Database connection failed");
+  });
+
+  const data = await req.json();
+  const { _id, name, image } = data;
+
+  let filterUser = {};
+
+  if (_id) {
+    filterUser = { _id };
+  } else {
+    const session = await auth();
+    const email = session?.user?.email;
+    if (!email) {
+      return Response.json({ error: "User not found" }, { status: 404 });
+    }
+    filterUser = { email };
+  }
+
+  await User.updateOne(filterUser, { $set: { name, image } });
+
+  return Response.json({ message: "User updated" }, { status: 200 });
+}
