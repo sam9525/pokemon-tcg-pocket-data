@@ -43,6 +43,26 @@ export default function EditableAvatar({
           </button>
         </div>
       )}
+      {!link && (
+        <div className="flex flex-col items-center gap-8">
+          <div className="text-center bg-gray-200 p-4 text-gray-500 rounded-full w-[120px] h-[120px] flex items-center justify-center">
+            No image
+          </div>
+          <input
+            type="file"
+            ref={fileInputRef}
+            onChange={handleFileChange}
+            accept="image/*"
+            className="hidden"
+          />
+          <button
+            className="profile-button w-30 h-12.5"
+            onClick={() => fileInputRef.current?.click()}
+          >
+            上傳頭像
+          </button>
+        </div>
+      )}
     </>
   );
 }
