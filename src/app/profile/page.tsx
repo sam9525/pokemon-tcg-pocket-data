@@ -61,6 +61,19 @@ export default function Profile() {
   const [profileFetched, setProfileFetched] = useState(false);
 
   useEffect(() => {
+    if (status === "loading" || !profileFetched) {
+      toast.loading("Loading...", { id: "loading-toast" });
+    }
+    if (status === "unauthenticated") {
+      toast.error("Please login to continue", { id: "loading-toast" });
+      router.push("/login");
+    }
+    if (status === "authenticated") {
+      toast.dismiss("loading-toast");
+    }
+  }, [status, profileFetched, router]);
+
+  useEffect(() => {
     if (status === "authenticated") {
       fetch("/api/profile")
         .then((res) => res.json())
@@ -127,14 +140,14 @@ export default function Profile() {
   };
 
   if (status === "loading" || !profileFetched) {
-    toast.loading("Loading...", { id: "loading-toast" });
+    return (
+      <div className="flex items-center justify-center min-h-150">
+        Loading...
+      </div>
+    );
   }
   if (status === "unauthenticated") {
-    toast.error("Please login to continue", { id: "loading-toast" });
-    router.push("/login");
-  }
-  if (status === "authenticated") {
-    toast.dismiss("loading-toast");
+    return null;
   }
 
   return (
