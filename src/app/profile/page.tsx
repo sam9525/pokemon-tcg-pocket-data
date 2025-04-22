@@ -46,7 +46,13 @@ export default function Profile() {
       }
 
       const formData = new FormData();
-      formData.append("file", newImage);
+      if (newImage instanceof File) {
+        formData.append("file", newImage);
+      } else {
+        // If it's a string (URL), we don't need to upload
+        setImage(newImage);
+        return;
+      }
 
       // Upload the new image to the aws s3 bucket
       const res = await fetch("/api/upload", {
@@ -144,7 +150,9 @@ export default function Profile() {
               type="text"
               id="name"
               value={username || ""}
-              onChange={(ev) => setUsername(ev.target.value)}
+              onChange={(ev: React.ChangeEvent<HTMLInputElement>) =>
+                setUsername(ev.target.value)
+              }
             />
           </div>
           <button
@@ -158,14 +166,19 @@ export default function Profile() {
           <label htmlFor="email" className="font-semibold">
             電子郵件
           </label>
-          <input type="email" id="email" value={email} />
+          <input type="email" id="email" value={email} readOnly />
         </div>
         <div className="flex items-center justify-center gap-10">
           <div className="profile flex flex-col items-start">
             <label htmlFor="password" className="font-semibold">
               密碼
             </label>
-            <input type="password" id="password" value={"************"} />
+            <input
+              type="password"
+              id="password"
+              value={"************"}
+              readOnly
+            />
           </div>
           <button className="profile-button w-30 h-8 rounded-md text-sm">
             變更密碼
