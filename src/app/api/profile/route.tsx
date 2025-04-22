@@ -13,6 +13,7 @@ export async function GET(req: Request) {
   const _id = url.searchParams.get("_id");
   let filterUser = {};
 
+  // If _id is provided, update the user with the given _id otherwise use the email from the session
   if (_id) {
     filterUser = { _id };
   } else {
@@ -24,6 +25,7 @@ export async function GET(req: Request) {
     filterUser = { email };
   }
 
+  // Get the user with the given filter
   const user = await User.findOne(filterUser).lean();
 
   return Response.json(user);
@@ -41,6 +43,7 @@ export async function PUT(req: Request) {
 
   let filterUser = {};
 
+  // If _id is provided, update the user with the given _id otherwise use the email from the session
   if (_id) {
     filterUser = { _id };
   } else {
@@ -52,6 +55,7 @@ export async function PUT(req: Request) {
     filterUser = { email };
   }
 
+  // Update the user with the given name and image
   await User.updateOne(filterUser, { $set: { name, image } });
 
   return Response.json({ message: "User updated" }, { status: 200 });

@@ -10,6 +10,7 @@ export async function POST(req: Request) {
       return Response.json({ error: "No file provided" }, { status: 400 });
     }
 
+    // Create a new S3 client
     const s3Client = new S3Client({
       region: "ap-southeast-2",
       credentials: {
@@ -18,7 +19,9 @@ export async function POST(req: Request) {
       },
     });
 
+    // Get the extension of the file
     const ext = file.name.split(".").slice(-1)[0];
+    // Create a new file name
     const newFileName = uniqid() + "." + ext;
 
     // Convert file to buffer using arrayBuffer
@@ -26,6 +29,7 @@ export async function POST(req: Request) {
     const buffer = Buffer.from(arrayBuffer);
     const bucket = "pokemon-tcg-pocket-data";
 
+    // Upload the file to S3
     await s3Client.send(
       new PutObjectCommand({
         Bucket: bucket,
@@ -36,8 +40,10 @@ export async function POST(req: Request) {
       })
     );
 
+    // Create a new link
     const link =
       "https://" + bucket + ".s3.ap-southeast-2.amazonaws.com/" + newFileName;
+
     return Response.json({ url: link });
   } catch (error) {
     console.error("Upload error:", error);
