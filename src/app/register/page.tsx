@@ -11,7 +11,7 @@ export default function Register() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const image =
-    "https://pokemon-tcg-pocket-data.s3.ap-southeast-2.amazonaws.com/avatar.jpg";
+    "https://pokemon-tcg-pocket-data.s3.ap-southeast-2.amazonaws.com/Avatar/avatar.jpg";
   const [confirmPassword, setConfirmPassword] = useState("");
   const [creatingUser, setCreatingUser] = useState(false);
 
