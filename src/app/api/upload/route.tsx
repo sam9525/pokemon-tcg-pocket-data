@@ -33,7 +33,7 @@ export async function POST(req: Request) {
     await s3Client.send(
       new PutObjectCommand({
         Bucket: bucket,
-        Key: newFileName,
+        Key: "Avatar/" + newFileName,
         ACL: "public-read",
         ContentType: file.type,
         Body: buffer,
@@ -42,7 +42,10 @@ export async function POST(req: Request) {
 
     // Create a new link
     const link =
-      "https://" + bucket + ".s3.ap-southeast-2.amazonaws.com/" + newFileName;
+      "https://" +
+      bucket +
+      ".s3.ap-southeast-2.amazonaws.com/Avatar/" +
+      newFileName;
 
     return Response.json({ url: link });
   } catch (error) {
