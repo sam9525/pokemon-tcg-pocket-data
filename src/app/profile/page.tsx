@@ -1,7 +1,7 @@
 "use client";
 
+import EditableAvatar from "@/components/layouts/EditableAvatar";
 import { useSession } from "next-auth/react";
-import Image from "next/image";
 import { useEffect, useState } from "react";
 
 export default function Profile() {
@@ -12,9 +12,6 @@ export default function Profile() {
     email: "",
     image: "",
   });
-  const name = userData.name;
-  const email = userData.email;
-  const image = userData.image;
 
   useEffect(() => {
     if (status === "authenticated") {
@@ -28,16 +25,7 @@ export default function Profile() {
 
   return (
     <div className="flex items-center justify-center gap-10 my-auto mx-auto min-h-150">
-      <div className="flex flex-col items-center gap-10">
-        <Image
-          src={image}
-          alt="avatar"
-          width={120}
-          height={120}
-          className="rounded-full mx-auto"
-        />
-        <button className="profile-button w-30 h-12.5">變更頭像</button>
-      </div>
+      <EditableAvatar link={userData.image} />
       <div className="border-l-2 border-primary h-110"></div>
       <div className="flex flex-col items-start gap-10">
         <div className="flex items-center justify-center gap-10">
@@ -45,7 +33,7 @@ export default function Profile() {
             <label htmlFor="name" className="font-semibold">
               名稱
             </label>
-            <input type="text" id="name" value={name} />
+            <input type="text" id="name" value={userData.name} />
           </div>
           <button className="profile-button w-30 h-8 rounded-md text-sm">
             變更名稱
@@ -55,7 +43,7 @@ export default function Profile() {
           <label htmlFor="email" className="font-semibold">
             電子郵件
           </label>
-          <input type="email" id="email" value={email} />
+          <input type="email" id="email" value={userData.email} />
         </div>
         <div className="flex items-center justify-center gap-10">
           <div className="profile flex flex-col items-start">
