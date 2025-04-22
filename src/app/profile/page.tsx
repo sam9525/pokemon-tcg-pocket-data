@@ -30,9 +30,25 @@ export default function Profile() {
 
   const handleAvatarChange = async (newImage: File | string) => {
     try {
+      // Delete the old image if it exists
+      if (image) {
+        const deleteRes = await fetch("/api/profile", {
+          method: "DELETE",
+          body: JSON.stringify({ url: image }),
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
+
+        if (!deleteRes.ok) {
+          console.error("Failed to delete old image, continuing with update");
+        }
+      }
+
       const formData = new FormData();
       formData.append("file", newImage);
 
+      // Upload the new image to the aws s3 bucket
       const res = await fetch("/api/upload", {
         method: "POST",
         body: formData,
@@ -41,6 +57,7 @@ export default function Profile() {
       const data = await res.json();
       setImage(data.url);
 
+      // Update the user image in the database
       const putPromise = new Promise(async (resolve, reject) => {
         const putRes = await fetch("/api/profile", {
           method: "PUT",

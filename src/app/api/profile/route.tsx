@@ -1,6 +1,7 @@
 import mongoose from "mongoose";
 import { auth } from "@/../auth";
 import { User } from "@/app/models/User";
+import { DeleteObjectCommand, S3Client } from "@aws-sdk/client-s3";
 
 export async function GET(req: Request) {
   // Connecting to database
@@ -59,4 +60,49 @@ export async function PUT(req: Request) {
   await User.updateOne(filterUser, { $set: { name, image } });
 
   return Response.json({ message: "User updated" }, { status: 200 });
+}
+
+export async function DELETE(req: Request) {
+  try {
+    const { url } = await req.json();
+
+    if (!url) {
+      return Response.json({ error: "No URL provided" }, { status: 400 });
+    }
+
+    // Skip deletion if it's the default avatar
+    if (url.includes("avatar.jpg")) {
+      return Response.json({ message: "Default avatar cannot be deleted" });
+    }
+
+    // Extract the key from the URL
+    const key = url.split(".com/")[1];
+    if (!key) {
+      return Response.json({ error: "Invalid URL format" }, { status: 400 });
+    }
+
+    // Create a new S3 client
+    const s3Client = new S3Client({
+      region: "ap-southeast-2",
+      credentials: {
+        accessKeyId: process.env.AWS_ACCESS_KEY as string,
+        secretAccessKey: process.env.AWS_SECRET_KEY as string,
+      },
+    });
+
+    const bucket = "pokemon-tcg-pocket-data";
+
+    // Delete the file from S3
+    await s3Client.send(
+      new DeleteObjectCommand({
+        Bucket: bucket,
+        Key: key,
+      })
+    );
+
+    return Response.json({ message: "File deleted successfully" });
+  } catch (error) {
+    console.error("Delete error:", error);
+    return Response.json({ error: "Failed to delete file" }, { status: 500 });
+  }
 }
