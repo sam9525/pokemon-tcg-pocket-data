@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { use } from "react";
+import Image from "next/image";
 
 export default function PackagePage({
   params,
@@ -36,5 +37,19 @@ export default function PackagePage({
     }
   }, [resolvedParams.id]);
 
-  return <div>Package {resolvedParams.id}</div>;
+  return (
+    <div className="flex flex-col items-center justify-center m-10">
+      <div className="grid grid-cols-6 gap-5">
+        {files.map((file) => (
+          <Image
+            key={file.id}
+            src={file.url}
+            alt={file.id}
+            width={150}
+            height={200}
+          />
+        ))}
+      </div>
+    </div>
+  );
 }
