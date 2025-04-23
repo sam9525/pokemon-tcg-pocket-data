@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import toast from "react-hot-toast";
 import { use } from "react";
 
 export default function PackagePage({
@@ -14,12 +15,22 @@ export default function PackagePage({
 
   useEffect(() => {
     try {
-      const fetchFiles = async () => {
+      const toastPromise = new Promise(async (resolve, reject) => {
         const response = await fetch(`/api/packages/${resolvedParams.id}`);
         const data = await response.json();
         setFiles(data.files || []);
-      };
-      fetchFiles();
+
+        if (response.ok) {
+          resolve(response);
+        } else {
+          reject(response);
+        }
+      });
+
+      toast.promise(toastPromise, {
+        loading: "Loading packages...",
+        error: "Failed to load packages",
+      });
     } catch (error) {
       console.error(error);
     }
