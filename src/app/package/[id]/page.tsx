@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import toast from "react-hot-toast";
 import { use } from "react";
 import Image from "next/image";
@@ -12,7 +12,7 @@ export default function PackagePage({
 }) {
   const resolvedParams = use(params);
   const [files, setFiles] = useState<{ id: string; url: string }[]>([]);
-  console.log(files);
+  const cardRefs = useRef<Map<string, HTMLDivElement>>(new Map());
 
   useEffect(() => {
     try {
@@ -37,17 +37,69 @@ export default function PackagePage({
     }
   }, [resolvedParams.id]);
 
+  const handleMove = (e: React.MouseEvent<HTMLDivElement>, cardId: string) => {
+    const card = cardRefs.current.get(cardId);
+    if (!card) return;
+
+    const rect = card.getBoundingClientRect();
+    const height = rect.height;
+    const width = rect.width;
+
+    // Calculate mouse position relative to the card
+    const xVal = e.clientX - rect.left;
+    const yVal = e.clientY - rect.top;
+
+    const xRotation = -20 * ((yVal - height / 2) / height);
+    const yRotation = 20 * ((xVal - width / 2) / width);
+
+    const transformString = `perspective(500px) scale(1.1) rotateX(${xRotation}deg) rotateY(${yRotation}deg)`;
+    card.style.transform = transformString;
+  };
+
+  const handleMouseOut = (cardId: string) => {
+    const card = cardRefs.current.get(cardId);
+    if (!card) return;
+
+    card.style.transform = "perspective(500px) scale(1) rotateX(0) rotateY(0)";
+  };
+
+  const handleMouseDown = (cardId: string) => {
+    const card = cardRefs.current.get(cardId);
+    if (!card) return;
+
+    card.style.transform =
+      "perspective(500px) scale(0.9) rotateX(0) rotateY(0)";
+  };
+
+  const handleMouseUp = (cardId: string) => {
+    const card = cardRefs.current.get(cardId);
+    if (!card) return;
+
+    card.style.transform =
+      "perspective(500px) scale(1.1) rotateX(0) rotateY(0)";
+  };
+
   return (
     <div className="flex flex-col items-center justify-center m-10">
-      <div className="grid grid-cols-6 gap-5">
+      <div className="grid grid-cols-6 gap-10">
         {files.map((file) => (
-          <Image
+          <div
             key={file.id}
-            src={file.url}
-            alt={file.id}
-            width={150}
-            height={200}
-          />
+            className="card-container"
+            onMouseMove={(e) => handleMove(e, file.id)}
+            onMouseOut={() => handleMouseOut(file.id)}
+            onMouseDown={() => handleMouseDown(file.id)}
+            onMouseUp={() => handleMouseUp(file.id)}
+          >
+            <div
+              ref={(el) => {
+                if (el) cardRefs.current.set(file.id, el);
+              }}
+              className="card"
+            >
+              <Image src={file.url} alt={file.id} width={200} height={200} />
+            </div>
+          </div>
         ))}
       </div>
     </div>
