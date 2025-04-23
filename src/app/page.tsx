@@ -3,16 +3,32 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import toast from "react-hot-toast";
 
 export default function Home() {
   const [packages, setPackages] = useState<{ id: string; url: string }[]>([]);
 
   useEffect(() => {
-    fetch("/api/packages").then((res) => {
-      res.json().then((data) => {
+    try {
+      const toastPromise = new Promise(async (resolve, reject) => {
+        const response = await fetch("/api/packages");
+        const data = await response.json();
         setPackages(data.packages || []);
+
+        if (response.ok) {
+          resolve(response);
+        } else {
+          reject(response);
+        }
       });
-    });
+
+      toast.promise(toastPromise, {
+        loading: "Loading packages...",
+        error: "Failed to load packages",
+      });
+    } catch (error) {
+      console.error(error);
+    }
   }, []);
   return (
     <div className="flex flex-col items-center justify-center m-10">
