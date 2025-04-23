@@ -43,12 +43,33 @@ const profileService = {
   async uploadImage(file: File): Promise<{ url: string }> {
     const formData = new FormData();
     formData.append("file", file);
-    const res = await fetch("/api/upload", {
-      method: "POST",
-      body: formData,
+
+    const uploadPromise = new Promise<{ url: string }>(
+      async (resolve, reject) => {
+        try {
+          const response = await fetch("/api/upload", {
+            method: "POST",
+            body: formData,
+          });
+
+          const data = await response.json();
+
+          if (!response.ok) {
+            reject(new Error(data.message || "Failed to upload"));
+          } else {
+            resolve(data);
+          }
+        } catch (error) {
+          reject(error);
+        }
+      }
+    );
+
+    return toast.promise(uploadPromise, {
+      loading: "Uploading...",
+      success: "Uploaded successfully",
+      error: (err) => `Failed to upload: ${err.message || "Unknown error"}`,
     });
-    if (!res.ok) throw new Error("Failed to upload image");
-    return res.json();
   },
 };
 export default function Profile() {
