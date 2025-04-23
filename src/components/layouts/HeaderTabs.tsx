@@ -7,8 +7,27 @@ import { useSession } from "next-auth/react";
 export default function HeaderTabs() {
   const session = useSession();
   const status = session?.status;
-
   const path = usePathname();
+
+  if (status === "loading") {
+    return (
+      <div className="flex justify-center font-bold header-tabs">
+        <Link className={path === "/" ? "active" : ""} href={"/"}>
+          卡牌
+        </Link>
+        <Link
+          className={path === "/decks-list" ? "active" : ""}
+          href={"/decks-list"}
+        >
+          牌組一欄
+        </Link>
+        <Link className={path === "/search" ? "active" : ""} href={"/search"}>
+          搜尋
+        </Link>
+      </div>
+    );
+  }
+
   return (
     <div className="flex justify-center font-bold header-tabs">
       <Link className={path === "/" ? "active" : ""} href={"/"}>
