@@ -11,7 +11,7 @@ export default function HeaderTabs() {
   const path = usePathname();
   return (
     <div className="flex justify-center font-bold header-tabs">
-      <Link className={path === "/cards" ? "active" : ""} href={"/cards"}>
+      <Link className={path === "/" ? "active" : ""} href={"/"}>
         卡牌
       </Link>
       <Link
