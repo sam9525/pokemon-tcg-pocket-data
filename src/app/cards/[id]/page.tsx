@@ -29,8 +29,8 @@ export default function PackagePage({
       });
 
       toast.promise(toastPromise, {
-        loading: "Loading packages...",
-        error: "Failed to load packages",
+        loading: "Loading cards...",
+        error: "Failed to load cards",
       });
     } catch (error) {
       console.error(error);
