@@ -151,6 +151,13 @@ export default function PackagePage({
               className="card"
             >
               <Image src={file.url} alt={file.id} width={200} height={280} />
+              <Image
+                src="https://pokemon-tcg-pocket-data.s3.ap-southeast-2.amazonaws.com/pokemon_card_backside.png"
+                alt="card-backside"
+                width={200}
+                height={280}
+                className="card-backside"
+              />
             </div>
           </div>
         ))}
