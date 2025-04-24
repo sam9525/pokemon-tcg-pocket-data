@@ -63,14 +63,6 @@ export default function PackagePage({
     card.style.transform = "perspective(500px) scale(1) rotateX(0) rotateY(0)";
   };
 
-  const handleMouseDown = (cardId: string) => {
-    const card = cardRefs.current.get(cardId);
-    if (!card) return;
-
-    card.style.transform =
-      "perspective(500px) scale(0.9) rotateX(0) rotateY(0)";
-  };
-
   const handleMouseUp = (cardId: string) => {
     const card = cardRefs.current.get(cardId);
     if (!card) return;
@@ -140,7 +132,6 @@ export default function PackagePage({
             className="card-container"
             onMouseMove={(e) => handleMove(e, file.id)}
             onMouseOut={() => handleMouseOut(file.id)}
-            onMouseDown={() => handleMouseDown(file.id)}
             onMouseUp={() => handleMouseUp(file.id)}
             onClick={() => handleClick(file.id)}
           >
