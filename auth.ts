@@ -3,7 +3,7 @@ import Credentials from "next-auth/providers/credentials";
 import { ZodError } from "zod";
 import { signInSchema } from "@/lib/zod";
 import mongoose from "mongoose";
-import { User } from "@/app/models/User";
+import { User } from "@/models/User";
 import GoogleProvider from "next-auth/providers/google";
 import { verifyPassword } from "@/utils/password";
 

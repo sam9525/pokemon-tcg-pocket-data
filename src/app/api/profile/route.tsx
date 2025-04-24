@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 import { auth } from "@/../auth";
-import { User } from "@/app/models/User";
+import { User } from "@/models/User";
 import { DeleteObjectCommand, S3Client } from "@aws-sdk/client-s3";
 
 export async function GET(req: Request) {

@@ -1,7 +1,7 @@
 import { registerSchema } from "@/lib/zod";
 import mongoose from "mongoose";
 import { ZodError } from "zod";
-import { User } from "@/app/models/User";
+import { User } from "@/models/User";
 import { NextResponse } from "next/server";
 import { saltAndHashPassword } from "@/utils/password";
 
