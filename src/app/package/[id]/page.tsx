@@ -79,6 +79,58 @@ export default function PackagePage({
       "perspective(500px) scale(1.1) rotateX(0) rotateY(0)";
   };
 
+  const handleClick = (cardId: string) => {
+    const card = cardRefs.current.get(cardId);
+    if (!card) return;
+
+    // Toggle focus class - add if not present, remove if already present
+    if (card.classList.contains("focus")) {
+      // Remove focus with animation
+      card.classList.add("unfocus");
+      setTimeout(() => {
+        card.classList.remove("focus", "unfocus");
+        // Remove mask when card is unfocused
+        document.getElementById("background-mask")?.remove();
+      }, 300); // Match the transition duration
+    } else {
+      // Remove focus from any other cards first
+      document.querySelectorAll(".card-container > div.focus").forEach((el) => {
+        el.classList.remove("focus");
+      });
+
+      // Calculate the card's position relative to the viewport
+      const rect = card.getBoundingClientRect();
+
+      // Calculate the position as a percentage of the viewport
+      // We need to account for the card's center point
+      const startX = rect.left + rect.width / 2;
+      const startY = rect.top + rect.height / 2;
+
+      // Set CSS variables for the animation
+      card.style.setProperty("--start-x", `${startX}px`);
+      card.style.setProperty("--start-y", `${startY}px`);
+
+      // Add focus to the clicked card
+      card.classList.add("focus");
+
+      // Create and add background mask
+      const mask = document.createElement("div");
+      mask.id = "background-mask";
+
+      // Remove focus and mask when clicked again
+      mask.addEventListener("click", () => {
+        card.classList.add("unfocus");
+        setTimeout(() => {
+          card.classList.remove("focus", "unfocus");
+          mask.remove();
+        }, 300);
+      });
+
+      document.body.appendChild(mask);
+    }
+    return;
+  };
+
   return (
     <div className="flex flex-col items-center justify-center m-10">
       <div className="grid grid-cols-6 gap-10">
@@ -90,6 +142,7 @@ export default function PackagePage({
             onMouseOut={() => handleMouseOut(file.id)}
             onMouseDown={() => handleMouseDown(file.id)}
             onMouseUp={() => handleMouseUp(file.id)}
+            onClick={() => handleClick(file.id)}
           >
             <div
               ref={(el) => {
@@ -97,7 +150,7 @@ export default function PackagePage({
               }}
               className="card"
             >
-              <Image src={file.url} alt={file.id} width={200} height={200} />
+              <Image src={file.url} alt={file.id} width={200} height={280} />
             </div>
           </div>
         ))}

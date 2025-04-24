@@ -76,3 +76,70 @@ button.profile-button {
   background-color: var(--primary);
   @apply text-black font-semibold rounded-md cursor-pointer;
 }
+
+.card-container > image {
+  transform-style: preserve-3d;
+}
+
+.card-container > div.focus {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 1000;
+  transform-style: preserve-3d;
+  transition: transform 0.3s ease-out;
+  animation: flyIn 0.5s ease-out forwards;
+}
+
+.card-container > div.unfocus {
+  animation: flyOut 0.3s ease-in forwards;
+}
+
+@keyframes flyIn {
+  0% {
+    top: var(--start-y);
+    left: var(--start-x);
+    transform: translate(-50%, -50%) scale(0.5) rotateY(0deg);
+  }
+  100% {
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(2) rotateY(360deg);
+  }
+}
+
+@keyframes flyOut {
+  0% {
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(2) rotateY(360deg);
+  }
+  100% {
+    top: var(--start-y);
+    left: var(--start-x);
+    transform: translate(-50%, -50%) scale(0.5) rotateY(0deg);
+  }
+}
+
+#background-mask {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.7);
+  z-index: 500;
+  opacity: 0;
+  transition: opacity 0.3s ease-in-out;
+  animation: fadeIn 0.3s ease-in forwards;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
