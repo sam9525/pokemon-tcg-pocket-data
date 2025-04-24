@@ -17,7 +17,7 @@ export default function PackagePage({
   useEffect(() => {
     try {
       const toastPromise = new Promise(async (resolve, reject) => {
-        const response = await fetch(`/api/packages/${resolvedParams.id}`);
+        const response = await fetch(`/api/cards/${resolvedParams.id}`);
         const data = await response.json();
         setFiles(data.files || []);
 

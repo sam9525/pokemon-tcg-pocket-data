@@ -12,7 +12,10 @@ export default function HeaderTabs() {
   if (status === "loading") {
     return (
       <div className="flex justify-center font-bold header-tabs">
-        <Link className={path === "/" ? "active" : ""} href={"/"}>
+        <Link
+          className={path.includes("/cards") || path === "/" ? "active" : ""}
+          href={"/"}
+        >
           卡牌
         </Link>
         <Link
@@ -30,7 +33,10 @@ export default function HeaderTabs() {
 
   return (
     <div className="flex justify-center font-bold header-tabs">
-      <Link className={path === "/" ? "active" : ""} href={"/"}>
+      <Link
+        className={path.includes("/cards") || path === "/" ? "active" : ""}
+        href={"/"}
+      >
         卡牌
       </Link>
       <Link

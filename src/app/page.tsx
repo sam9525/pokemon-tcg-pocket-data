@@ -34,10 +34,10 @@ export default function Home() {
     <div className="flex flex-col items-center justify-center m-10">
       <div className="grid grid-cols-3 gap-15">
         {packages.slice(1, -3).map((pkg) => (
-          <Link href={`/package/${pkg.id}`} key={pkg.id} className="m-auto">
+          <Link href={`/cards/${pkg.id}`} key={pkg.id} className="m-auto">
             <Image
               src={pkg.url}
-              alt={`Package ${pkg.id}`}
+              alt={`card ${pkg.id}`}
               width={150}
               height={200}
             />
