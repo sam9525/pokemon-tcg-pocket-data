@@ -37,6 +37,37 @@ export default function PackagePage({
     }
   }, [resolvedParams.id]);
 
+  const handlePutCards = () => {
+    try {
+      // POST request to the server
+      const saveCards = async () => {
+        if (files.length > 1) {
+          for (let i = 0; i < files.length; i++) {
+            try {
+              const response = await fetch(`/api/cards/${resolvedParams.id}`, {
+                method: "POST",
+                body: JSON.stringify({ id: files[i].id, url: files[i].url }),
+                headers: {
+                  "Content-Type": "application/json",
+                },
+              });
+              const result = await response.json();
+              if (!response.ok) {
+                console.error(`Failed to save card ${files[i].id}:`, result);
+              }
+            } catch (error) {
+              console.error(`Error saving card ${files[i].id}:`, error);
+            }
+          }
+        }
+      };
+
+      saveCards();
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
   const handleMove = (e: React.MouseEvent<HTMLDivElement>, cardId: string) => {
     const card = cardRefs.current.get(cardId);
     if (!card) return;
@@ -125,6 +156,9 @@ export default function PackagePage({
 
   return (
     <div className="flex flex-col items-center justify-center m-10">
+      <button onClick={handlePutCards} className="put-cards">
+        Push the card to the database
+      </button>
       <div className="grid grid-cols-6 gap-10">
         {files.map((file) => (
           <div

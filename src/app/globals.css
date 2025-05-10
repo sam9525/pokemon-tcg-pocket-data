@@ -154,3 +154,9 @@ button.profile-button {
   backface-visibility: hidden;
   transform: rotateY(180deg);
 }
+
+.put-cards {
+  background-color: var(--primary);
+  color: var(--foreground);
+  @apply font-semibold rounded-md cursor-pointer p-3 my-3;
+}
