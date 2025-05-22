@@ -19,7 +19,7 @@ export default function PackagePage({
       const toastPromise = new Promise(async (resolve, reject) => {
         const response = await fetch(`/api/cards/${resolvedParams.id}`);
         const data = await response.json();
-        setFiles(data.files || []);
+        setFiles(data.cards || []);
 
         if (response.ok) {
           resolve(response);
