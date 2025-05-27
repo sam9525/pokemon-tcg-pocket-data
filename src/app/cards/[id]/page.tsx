@@ -41,6 +41,7 @@ export default function PackagePage({
   const handleMove = (e: React.MouseEvent<HTMLDivElement>, cardId: string) => {
     const card = cardRefs.current.get(cardId);
     if (!card) return;
+    const cardImage = card.querySelector("img");
 
     const rect = card.getBoundingClientRect();
     const height = rect.height;
@@ -53,23 +54,35 @@ export default function PackagePage({
     const xRotation = -20 * ((yVal - height / 2) / height);
     const yRotation = 20 * ((xVal - width / 2) / width);
 
-    const transformString = `perspective(500px) scale(1.1) rotateX(${xRotation}deg) rotateY(${yRotation}deg)`;
-    card.style.transform = transformString;
+    const transformString = `perspective(500px) rotateX(${xRotation}deg) rotateY(${yRotation}deg)`;
+
+    card.style.transform = transformString + " scale(1.1)";
+    if (!cardImage) return;
+    cardImage.style.transform = transformString;
   };
 
   const handleMouseOut = (cardId: string) => {
     const card = cardRefs.current.get(cardId);
-    if (!card) return;
+    const cardImage = card?.querySelector("img");
 
-    card.style.transform = "perspective(500px) scale(1) rotateX(0) rotateY(0)";
+    const transformString = "perspective(500px) scale(1) rotateX(0) rotateY(0)";
+
+    if (!card) return;
+    card.style.transform = transformString;
+    if (!cardImage) return;
+    cardImage.style.transform = transformString;
   };
 
   const handleMouseUp = (cardId: string) => {
     const card = cardRefs.current.get(cardId);
-    if (!card) return;
+    const cardImage = card?.querySelector("img");
 
-    card.style.transform =
-      "perspective(500px) scale(1.1) rotateX(0) rotateY(0)";
+    const transformString = "perspective(500px) rotateX(0) rotateY(0)";
+
+    if (!card) return;
+    card.style.transform = transformString + " scale(1.1)";
+    if (!cardImage) return;
+    cardImage.style.transform = transformString;
   };
 
   const handleClick = (cardId: string) => {
@@ -143,7 +156,15 @@ export default function PackagePage({
               }}
               className="card"
             >
-              <Image src={file.url} alt={file.id} width={200} height={280} />
+              <Image
+                src={file.url}
+                alt={file.id}
+                width={200}
+                height={280}
+                onMouseMove={(e) => handleMove(e, file.id)}
+                onMouseOut={() => handleMouseOut(file.id)}
+                onMouseUp={() => handleMouseUp(file.id)}
+              />
               <Image
                 src="https://pokemon-tcg-pocket-data.s3.ap-southeast-2.amazonaws.com/pokemon_card_backside.png"
                 alt="card-backside"

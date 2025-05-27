@@ -87,6 +87,7 @@ button.profile-button {
   left: 50%;
   transform: translate(-50%, -50%);
   z-index: 1000;
+  perspective: 1000px;
   transform-style: preserve-3d;
   transition: transform 0.3s ease-out;
   animation: flyIn 0.5s ease-out forwards;
