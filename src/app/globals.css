@@ -154,3 +154,20 @@ button.profile-button {
   backface-visibility: hidden;
   transform: rotateY(180deg);
 }
+
+.filtering-button {
+  @apply w-30 h-10 rounded-full border-2 flex items-center justify-center cursor-pointer text-sm;
+  border-color: var(--primary);
+  color: var(--primary);
+  transition: all 0.2s ease-in-out;
+}
+
+.filtering-button:not(.active):hover {
+  box-shadow: 2px 2px 0 0 var(--primary);
+  transform: translate(-2px, -2px);
+}
+
+.filtering-button.active {
+  background-color: var(--primary);
+  color: var(--background);
+}

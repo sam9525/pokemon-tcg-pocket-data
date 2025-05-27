@@ -4,6 +4,7 @@ import { useEffect, useState, useRef } from "react";
 import toast from "react-hot-toast";
 import { use } from "react";
 import Image from "next/image";
+import FilteringTabs from "@/components/layouts/FilteringTabs";
 
 export default function PackagePage({
   params,
@@ -125,6 +126,7 @@ export default function PackagePage({
 
   return (
     <div className="flex flex-col items-center justify-center m-10">
+      <FilteringTabs />
       <div className="grid grid-cols-6 gap-10">
         {files.map((file) => (
           <div
