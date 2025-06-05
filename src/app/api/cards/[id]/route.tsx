@@ -12,11 +12,33 @@ export async function GET(
       throw new Error("Database connection failed");
     });
 
+    // Get filter from URL search params
+    const url = new URL(request.url);
+    const filterParam = url.searchParams.get("filter");
+    const filters = filterParam ? filterParam.split(",") : [];
+
+    const rarityMap = {
+      pokemon: ["common", "uncommon", "rare"],
+      "pokemon-ex": ["double rare"],
+      "special-art": ["art rare", "super rare", "super art rare"],
+      "real-art": ["immersive rare"],
+      crown: ["ultra rare"],
+    };
+
+    const rarityFilters = [
+      ...new Set(
+        filters.flatMap(
+          (filter) => rarityMap[filter as keyof typeof rarityMap] || []
+        )
+      ),
+    ];
+
     const pack = params.id.split("_")[0] + "_" + params.id.split("_")[2];
     const boosterPack = params.id.split("_")[1];
     const cards = await Card.find({
       package: pack,
       boosterPack: boosterPack,
+      ...(rarityFilters.length > 0 && { rarity: { $in: rarityFilters } }),
     });
 
     return Response.json({
