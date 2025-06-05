@@ -14,6 +14,7 @@ export default function PackagePage({
   const resolvedParams = use(params);
   const [files, setFiles] = useState<{ id: string; url: string }[]>([]);
   const cardRefs = useRef<Map<string, HTMLDivElement>>(new Map());
+  const [filter, setFilter] = useState<string>("all");
 
   useEffect(() => {
     try {
@@ -139,7 +140,7 @@ export default function PackagePage({
 
   return (
     <div className="flex flex-col items-center justify-center m-10">
-      <FilteringTabs />
+      <FilteringTabs filter={filter} setFilter={setFilter} />
       <div className="grid grid-cols-6 gap-10">
         {files.map((file) => (
           <div
