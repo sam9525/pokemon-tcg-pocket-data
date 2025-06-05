@@ -14,7 +14,7 @@ export default function PackagePage({
   const resolvedParams = use(params);
   const [files, setFiles] = useState<{ id: string; url: string }[]>([]);
   const cardRefs = useRef<Map<string, HTMLDivElement>>(new Map());
-  const [filter, setFilter] = useState<string>("all");
+  const [filter, setFilter] = useState<string[]>([]);
 
   useEffect(() => {
     try {
@@ -37,7 +37,7 @@ export default function PackagePage({
     } catch (error) {
       console.error(error);
     }
-  }, [resolvedParams.id]);
+  }, [resolvedParams.id, filter]);
 
   const handleMove = (e: React.MouseEvent<HTMLDivElement>, cardId: string) => {
     const card = cardRefs.current.get(cardId);
