@@ -4,11 +4,18 @@
   --background: #000000;
   --foreground: #0f1216;
   --primary: #ffd700;
+  --search-background: #1e1e1e;
+  --search-input: #2e2e2e;
+  --search-extra: #3e3e3e;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  --color-primary: var(--primary);
+  --color-search-background: var(--search-background);
+  --color-search-input: var(--search-input);
+  --color-search-extra: var(--search-extra);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
@@ -49,7 +56,8 @@ form.login > input[type="email"],
 form.login > input[type="password"],
 form.register > input[type="text"],
 form.register > input[type="email"],
-form.register > input[type="password"] {
+form.register > input[type="password"],
+div.search-container > input[type="text"] {
   border: 1px solid var(--primary);
   border-radius: 10px;
   @apply p-2 focus:outline-none focus:ring-2 focus:border-transparent;
