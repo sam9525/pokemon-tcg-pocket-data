@@ -45,6 +45,7 @@ export default function SearchPage() {
   const [package_icons, setPackageIcons] = useState<FilterItem[]>([]);
   const [Boosters_icon, setBoostersIcon] = useState<FilterItem[]>([]);
   const [specific_effect, setSpecificEffect] = useState<FilterItem[]>([]);
+  const [filtering, setFiltering] = useState<[string, string][]>([]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -77,21 +78,19 @@ export default function SearchPage() {
   }, [isLoading]);
 
   const mouseClick = (filterName: string, id: string) => {
-    const filter = document.querySelector(`.${filterName}`);
-    let type_item: HTMLElement | null | undefined = null;
-    if (filterName === "rarity") {
-      type_item = filter?.querySelector(`.${id}`);
-    } else {
-      type_item = filter?.querySelector(`[alt="${id}"]`);
-    }
+    setFiltering((prevFiltering) => {
+      const existingIndex = prevFiltering.findIndex(
+        ([filter, itemId]) => filter === filterName && itemId === id
+      );
 
-    if (type_item?.classList.contains("opacity-30")) {
-      type_item?.classList.add("opacity-100");
-      type_item?.classList.remove("opacity-30");
-    } else {
-      type_item?.classList.remove("opacity-100");
-      type_item?.classList.add("opacity-30");
-    }
+      if (existingIndex !== -1) {
+        // Remove the filter if it already exists
+        return prevFiltering.filter((_, index) => index !== existingIndex);
+      } else {
+        // Add the filter if it doesn't exist
+        return [...prevFiltering, [filterName, id]];
+      }
+    });
   };
 
   // Filter section component
@@ -116,23 +115,31 @@ export default function SearchPage() {
 
   // Type filter item component
   const FilterItemImage = React.memo<FilterItemImageProps>(
-    ({ filterName, item, width, height }) => (
-      <button
-        key={item.id}
-        className="cursor-pointer"
-        onClick={() => {
-          mouseClick(filterName || "", item.id);
-        }}
-      >
-        <Image
-          src={item.url}
-          alt={item.id}
-          width={width}
-          height={height}
-          className="opacity-30 transition-opacity duration-300"
-        />
-      </button>
-    )
+    ({ filterName, item, width, height }) => {
+      const isActive = filtering.some(
+        ([filter, itemId]) => filter === filterName && itemId === item.id
+      );
+
+      return (
+        <button
+          key={item.id}
+          className="cursor-pointer"
+          onClick={() => {
+            mouseClick(filterName || "", item.id);
+          }}
+        >
+          <Image
+            src={item.url}
+            alt={item.id}
+            width={width}
+            height={height}
+            className={`transition-opacity duration-300 ${
+              isActive ? "opacity-100" : "opacity-30"
+            }`}
+          />
+        </button>
+      );
+    }
   );
 
   FilterItemImage.displayName = "FilterItemImage";
@@ -145,26 +152,33 @@ export default function SearchPage() {
 
       return (
         <div className="flex gap-2">
-          {starCounts.map((starCount) => (
-            <button
-              key={`${rarity.id}-${starCount}`}
-              className={`${rarity.id}-${starCount} cursor-pointer flex flex-row items-center opacity-30 transition-opacity duration-300`}
-              onClick={() =>
-                mouseClick(filterName || "", `${rarity.id}-${starCount}`)
-              }
-            >
-              {Array.from({ length: starCount }, (_, index) => (
-                <Image
-                  key={index}
-                  src={rarity.url}
-                  alt={`${rarity.id}-${starCount}`}
-                  width={width}
-                  height={height}
-                  className={`w-auto h-8 transition-opacity duration-300`}
-                />
-              ))}
-            </button>
-          ))}
+          {starCounts.map((starCount) => {
+            const itemId = `${rarity.id}-${starCount}`;
+            const isActive = filtering.some(
+              ([filter, id]) => filter === filterName && id === itemId
+            );
+
+            return (
+              <button
+                key={itemId}
+                className={`${itemId} cursor-pointer flex flex-row items-center transition-opacity duration-300 ${
+                  isActive ? "opacity-100" : "opacity-30"
+                }`}
+                onClick={() => mouseClick(filterName || "", itemId)}
+              >
+                {Array.from({ length: starCount }, (_, index) => (
+                  <Image
+                    key={index}
+                    src={rarity.url}
+                    alt={itemId}
+                    width={width}
+                    height={height}
+                    className={`w-auto h-8 transition-opacity duration-300`}
+                  />
+                ))}
+              </button>
+            );
+          })}
           <div className="w-0.5 h-9 rounded-lg bg-primary"></div>
         </div>
       );
