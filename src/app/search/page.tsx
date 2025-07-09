@@ -1,5 +1,6 @@
 "use client";
 
+import FilteredItems from "@/components/layouts/FilteredItems";
 import Image from "next/image";
 import React, { useEffect, useState } from "react";
 import toast from "react-hot-toast";
@@ -46,6 +47,7 @@ export default function SearchPage() {
   const [Boosters_icon, setBoostersIcon] = useState<FilterItem[]>([]);
   const [specific_effect, setSpecificEffect] = useState<FilterItem[]>([]);
   const [filtering, setFiltering] = useState<[string, string][]>([]);
+  const [searchResult, setSearchResult] = useState<FilterItem[]>([]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -77,6 +79,45 @@ export default function SearchPage() {
     }
   }, [isLoading]);
 
+  useEffect(() => {
+    const fetchSearchResult = async () => {
+      try {
+        setIsLoading(true);
+
+        // If filtering array is empty, clear search results and return early
+        if (filtering.length === 0) {
+          setSearchResult([]);
+          return;
+        }
+
+        // Convert filtering array to structured object
+        const filterObject: Record<string, string[]> = {};
+        filtering.forEach(([filterName, id]) => {
+          if (!filterObject[filterName]) {
+            filterObject[filterName] = [];
+          }
+          filterObject[filterName].push(id);
+        });
+
+        const res = await fetch("/api/search/filtering", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(filterObject),
+        });
+        const data = await res.json();
+        setSearchResult(data);
+      } catch (error) {
+        console.error(error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchSearchResult();
+  }, [filtering]);
+
   const mouseClick = (filterName: string, id: string) => {
     setFiltering((prevFiltering) => {
       const existingIndex = prevFiltering.findIndex(
@@ -91,6 +132,7 @@ export default function SearchPage() {
         return [...prevFiltering, [filterName, id]];
       }
     });
+    console.log(filtering);
   };
 
   // Filter section component
@@ -188,120 +230,125 @@ export default function SearchPage() {
   RarityFilterItem.displayName = "RarityFilterItem";
 
   return (
-    <div className="w-240 m-auto my-12 bg-search-background rounded-xl border-primary border-2">
-      <div className="flex flex-col gap-5 items-center justify-center p-6">
-        <input
-          type="text"
-          placeholder="請輸入寶可夢名稱"
-          className="w-140 px-4 py-2 bg-search-input rounded-lg hover:-webkit-text-fill-color-primary focus:outline-none focus:ring-2 focus:border-transparent"
-        />
-        <FilterSection
-          title="屬性"
-          items={types.slice(1)}
-          filterName="types"
-          renderItem={(filterName, type) => (
-            <FilterItemImage
-              filterName={filterName}
-              item={type}
-              width={32}
-              height={32}
-            />
-          )}
-          className="w-170 types"
-        />
-        <FilterSection
-          title="稀有度"
-          items={rarity.slice(1)}
-          filterName="rarity"
-          renderItem={(filterName, rarity, index) => (
-            <RarityFilterItem
-              filterName={filterName}
-              rarity={rarity}
-              repeats={repeats}
-              rarityIndex={index}
-              width={32}
-              height={32}
-            />
-          )}
-          className="w-170 rarity"
-        />
-        <div className="w-180 h-0.5 rounded-lg bg-primary"></div>
-        <FilterSection
-          title="系列"
-          items={package_icons}
-          filterName="package_icons"
-          renderItem={(filterName, package_icon) => (
-            <FilterItemImage
-              filterName={filterName}
-              item={package_icon}
-              width={100}
-              height={44}
-            />
-          )}
-          className="w-170 package_icons"
-        />
-        <div className="w-180 h-0.5 rounded-lg bg-primary"></div>
-        <FilterSection
-          title="擴充包"
-          items={Boosters_icon}
-          filterName="Boosters_icon"
-          renderItem={(filterName, Boosters_icon) => (
-            <FilterItemImage
-              filterName={filterName}
-              item={Boosters_icon}
-              width={100}
-              height={44}
-            />
-          )}
-          className="w-170 Boosters_icon"
-        />
-        <div className="w-180 m-auto p-6 bg-search-extra rounded-lg">
-          <div className="flex flex-col gap-4 items-center justify-center">
-            <FilterSection
-              title="特殊效果"
-              items={specific_effect.slice(1)}
-              filterName="specific_effect"
-              renderItem={(filterName, specific_effect) => (
-                <FilterItemImage
-                  filterName={filterName}
-                  item={specific_effect}
-                  width={32}
-                  height={32}
-                />
-              )}
-              className="w-130 specific_effect"
-            />
-            <FilterSection
-              title="招式"
-              items={types.slice(1, 9)}
-              filterName="fight_energy"
-              renderItem={(filterName, type) => (
-                <FilterItemImage
-                  filterName={filterName}
-                  item={type}
-                  width={32}
-                  height={32}
-                />
-              )}
-              className="w-130 fight_energy"
-            />
-            <FilterSection
-              title="弱點"
-              items={types.slice(1, 9)}
-              filterName="weakness"
-              renderItem={(filterName, type) => (
-                <FilterItemImage
-                  filterName={filterName}
-                  item={type}
-                  width={32}
-                  height={32}
-                />
-              )}
-              className="w-130 weakness"
-            />
+    <>
+      <div className="w-240 m-auto my-12 bg-search-background rounded-xl border-primary border-2">
+        <div className="flex flex-col gap-5 items-center justify-center p-6">
+          <input
+            type="text"
+            placeholder="請輸入寶可夢名稱"
+            className="w-140 px-4 py-2 bg-search-input rounded-lg hover:-webkit-text-fill-color-primary focus:outline-none focus:ring-2 focus:border-transparent"
+          />
+          <FilterSection
+            title="屬性"
+            items={types.slice(1)}
+            filterName="types"
+            renderItem={(filterName, type) => (
+              <FilterItemImage
+                filterName={filterName}
+                item={type}
+                width={32}
+                height={32}
+              />
+            )}
+            className="w-170 types"
+          />
+          <FilterSection
+            title="稀有度"
+            items={rarity.slice(1)}
+            filterName="rarity"
+            renderItem={(filterName, rarity, index) => (
+              <RarityFilterItem
+                filterName={filterName}
+                rarity={rarity}
+                repeats={repeats}
+                rarityIndex={index}
+                width={32}
+                height={32}
+              />
+            )}
+            className="w-170 rarity"
+          />
+          <div className="w-180 h-0.5 rounded-lg bg-primary"></div>
+          <FilterSection
+            title="系列"
+            items={package_icons}
+            filterName="package_icons"
+            renderItem={(filterName, package_icon) => (
+              <FilterItemImage
+                filterName={filterName}
+                item={package_icon}
+                width={100}
+                height={44}
+              />
+            )}
+            className="w-170 package_icons"
+          />
+          <div className="w-180 h-0.5 rounded-lg bg-primary"></div>
+          <FilterSection
+            title="擴充包"
+            items={Boosters_icon}
+            filterName="Boosters_icon"
+            renderItem={(filterName, Boosters_icon) => (
+              <FilterItemImage
+                filterName={filterName}
+                item={Boosters_icon}
+                width={100}
+                height={44}
+              />
+            )}
+            className="w-170 Boosters_icon"
+          />
+          <div className="w-180 m-auto p-6 bg-search-extra rounded-lg">
+            <div className="flex flex-col gap-4 items-center justify-center">
+              <FilterSection
+                title="特殊效果"
+                items={specific_effect.slice(1)}
+                filterName="specific_effect"
+                renderItem={(filterName, specific_effect) => (
+                  <FilterItemImage
+                    filterName={filterName}
+                    item={specific_effect}
+                    width={32}
+                    height={32}
+                  />
+                )}
+                className="w-130 specific_effect"
+              />
+              <FilterSection
+                title="招式"
+                items={types.slice(1, 9)}
+                filterName="fight_energy"
+                renderItem={(filterName, type) => (
+                  <FilterItemImage
+                    filterName={filterName}
+                    item={type}
+                    width={32}
+                    height={32}
+                  />
+                )}
+                className="w-130 fight_energy"
+              />
+              <FilterSection
+                title="弱點"
+                items={types.slice(1, 9)}
+                filterName="weakness"
+                renderItem={(filterName, type) => (
+                  <FilterItemImage
+                    filterName={filterName}
+                    item={type}
+                    width={32}
+                    height={32}
+                  />
+                )}
+                className="w-130 weakness"
+              />
+            </div>
           </div>
         </div>
       </div>
-    </div>
+      <div className="flex flex-col items-center justify-center m-10">
+        <FilteredItems files={searchResult} />
+      </div>
+    </>
   );
 }
