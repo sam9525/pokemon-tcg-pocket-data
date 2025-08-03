@@ -1,0 +1,722 @@
+{
+  "charizard": {
+    "000270": {
+      "type": "grass",
+      "trainer": "pokemon",
+      "special_effect": "none",
+      "fight_energy": "colorless",
+      "weakness": "fire"
+    },
+    "000280": {
+      "type": "grass",
+      "trainer": "pokemon",
+      "special_effect": "none",
+      "fight_energy": "colorless",
+      "weakness": "fire"
+    },
+    "000370": {
+      "type": "fire",
+      "trainer": "pokemon",
+      "special_effect": "none",
+      "fight_energy": "colorless",
+      "weakness": "water"
+    },
+    "000460": {
+      "type": "fire",
+      "trainer": "pokemon",
+      "special_effect": "none",
+      "fight_energy": "fire",
+      "weakness": "lightning"
+    },
+    "000470": {
+      "type": "fire",
+      "trainer": "pokemon",
+      "special_effect": "none",
+      "fight_energy": "fire",
+      "weakness": "lightning"
+    },
+    "000510": {
+      "type": "fire",
+      "trainer": "pokemon",
+      "special_effect": "none",
+      "fight_energy": "colorless",
+      "weakness": "water"
+    },
+    "000570": {
+      "type": "water",
+      "trainer": "pokemon",
+      "special_effect": "none",
+      "fight_energy": "colorless",
+      "weakness": "lightning"
+    },
+    "000590": {
+      "type": "water",
+      "trainer": "pokemon",
+      "special_effect": "none",
+      "fight_energy": "colorless",
+      "weakness": "lightning"
+    },
+    "000600": {
+      "type": "water",
+      "trainer": "pokemon",
+      "special_effect": "none",
+      "fight_energy": "colorless",
+      "weakness": "lightning"
+    },
+    "000850": {
+      "type": "water",
+      "trainer": "pokemon",
+      "special_effect": "none",
+      "fight_energy": "colorless",
+      "weakness": "lightning"
+    },
+    "000860": {
+      "type": "water",
+      "trainer": "pokemon",
+      "special_effect": "none",
+      "fight_energy": "colorless",
+      "weakness": "lightning"
+    },
+    "000870": {
+      "type": "water",
+      "trainer": "pokemon",
+      "special_effect": "none",
+      "fight_energy": "colorless",
+      "weakness": "lightning"
+    },
+    "000880": {
+      "type": "water",
+      "trainer": "pokemon",
+      "special_effect": "none",
+      "fight_energy": "colorless",
+      "weakness": "lightning"
+    },
+    "000920": {
+      "type": "water",
+      "trainer": "pokemon",
+      "special_effect": "none",
+      "fight_energy": "colorless",
+      "weakness": "metal"
+    },
+    "000930": {
+      "type": "water",
+      "trainer": "pokemon",
+      "special_effect": "none",
+      "fight_energy": "water",
+      "weakness": "metal"
+    },
+    "001110": {
+      "type": "lightning",
+      "trainer": "pokemon",
+      "special_effect": "none",
+      "fight_energy": "colorless",
+      "weakness": "fighting"
+    },
+    "001150": {
+      "type": "psychic",
+      "trainer": "pokemon",
+      "special_effect": "none",
+      "fight_energy": "colorless",
+      "weakness": "darkness"
+    },
+    "001330": {
+      "type": "psychic",
+      "trainer": "pokemon",
+      "special_effect": "none",
+      "fight_energy": "colorless",
+      "weakness": "darkness"
+    },
+    "001410": {
+      "type": "fighting",
+      "trainer": "pokemon",
+      "special_effect": "none",
+      "fight_energy": "fighting",
+      "weakness": "psychic"
+    },
+    "001430": {
+      "type": "fighting",
+      "trainer": "pokemon",
+      "special_effect": "none",
+      "fight_energy": "fighting",
+      "weakness": "psychic"
+    },
+    "001440": {
+      "type": "fighting",
+      "trainer": "pokemon",
+      "special_effect": "none",
+      "fight_energy": "fighting",
+      "weakness": "psychic"
+    },
+    "001450": {
+      "type": "fighting",
+      "trainer": "pokemon",
+      "special_effect": "none",
+      "fight_energy": "fighting",
+      "weakness": "psychic"
+    },
+    "001460": {
+      "type": "fighting",
+      "trainer": "pokemon",
+      "special_effect": "none",
+      "fight_energy": "fighting",
+      "weakness": "psychic"
+    },
+    "001550": {
+      "type": "fighting",
+      "trainer": "pokemon",
+      "special_effect": "none",
+      "fight_energy": "fighting",
+      "weakness": "psychic"
+    },
+    "001620": {
+      "type": "fighting",
+      "trainer": "pokemon",
+      "special_effect": "none",
+      "fight_energy": "fighting",
+      "weakness": "psychic"
+    },
+    "001630": {
+      "type": "fighting",
+      "trainer": "pokemon",
+      "special_effect": "none",
+      "fight_energy": "fighting",
+      "weakness": "psychic"
+    },
+    "001910": {
+      "type": "colorless",
+      "trainer": "pokemon",
+      "special_effect": "none",
+      "fight_energy": "colorless",
+      "weakness": "lightning"
+    },
+    "001920": {
+      "type": "colorless",
+      "trainer": "pokemon",
+      "special_effect": "none",
+      "fight_energy": "colorless",
+      "weakness": "lightning"
+    },
+    "001980": {
+      "type": "colorless",
+      "trainer": "pokemon",
+      "special_effect": "none",
+      "fight_energy": "colorless",
+      "weakness": "lightning"
+    },
+    "001990": {
+      "type": "colorless",
+      "trainer": "pokemon",
+      "special_effect": "none",
+      "fight_energy": "colorless",
+      "weakness": "lightning"
+    },
+    "002000": {
+      "type": "colorless",
+      "trainer": "pokemon",
+      "special_effect": "none",
+      "fight_energy": "colorless",
+      "weakness": "lightning"
+    },
+    "KOURANOKASEKI": {
+      "type": "none",
+      "trainer": "item_fossil",
+      "special_effect": "none",
+      "fight_energy": "none",
+      "weakness": "none"
+    },
+    "ERIKA": {
+      "type": "none",
+      "trainer": "trainer",
+      "special_effect": "none",
+      "fight_energy": "none",
+      "weakness": "none"
+    },
+    "KATSURA": {
+      "type": "none",
+      "trainer": "trainer",
+      "special_effect": "none",
+      "fight_energy": "none",
+      "weakness": "none"
+    },
+    "NATSUME": {
+      "type": "none",
+      "trainer": "trainer",
+      "special_effect": "none",
+      "fight_energy": "none",
+      "weakness": "none"
+    }
+  },
+  "mewtwo": {
+    "000270": {
+      "type": "grass",
+      "trainer": "pokemon",
+      "special_effect": "none",
+      "fight_energy": "colorless",
+      "weakness": "fire"
+    },
+    "000280": {
+      "type": "grass",
+      "trainer": "pokemon",
+      "special_effect": "none",
+      "fight_energy": "colorless",
+      "weakness": "fire"
+    },
+    "000510": {
+      "type": "fire",
+      "trainer": "pokemon",
+      "special_effect": "none",
+      "fight_energy": "colorless",
+      "weakness": "water"
+    },
+    "000570": {
+      "type": "water",
+      "trainer": "pokemon",
+      "special_effect": "none",
+      "fight_energy": "colorless",
+      "weakness": "lightning"
+    },
+    "000920": {
+      "type": "water",
+      "trainer": "pokemon",
+      "special_effect": "none",
+      "fight_energy": "colorless",
+      "weakness": "metal"
+    },
+    "000930": {
+      "type": "water",
+      "trainer": "pokemon",
+      "special_effect": "none",
+      "fight_energy": "water",
+      "weakness": "metal"
+    },
+    "001110": {
+      "type": "lightning",
+      "trainer": "pokemon",
+      "special_effect": "none",
+      "fight_energy": "colorless",
+      "weakness": "fighting"
+    },
+    "001300": {
+      "type": "psychic",
+      "trainer": "pokemon",
+      "special_effect": "none",
+      "fight_energy": "colorless",
+      "weakness": "darkness"
+    },
+    "001330": {
+      "type": "psychic",
+      "trainer": "pokemon",
+      "special_effect": "none",
+      "fight_energy": "colorless",
+      "weakness": "darkness"
+    },
+    "001510": {
+      "type": "fighting",
+      "trainer": "pokemon",
+      "special_effect": "none",
+      "fight_energy": "colorless",
+      "weakness": "grass"
+    },
+    "001540": {
+      "type": "fighting",
+      "trainer": "pokemon",
+      "special_effect": "none",
+      "fight_energy": "fighting",
+      "weakness": "psychic"
+    },
+    "001620": {
+      "type": "fighting",
+      "trainer": "pokemon",
+      "special_effect": "none",
+      "fight_energy": "fighting",
+      "weakness": "psychic"
+    },
+    "001630": {
+      "type": "fighting",
+      "trainer": "pokemon",
+      "special_effect": "none",
+      "fight_energy": "fighting",
+      "weakness": "psychic"
+    },
+    "001720": {
+      "type": "darkness",
+      "trainer": "pokemon",
+      "special_effect": "none",
+      "fight_energy": "colorless",
+      "weakness": "fighting"
+    },
+    "001730": {
+      "type": "darkness",
+      "trainer": "pokemon",
+      "special_effect": "none",
+      "fight_energy": "colorless",
+      "weakness": "fighting"
+    },
+    "001830": {
+      "type": "dragon",
+      "trainer": "pokemon",
+      "special_effect": "none",
+      "fight_energy": "water lightning",
+      "weakness": "none"
+    },
+    "001840": {
+      "type": "dragon",
+      "trainer": "pokemon",
+      "special_effect": "none",
+      "fight_energy": "water lightning",
+      "weakness": "none"
+    },
+    "001850": {
+      "type": "dragon",
+      "trainer": "pokemon",
+      "special_effect": "none",
+      "fight_energy": "water lightning",
+      "weakness": "none"
+    },
+    "001860": {
+      "type": "colorless",
+      "trainer": "pokemon",
+      "special_effect": "none",
+      "fight_energy": "colorless",
+      "weakness": "lightning"
+    },
+    "001870": {
+      "type": "colorless",
+      "trainer": "pokemon",
+      "special_effect": "none",
+      "fight_energy": "colorless",
+      "weakness": "lightning"
+    },
+    "001880": {
+      "type": "colorless",
+      "trainer": "pokemon",
+      "special_effect": "none",
+      "fight_energy": "colorless",
+      "weakness": "lightning"
+    },
+    "001980": {
+      "type": "colorless",
+      "trainer": "pokemon",
+      "special_effect": "none",
+      "fight_energy": "colorless",
+      "weakness": "lightning"
+    },
+    "001990": {
+      "type": "colorless",
+      "trainer": "pokemon",
+      "special_effect": "none",
+      "fight_energy": "colorless",
+      "weakness": "lightning"
+    },
+    "002000": {
+      "type": "colorless",
+      "trainer": "pokemon",
+      "special_effect": "none",
+      "fight_energy": "colorless",
+      "weakness": "lightning"
+    },
+    "002080": {
+      "type": "colorless",
+      "trainer": "pokemon",
+      "special_effect": "none",
+      "fight_energy": "colorless",
+      "weakness": "lightning"
+    },
+    "HIMITSUNOKOHAKU": {
+      "type": "none",
+      "trainer": "item_fossil",
+      "special_effect": "none",
+      "fight_energy": "none",
+      "weakness": "none"
+    },
+    "KYOU": {
+      "type": "none",
+      "trainer": "trainer",
+      "special_effect": "none",
+      "fight_energy": "none",
+      "weakness": "none"
+    },
+    "SAKAKI": {
+      "type": "none",
+      "trainer": "trainer",
+      "special_effect": "none",
+      "fight_energy": "none",
+      "weakness": "none"
+    }
+  },
+  "pikachu": {
+    "000050": {
+      "type": "grass",
+      "trainer": "pokemon",
+      "special_effect": "none",
+      "fight_energy": "colorless",
+      "weakness": "fire"
+    },
+    "000060": {
+      "type": "grass",
+      "trainer": "pokemon",
+      "special_effect": "none",
+      "fight_energy": "colorless",
+      "weakness": "fire"
+    },
+    "000270": {
+      "type": "grass",
+      "trainer": "pokemon",
+      "special_effect": "none",
+      "fight_energy": "colorless",
+      "weakness": "fire"
+    },
+    "000280": {
+      "type": "grass",
+      "trainer": "pokemon",
+      "special_effect": "none",
+      "fight_energy": "colorless",
+      "weakness": "fire"
+    },
+    "000390": {
+      "type": "fire",
+      "trainer": "pokemon",
+      "special_effect": "none",
+      "fight_energy": "colorless",
+      "weakness": "water"
+    },
+    "000510": {
+      "type": "fire",
+      "trainer": "pokemon",
+      "special_effect": "none",
+      "fight_energy": "colorless",
+      "weakness": "water"
+    },
+    "000570": {
+      "type": "water",
+      "trainer": "pokemon",
+      "special_effect": "none",
+      "fight_energy": "colorless",
+      "weakness": "lightning"
+    },
+    "000640": {
+      "type": "water",
+      "trainer": "pokemon",
+      "special_effect": "none",
+      "fight_energy": "colorless",
+      "weakness": "lightning"
+    },
+    "000720": {
+      "type": "water",
+      "trainer": "pokemon",
+      "special_effect": "none",
+      "fight_energy": "colorless",
+      "weakness": "lightning"
+    },
+    "000770": {
+      "type": "water",
+      "trainer": "pokemon",
+      "special_effect": "none",
+      "fight_energy": "colorless",
+      "weakness": "lightning"
+    },
+    "000920": {
+      "type": "water",
+      "trainer": "pokemon",
+      "special_effect": "none",
+      "fight_energy": "colorless",
+      "weakness": "metal"
+    },
+    "000930": {
+      "type": "water",
+      "trainer": "pokemon",
+      "special_effect": "none",
+      "fight_energy": "colorless",
+      "weakness": "metal"
+    },
+    "001030": {
+      "type": "lightning",
+      "trainer": "pokemon",
+      "special_effect": "none",
+      "fight_energy": "lightning",
+      "weakness": "lightning"
+    },
+    "001040": {
+      "type": "lightning",
+      "trainer": "pokemon",
+      "special_effect": "none",
+      "fight_energy": "lightning",
+      "weakness": "lightning"
+    },
+    "001110": {
+      "type": "lightning",
+      "trainer": "pokemon",
+      "special_effect": "none",
+      "fight_energy": "colorless",
+      "weakness": "fighting"
+    },
+    "001140": {
+      "type": "psychic",
+      "trainer": "pokemon",
+      "special_effect": "none",
+      "fight_energy": "psychic",
+      "weakness": "metal"
+    },
+    "001150": {
+      "type": "psychic",
+      "trainer": "pokemon",
+      "special_effect": "none",
+      "fight_energy": "psychic",
+      "weakness": "metal"
+    },
+    "001330": {
+      "type": "psychic",
+      "trainer": "pokemon",
+      "special_effect": "none",
+      "fight_energy": "colorless",
+      "weakness": "darkness"
+    },
+    "001600": {
+      "type": "fighting",
+      "trainer": "pokemon",
+      "special_effect": "none",
+      "fight_energy": "colorless",
+      "weakness": "psychic"
+    },
+    "001610": {
+      "type": "fighting",
+      "trainer": "pokemon",
+      "special_effect": "none",
+      "fight_energy": "colorless",
+      "weakness": "psychic"
+    },
+    "001620": {
+      "type": "fighting",
+      "trainer": "pokemon",
+      "special_effect": "none",
+      "fight_energy": "fighting",
+      "weakness": "psychic"
+    },
+    "001630": {
+      "type": "fighting",
+      "trainer": "pokemon",
+      "special_effect": "none",
+      "fight_energy": "fighting",
+      "weakness": "psychic"
+    },
+    "001980": {
+      "type": "colorless",
+      "trainer": "pokemon",
+      "special_effect": "none",
+      "fight_energy": "colorless",
+      "weakness": "lightning"
+    },
+    "001990": {
+      "type": "colorless",
+      "trainer": "pokemon",
+      "special_effect": "none",
+      "fight_energy": "colorless",
+      "weakness": "lightning"
+    },
+    "002000": {
+      "type": "colorless",
+      "trainer": "pokemon",
+      "special_effect": "none",
+      "fight_energy": "colorless",
+      "weakness": "lightning"
+    },
+    "KAINOKASEKI": {
+      "type": "none",
+      "trainer": "item_fossil",
+      "special_effect": "none",
+      "fight_energy": "none",
+      "weakness": "none"
+    },
+    "KASUMI": {
+      "type": "none",
+      "trainer": "trainer",
+      "special_effect": "none",
+      "fight_energy": "none",
+      "weakness": "none"
+    },
+    "TAKESHI": {
+      "type": "none",
+      "trainer": "trainer",
+      "special_effect": "none",
+      "fight_energy": "none",
+      "weakness": "none"
+    },
+    "MATISSE": {
+      "type": "none",
+      "trainer": "trainer",
+      "special_effect": "none",
+      "fight_energy": "none",
+      "weakness": "none"
+    },
+    "KIZUGUSURI": {
+      "type": "none",
+      "boosterPack": [
+        "promo-a"
+      ],
+      "trainer": "tool",
+      "special_effect": "none",
+      "fight_energy": "none",
+      "weakness": "none"
+    },
+    "SPEEDER": {
+      "type": "none",
+      "boosterPack": [
+        "promo-a"
+      ],
+      "trainer": "tool",
+      "special_effect": "none",
+      "fight_energy": "none",
+      "weakness": "none"
+    },
+    "MONSTERBALL": {
+      "type": "none",
+      "boosterPack": [
+        "promo-a"
+      ],
+      "trainer": "tool",
+      "special_effect": "none",
+      "fight_energy": "none",
+      "weakness": "none"
+    },
+    "HAKASENOKENKYU": {
+      "type": "none",
+      "boosterPack": [
+        "promo-a"
+      ],
+      "trainer": "tool",
+      "special_effect": "none",
+      "fight_energy": "none",
+      "weakness": "none"
+    },
+    "HANDSCOPE": {
+      "type": "none",
+      "boosterPack": [
+        "promo-a"
+      ],
+      "trainer": "tool",
+      "special_effect": "none",
+      "fight_energy": "none",
+      "weakness": "none"
+    },
+    "POKEMONZUKAN": {
+      "type": "none",
+      "boosterPack": [
+        "promo-a"
+      ],
+      "trainer": "tool",
+      "special_effect": "none",
+      "fight_energy": "none",
+      "weakness": "none"
+    },
+    "REDCARD": {
+      "type": "none",
+      "boosterPack": [
+        "promo-a"
+      ],
+      "trainer": "tool",
+      "special_effect": "none",
+      "fight_energy": "none",
+      "weakness": "none"
+    }
+  }
+}
