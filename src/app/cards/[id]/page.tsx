@@ -37,7 +37,7 @@ export default function PackagePage({
     }
   }, [resolvedParams.id]);
 
-  const handlePutCards = () => {
+  const handlePutCards = (language: string) => {
     try {
       // POST request to the server
       const saveCards = async () => {
@@ -46,7 +46,11 @@ export default function PackagePage({
             try {
               const response = await fetch(`/api/cards/${resolvedParams.id}`, {
                 method: "POST",
-                body: JSON.stringify({ id: files[i].id, url: files[i].url }),
+                body: JSON.stringify({
+                  id: files[i].id,
+                  url: files[i].url,
+                  language: language,
+                }),
                 headers: {
                   "Content-Type": "application/json",
                 },
@@ -156,9 +160,17 @@ export default function PackagePage({
 
   return (
     <div className="flex flex-col items-center justify-center m-10">
-      <button onClick={handlePutCards} className="put-cards">
-        Push the card to the database
-      </button>
+      <div className="flex flex-row gap-10 mb-10">
+        <button onClick={() => handlePutCards("zh_TW")} className="put-cards">
+          Mandarin
+        </button>
+        <button onClick={() => handlePutCards("en_US")} className="put-cards">
+          English
+        </button>
+        <button onClick={() => handlePutCards("ja_JP")} className="put-cards">
+          Japanese
+        </button>
+      </div>
       <div className="grid grid-cols-6 gap-10">
         {files.map((file) => (
           <div
