@@ -180,3 +180,9 @@ button.profile-button {
   background-color: var(--primary);
   color: var(--background);
 }
+
+.put-cards {
+  background-color: var(--primary);
+  color: var(--foreground);
+  @apply font-semibold rounded-md cursor-pointer p-3 my-3;
+}
