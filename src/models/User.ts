@@ -7,6 +7,7 @@ const UserSchema = new Schema(
     password: { type: String, required: false },
     image: { type: String },
     provider: { type: String, default: "credentials" },
+    isAdmin: { type: Boolean, default: false },
   },
   { timestamps: true }
 );
