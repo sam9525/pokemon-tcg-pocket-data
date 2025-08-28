@@ -186,3 +186,16 @@ button.profile-button {
   color: var(--foreground);
   @apply font-semibold rounded-md cursor-pointer p-3 my-3;
 }
+
+.users-table > thead > tr > th {
+  border: 1px solid var(--primary);
+  padding: 8px;
+  background-color: var(--primary);
+  color: var(--foreground);
+}
+
+.users-table > tbody > tr > td {
+  border: 1px solid var(--primary);
+  padding: 8px;
+  text-align: center;
+}

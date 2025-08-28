@@ -3,11 +3,26 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useSession } from "next-auth/react";
+import { useEffect, useState } from "react";
 
 export default function HeaderTabs() {
   const session = useSession();
   const status = session?.status;
   const path = usePathname();
+  const [isAdmin, setIsAdmin] = useState(false);
+
+  useEffect(() => {
+    try {
+      // Get user data to check if the user is admin
+      fetch("/api/profile")
+        .then((response) => response.json())
+        .then((data) => {
+          setIsAdmin(data.isAdmin);
+        });
+    } catch (error) {
+      console.log(error);
+    }
+  });
 
   if (status === "loading") {
     return (
@@ -67,6 +82,22 @@ export default function HeaderTabs() {
             href={"/deck-builder"}
           >
             組牌
+          </Link>
+        </>
+      )}
+      {status === "authenticated" && isAdmin && (
+        <>
+          <Link
+            className={path === "/dashboard/users" ? "active" : ""}
+            href={"/dashboard/users"}
+          >
+            使用者
+          </Link>
+          <Link
+            className={path === "/dashboard/s3Cards" ? "active" : ""}
+            href={"/dashboard/s3Cards"}
+          >
+            S3 卡牌
           </Link>
         </>
       )}
