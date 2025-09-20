@@ -1,4 +1,6 @@
 import { S3Client, ListObjectsCommand } from "@aws-sdk/client-s3";
+import mongoose from "mongoose";
+import { Card } from "@/models/Card";
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
@@ -58,4 +60,25 @@ export async function GET(request: Request) {
   } catch (error) {
     console.error(error);
   }
+}
+
+let isConnected = false;
+
+export async function POST(request: Request) {
+  if (!isConnected) {
+    await mongoose.connect(process.env.MONGO_URL as string);
+    isConnected = true;
+  }
+
+  const data = await request.json();
+
+  const { preprocessedCards } = data;
+
+  // Post to the database
+  await Card.insertMany(preprocessedCards);
+
+  return Response.json({
+    success: true,
+    message: "Card created",
+  });
 }
