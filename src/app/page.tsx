@@ -2,13 +2,17 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import toast from "react-hot-toast";
 
 export default function Home() {
+  const hasLoaded = useRef(false);
   const [packages, setPackages] = useState<{ id: string; url: string }[]>([]);
 
   useEffect(() => {
+    if (hasLoaded.current) return;
+    hasLoaded.current = true;
+
     try {
       const toastPromise = new Promise(async (resolve, reject) => {
         const response = await fetch("/api/packages");
@@ -25,6 +29,7 @@ export default function Home() {
       toast.promise(toastPromise, {
         loading: "Loading packages...",
         error: "Failed to load packages",
+        success: "Packages loaded successfully",
       });
     } catch (error) {
       console.error(error);

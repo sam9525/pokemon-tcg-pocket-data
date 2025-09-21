@@ -2,7 +2,7 @@
 
 import FilteredItems from "@/components/layouts/FilteredItems";
 import Image from "next/image";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import toast from "react-hot-toast";
 
 interface FilterItem {
@@ -39,6 +39,7 @@ interface RarityFilterItemProps {
 }
 
 export default function SearchPage() {
+  const hasLoaded = useRef(false);
   const [isLoading, setIsLoading] = useState(true);
   const [types, setTypes] = useState<FilterItem[]>([]);
   const [rarity, setRarity] = useState<FilterItem[]>([]);
@@ -71,6 +72,9 @@ export default function SearchPage() {
   }, []);
 
   useEffect(() => {
+    if (hasLoaded.current) return;
+    hasLoaded.current = true;
+
     if (isLoading) {
       const loadingToast = toast.loading("Loading...");
       return () => {

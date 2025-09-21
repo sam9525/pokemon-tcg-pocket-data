@@ -2,15 +2,19 @@
 
 import { UserDocument } from "@/models/User";
 import { useSession } from "next-auth/react";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import toast from "react-hot-toast";
 
 export default function UsersPage() {
+  const hasLoaded = useRef(false);
   const session = useSession();
   const status = session?.status;
   const [users, setUsers] = useState<UserDocument[]>([]);
 
   useEffect(() => {
+    if (hasLoaded.current) return;
+    hasLoaded.current = true;
+
     if (status === "authenticated") {
       const toastPromise = new Promise(async (resolve, reject) => {
         fetch("/api/users")
