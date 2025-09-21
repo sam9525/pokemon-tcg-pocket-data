@@ -12,8 +12,11 @@ export async function GET(
     const url = new URL(request.url);
     const filterParam = url.searchParams.get("filter");
     const filters = filterParam ? filterParam.split(",") : [];
+    const language = url.searchParams.get("language");
 
-    const cachePrefix = `cards_${(await params).id}_${filters.join("_")}`;
+    const cachePrefix = `cards_${(await params).id}_${filters.join(
+      "_"
+    )}_${language}`;
 
     // Get the response from the cache
     const cached = cacheManager.get(cachePrefix);
@@ -52,6 +55,7 @@ export async function GET(
       package: pack,
       boosterPack: boosterPack,
       ...(rarityFilters.length > 0 && { rarity: { $in: rarityFilters } }),
+      language: language,
     });
 
     const cardsMap = {

@@ -13,6 +13,7 @@ import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 import Image from "next/image";
 import Profile from "../icons/profile";
+import { getLanguage, setLanguage } from "@/utils/language";
 
 export default function Header() {
   const session = useSession();
@@ -25,6 +26,7 @@ export default function Header() {
   const menuRef = useRef<HTMLDivElement>(null);
   const buttonRef = useRef<HTMLButtonElement>(null);
   const router = useRouter();
+  const [languageInPage, setLanguageInPage] = useState(getLanguage());
 
   useEffect(() => {
     // Fetch user data
@@ -84,7 +86,7 @@ export default function Header() {
             {showUserMenu && (
               <div
                 ref={menuRef}
-                className="w-42 absolute top-20 right-11 border-1 border-primary bg-background rounded-md px-4 py-2 flex flex-col items-start  gap-2"
+                className="absolute top-20 right-11 border-1 border-primary bg-background rounded-md px-4 py-2 flex flex-col items-start  gap-2"
               >
                 {status === "authenticated" && (
                   <>
@@ -112,7 +114,19 @@ export default function Header() {
                   <div className="w-6">
                     <Earth />
                   </div>
-                  <span className="text-sm">語言：繁體中文</span>
+                  <span className="text-sm">語言：</span>
+                  <select
+                    className="language-dropdown"
+                    onChange={(e) => {
+                      setLanguageInPage(e.target.value as string);
+                      setLanguage(e.target.value as string);
+                    }}
+                    value={languageInPage}
+                  >
+                    <option value="zh_TW">繁體中文</option>
+                    <option value="en_US">English</option>
+                    <option value="ja_JP">Japanese</option>
+                  </select>
                 </div>
                 {status !== "authenticated" && (
                   <Link

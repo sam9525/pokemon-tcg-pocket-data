@@ -5,6 +5,7 @@ import toast from "react-hot-toast";
 import { use } from "react";
 import FilteringTabs from "@/components/layouts/FilteringTabs";
 import FilteredItems from "@/components/layouts/FilteredItems";
+import { getLanguage } from "@/utils/language";
 
 export default function PackagePage({
   params,
@@ -19,7 +20,9 @@ export default function PackagePage({
     try {
       const toastPromise = new Promise(async (resolve, reject) => {
         const response = await fetch(
-          `/api/cards/${resolvedParams.id}?filter=${filter.join(",")}`
+          `/api/cards/${resolvedParams.id}?filter=${filter.join(
+            ","
+          )}&language=${getLanguage()}`
         );
         const data = await response.json();
         setFiles(data.cards || []);
