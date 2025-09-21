@@ -1,7 +1,6 @@
 import { ListObjectsCommand, S3Client } from "@aws-sdk/client-s3";
-
-const s3ResponseCache = new Map<string, { data: unknown; timestamp: number }>();
-const CACHE_TTL = 20 * 60 * 1000; // 20 minutes
+import { cacheManager } from "@/utils/cache";
+import { CACHE_CONFIG } from "@/utils/cacheConfig";
 
 const ListObjects = async (
   s3Client: S3Client,
@@ -31,12 +30,14 @@ const ListObjects = async (
 
 export async function GET() {
   try {
-    const cacheKey = "search";
-    const cached = s3ResponseCache.get(cacheKey);
+    const cachePrefix = "search";
+
+    // Get the response from the cache
+    const cached = cacheManager.get(cachePrefix);
 
     // Check if the response is cached and not expired
-    if (cached && Date.now() - cached.timestamp < CACHE_TTL) {
-      return Response.json(cached.data);
+    if (cached) {
+      return Response.json(cached);
     }
 
     // Connect to s3
@@ -69,7 +70,7 @@ export async function GET() {
     };
 
     // Store the response in the cache
-    s3ResponseCache.set(cacheKey, { data: result, timestamp: Date.now() });
+    cacheManager.set(cachePrefix, result, CACHE_CONFIG.CACHE_20_TTL.TTL);
 
     return Response.json(result);
   } catch (error) {

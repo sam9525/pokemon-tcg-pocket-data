@@ -1,21 +1,22 @@
 import { S3Client, ListObjectsCommand } from "@aws-sdk/client-s3";
 import mongoose from "mongoose";
 import { Card } from "@/models/Card";
-
-const s3ResponseCache = new Map<string, { data: unknown; timestamp: number }>();
-const CACHE_TTL = 10 * 60 * 1000; // 10 minutes
+import { CACHE_CONFIG } from "@/utils/cacheConfig";
+import { cacheManager } from "@/utils/cache";
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const packageId = searchParams.get("packageId");
   const language = searchParams.get("language");
 
-  const cacheKey = `${packageId}_${language}`;
-  const cached = s3ResponseCache.get(cacheKey);
+  const cachePrefix = `${packageId}_${language}`;
+
+  // Get the response from the cache
+  const cached = cacheManager.get(cachePrefix);
 
   // Check if the response is cached and not expired
-  if (cached && Date.now() - cached.timestamp < CACHE_TTL) {
-    return Response.json(cached.data);
+  if (cached) {
+    return Response.json(cached);
   }
 
   // Create a new S3 client
@@ -69,7 +70,8 @@ export async function GET(request: Request) {
       files,
     };
 
-    s3ResponseCache.set(cacheKey, { data: result, timestamp: Date.now() });
+    // Store the response in the cache
+    cacheManager.set(cachePrefix, result, CACHE_CONFIG.CACHE_10_TTL.TTL);
 
     return Response.json(result);
   } catch (error) {
