@@ -1,5 +1,8 @@
 import { ListObjectsCommand, S3Client } from "@aws-sdk/client-s3";
 
+const s3ResponseCache = new Map<string, { data: unknown; timestamp: number }>();
+const CACHE_TTL = 20 * 60 * 1000; // 20 minutes
+
 const ListObjects = async (
   s3Client: S3Client,
   bucket: string,
@@ -28,6 +31,14 @@ const ListObjects = async (
 
 export async function GET() {
   try {
+    const cacheKey = "search";
+    const cached = s3ResponseCache.get(cacheKey);
+
+    // Check if the response is cached and not expired
+    if (cached && Date.now() - cached.timestamp < CACHE_TTL) {
+      return Response.json(cached.data);
+    }
+
     // Connect to s3
     const s3Client = new S3Client({
       region: "ap-southeast-2",
@@ -49,13 +60,18 @@ export async function GET() {
         ListObjects(s3Client, bucket, "Special-Effect/", ""),
       ]);
 
-    return Response.json({
+    const result = {
       types,
       rarity,
       package_icons,
       Boosters_icon,
       specific_effect,
-    });
+    };
+
+    // Store the response in the cache
+    s3ResponseCache.set(cacheKey, { data: result, timestamp: Date.now() });
+
+    return Response.json(result);
   } catch (error) {
     console.error("Error fetching types icon:", error);
     return Response.json(
