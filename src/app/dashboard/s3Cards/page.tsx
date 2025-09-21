@@ -54,6 +54,7 @@ export default function S3CardsPage() {
   const [packageId, setPackageId] = useState<string>("");
   const [language, setLanguage] = useState<string>("");
   const [s3Cards, setS3Cards] = useState<{ id: string; url: string }[]>([]);
+  const [packageInDB, setPackageInDB] = useState<boolean>(false);
   const { preprocessWithWorker } = useWebWorkerPreprocessing();
 
   const searchCards = () => {
@@ -64,12 +65,19 @@ export default function S3CardsPage() {
 
       const data = await res.json();
       setS3Cards(data.files || []);
-      console.log(data.files);
 
-      if (res.ok) {
+      const resInDB = await fetch(
+        `/api/packageInDB?code=${packageId?.split("_")[0]}&language=${language}`
+      );
+      const dataInDB = await resInDB.json();
+      setPackageInDB(dataInDB.packageInDB);
+
+      if (res.ok && resInDB) {
         resolve(res);
+        resolve(resInDB);
       } else {
         reject(res);
+        reject(resInDB);
       }
     });
 
@@ -93,8 +101,6 @@ export default function S3CardsPage() {
               language
             );
 
-            console.log(preprocessedCards);
-
             const res = await fetch(`/api/s3Cards`, {
               method: "POST",
               body: JSON.stringify({
@@ -105,13 +111,32 @@ export default function S3CardsPage() {
               },
             });
 
-            if (res.ok) {
+            const resInDB = await fetch(
+              `/api/packageInDB?code=${
+                packageId?.split("_")[0]
+              }&language=${language}`,
+              {
+                method: "POST",
+                body: JSON.stringify({
+                  packageInDB: true,
+                }),
+                headers: {
+                  "Content-Type": "application/json",
+                },
+              }
+            );
+            const dataInDB = await resInDB.json();
+            setPackageInDB(dataInDB.packageInDB);
+
+            if (res.ok && resInDB) {
               resolve(res);
+              resolve(resInDB);
 
               // Clear the card lookup cache
               scheduleCacheClear(packageId?.split("_")[0]);
             } else {
               reject(res);
+              reject(resInDB);
             }
           });
 
@@ -164,9 +189,12 @@ export default function S3CardsPage() {
         <button className="put-cards mr-5" onClick={searchCards}>
           Search Cards
         </button>
-        <button className="put-cards" onClick={putCards}>
-          Put Cards
-        </button>
+        {!packageInDB && (
+          <button className="put-cards" onClick={putCards}>
+            Put Cards
+          </button>
+        )}
+        {packageInDB && <div className="put-cards">Cards in DB</div>}
       </div>
       <div className="flex flex-col items-center justify-center">
         <h3 className="text-2xl font-bold mb-5">
