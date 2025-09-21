@@ -2,10 +2,22 @@ let language: string = "zh_TW";
 
 export const setLanguage = (lang: string) => {
   language = lang;
-  console.log("language set to", language);
 };
 
 export const getLanguage = () => {
-  console.log("language get to", language);
   return language;
+};
+
+// Language
+import English from "../language/en.json";
+import Japanese from "../language/ja.json";
+import TraditionalChinese from "../language/zh-TW.json";
+
+export const languageLookup: Record<
+  string,
+  Record<string, Record<string, string>>
+> = {
+  en_US: English,
+  ja_JP: Japanese,
+  zh_TW: TraditionalChinese,
 };

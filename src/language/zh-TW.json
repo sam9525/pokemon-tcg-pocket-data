@@ -1,0 +1,91 @@
+{
+  "HEADER_TABS": {
+    "cards": "卡牌",
+    "decksList": "牌組一欄",
+    "search": "搜尋",
+    "myDecks": "我的牌組",
+    "deckCollection": "牌組收藏",
+    "deckBuilder": "組牌",
+    "users": "使用者",
+    "s3Cards": "S3 卡牌"
+  },
+  "PROFILES": {
+    "profile": "個人資料",
+    "language": "語言",
+    "username": "名稱",
+    "email": "電子郵件",
+    "password": "密碼",
+    "changeAvatar": "變更頭像",
+    "changeName": "變更名稱",
+    "changePassword": "變更密碼",
+    "logout": "登出"
+  },
+  "LOGIN": {
+    "login": "登入",
+    "username": "使用者名稱",
+    "email": "電子郵件",
+    "password": "密碼",
+    "confirmPassword": "確認密碼",
+    "forgotPassword": "忘記密碼",
+    "register": "註冊",
+    "joinNow": "現在加入",
+    "loginWithGoogle": "使用 Google 登入"
+  },
+  "FILTER": {
+    "all": "全部",
+    "pokemon": "寶可夢",
+    "pokemonex": "寶可夢EX",
+    "specialArt": "特殊藝術",
+    "liveCard": "實境卡",
+    "crown": "皇冠"
+  },
+  "SEARCH": {
+    "enterPokemonName": "請輸入寶可夢名稱",
+    "type": "屬性",
+    "rarity": "稀有度",
+    "package": "系列",
+    "boosterPack": "擴充包",
+    "speicalEffect": "特殊效果",
+    "fightEnergy": "招式能量",
+    "weakness": "弱點"
+  },
+  "USERS": {
+    "username": "使用者名稱",
+    "email": "電子郵件",
+    "provider": "提供者",
+    "createdAt": "建立時間",
+    "admin": "管理員"
+  },
+  "S3_CARDS": {
+    "selectPackage": "選擇系列",
+    "selectLanguage": "選擇語言",
+    "searchCards": "搜尋卡牌",
+    "putCards": "上傳卡牌",
+    "cardsInDB": "已在資料庫中",
+    "cardsFound": "卡牌找到",
+    "image": "圖片",
+    "id": "ID"
+  },
+  "NOTIFICATIONS": {
+    "loadingPackages": "載入系列中",
+    "failedToLoadPackages": "載入系列失敗",
+    "packagesLoaded": "系列載入成功",
+    "loadingCards": "載入卡牌中",
+    "failedToLoadCards": "載入卡牌失敗",
+    "cardsLoadedSuccessfully": "卡牌載入成功",
+    "loading": "載入中",
+    "loadingSuccessful": "載入成功",
+    "loadingUsers": "載入使用者中",
+    "failedToLoadUsers": "載入使用者失敗",
+    "usersLoadedSuccessfully": "使用者載入成功",
+    "loadingS3Cards": "載入S3卡牌中",
+    "failedToLoadS3Cards": "載入S3卡牌失敗",
+    "s3CardsLoadedSuccessfully": "S3卡牌載入成功",
+    "savingCards": "儲存卡牌中",
+    "failedToSaveCards": "儲存卡牌失敗",
+    "cardsSavedSuccessfully": "卡牌儲存成功",
+    "updatingName": "更新名稱中",
+    "failedToUpdateName": "更新名稱失敗",
+    "nameUpdatedSuccessfully": "名稱更新成功"
+  }
+}
