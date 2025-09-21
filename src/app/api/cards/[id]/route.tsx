@@ -1,4 +1,6 @@
 import { Card } from "@/models/Card";
+import { cacheManager } from "@/utils/cache";
+import { CACHE_CONFIG } from "@/utils/cacheConfig";
 import mongoose from "mongoose";
 
 export async function GET(
@@ -6,16 +8,26 @@ export async function GET(
   { params }: { params: { id: string } }
 ) {
   try {
+    // Get filter from URL search params
+    const url = new URL(request.url);
+    const filterParam = url.searchParams.get("filter");
+    const filters = filterParam ? filterParam.split(",") : [];
+
+    const cachePrefix = `cards_${(await params).id}_${filters.join("_")}`;
+
+    // Get the response from the cache
+    const cached = cacheManager.get(cachePrefix);
+
+    // Check if the response is cached and not expired
+    if (cached) {
+      return Response.json(cached);
+    }
+
     // Create to mongoosedb
     await mongoose.connect(process.env.MONGO_URL as string).catch((err) => {
       console.error("Failed to connect to MongoDB:", err);
       throw new Error("Database connection failed");
     });
-
-    // Get filter from URL search params
-    const url = new URL(request.url);
-    const filterParam = url.searchParams.get("filter");
-    const filters = filterParam ? filterParam.split(",") : [];
 
     const rarityMap = {
       pokemon: ["common", "uncommon", "rare"],
@@ -42,14 +54,19 @@ export async function GET(
       ...(rarityFilters.length > 0 && { rarity: { $in: rarityFilters } }),
     });
 
-    return Response.json({
+    const cardsMap = {
       cards: cards.map((card) => ({ id: card.cardId, url: card.imageUrl })),
-    });
+    };
+
+    // Store the response in the cache
+    cacheManager.set(cachePrefix, cardsMap, CACHE_CONFIG.CACHE_20_TTL.TTL);
+
+    return Response.json(cardsMap);
   } catch (error) {
-    console.error("Error fetching packages:", error);
+    console.error("Error fetching cards:", error);
     return Response.json(
       {
-        error: "Failed to fetch package files",
+        error: "Failed to fetch cards",
         details: error instanceof Error ? error.message : String(error),
       },
       { status: 500 }

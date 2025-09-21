@@ -1,7 +1,19 @@
+import { cacheManager } from "@/utils/cache";
+import { CACHE_CONFIG } from "@/utils/cacheConfig";
 import { ListObjectsCommand, S3Client } from "@aws-sdk/client-s3";
 
 export async function GET() {
   try {
+    const cachePrefix = "packages";
+
+    // Get the response from the cache
+    const cached = cacheManager.get(cachePrefix);
+
+    // Check if the response is cached and not expired
+    if (cached) {
+      return Response.json({ packages: cached });
+    }
+
     // Create a new S3 client
     const s3Client = new S3Client({
       region: "ap-southeast-2",
@@ -30,6 +42,9 @@ export async function GET() {
         url: url,
       };
     });
+
+    // Store the response in the cache
+    cacheManager.set(cachePrefix, packages, CACHE_CONFIG.CACHE_20_TTL.TTL);
 
     // Return a success response
     return Response.json({ packages });
