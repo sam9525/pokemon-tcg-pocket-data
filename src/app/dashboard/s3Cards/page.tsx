@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import Image from "next/image";
+import { scheduleCacheClear } from "@/utils/cardLookup";
 
 const useWebWorkerPreprocessing = () => {
   const [preprocessingWorker, setPreprocessingWorker] = useState<Worker | null>(
@@ -106,6 +107,9 @@ export default function S3CardsPage() {
 
             if (res.ok) {
               resolve(res);
+
+              // Clear the card lookup cache
+              scheduleCacheClear(packageId?.split("_")[0]);
             } else {
               reject(res);
             }

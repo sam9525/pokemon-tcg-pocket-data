@@ -131,7 +131,7 @@ export function clearCardLookupCache(packageCode?: string) {
 // Schedule cache clearing for a specific package
 export function scheduleCacheClear(
   packageCode: string,
-  delayMinutes: number = 30
+  delayMinutes: number = 10
 ) {
   const delayMs = delayMinutes * 60 * 1000; // Convert minutes to milliseconds
 
