@@ -4,9 +4,11 @@ import { useRef } from "react";
 export default function EditableAvatar({
   link,
   setLink,
+  currentLanguageLookup,
 }: {
   link: string | File;
   setLink: (link: File) => void;
+  currentLanguageLookup: Record<string, Record<string, string>>;
 }) {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -39,7 +41,7 @@ export default function EditableAvatar({
             className="profile-button w-30 h-12.5"
             onClick={() => fileInputRef.current?.click()}
           >
-            變更頭像
+            {currentLanguageLookup.PROFILES.changeAvatar}
           </button>
         </div>
       )}
@@ -59,7 +61,7 @@ export default function EditableAvatar({
             className="profile-button w-30 h-12.5"
             onClick={() => fileInputRef.current?.click()}
           >
-            上傳頭像
+            {currentLanguageLookup.PROFILES.uploadAvatar}
           </button>
         </div>
       )}

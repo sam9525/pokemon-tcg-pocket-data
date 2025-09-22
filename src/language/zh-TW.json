@@ -16,6 +16,7 @@
     "email": "電子郵件",
     "password": "密碼",
     "changeAvatar": "變更頭像",
+    "uploadAvatar": "上傳頭像",
     "changeName": "變更名稱",
     "changePassword": "變更密碼",
     "logout": "登出"
@@ -28,6 +29,7 @@
     "confirmPassword": "確認密碼",
     "forgotPassword": "忘記密碼",
     "register": "註冊",
+    "notAMember": "不是會員嗎？",
     "joinNow": "現在加入",
     "loginWithGoogle": "使用 Google 登入"
   },
@@ -66,7 +68,28 @@
     "image": "圖片",
     "id": "ID"
   },
+  "PACKAGES": {
+    "A1": "A1 - 基因頂點",
+    "A1a": "A1a - 幻遊島",
+    "A2": "A2 - 時空激鬥",
+    "A2a": "A2a - 超克之光",
+    "A2b": "A2b - 嗨放異彩",
+    "A3": "A3 - 雙天之守護者",
+    "A3a": "A3a - 異次元危機",
+    "A3b": "A3b - 伊布花園",
+    "A4": "A4 - 天與海的指引",
+    "A4a": "A4a - 未知水域"
+  },
   "NOTIFICATIONS": {
+    "loggingIn": "登入中",
+    "loginSuccessful": "登入成功",
+    "loginFailed": "登入失敗",
+    "connectingToGoogle": "連接到 Google 中",
+    "failedToLoginWithGoogle": "登入 Google 失敗",
+    "googleLoginSuccessful": "登入 Google 成功",
+    "registering": "註冊中",
+    "registrationSuccessful": "註冊成功",
+    "registrationFailed": "註冊失敗",
     "loadingPackages": "載入系列中",
     "failedToLoadPackages": "載入系列失敗",
     "packagesLoaded": "系列載入成功",

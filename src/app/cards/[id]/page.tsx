@@ -5,7 +5,7 @@ import toast from "react-hot-toast";
 import { use } from "react";
 import FilteringTabs from "@/components/layouts/FilteringTabs";
 import FilteredItems from "@/components/layouts/FilteredItems";
-import { getLanguage } from "@/utils/language";
+import { useLanguage } from "@/components/provider/LanguageProvider";
 
 export default function PackagePage({
   params,
@@ -15,6 +15,7 @@ export default function PackagePage({
   const resolvedParams = use(params);
   const [files, setFiles] = useState<{ id: string; url: string }[]>([]);
   const [filter, setFilter] = useState<string[]>([]);
+  const { language, currentLanguageLookup } = useLanguage();
 
   useEffect(() => {
     try {
@@ -22,7 +23,7 @@ export default function PackagePage({
         const response = await fetch(
           `/api/cards/${resolvedParams.id}?filter=${filter.join(
             ","
-          )}&language=${getLanguage()}`
+          )}&language=${language}`
         );
         const data = await response.json();
         setFiles(data.cards || []);
@@ -35,18 +36,22 @@ export default function PackagePage({
       });
 
       toast.promise(toastPromise, {
-        loading: "Loading cards...",
-        error: "Failed to load cards",
-        success: "Cards loaded successfully",
+        loading: currentLanguageLookup.NOTIFICATIONS.loadingCards,
+        error: currentLanguageLookup.NOTIFICATIONS.failedToLoadCards,
+        success: currentLanguageLookup.NOTIFICATIONS.cardsLoadedSuccessfully,
       });
     } catch (error) {
       console.error(error);
     }
-  }, [resolvedParams.id, filter]);
+  }, [resolvedParams.id, filter, language, currentLanguageLookup]);
 
   return (
     <div className="flex flex-col items-center justify-center m-10">
-      <FilteringTabs filter={filter} setFilter={setFilter} />
+      <FilteringTabs
+        filter={filter}
+        setFilter={setFilter}
+        currentLanguageLookup={currentLanguageLookup}
+      />
       <FilteredItems files={files} />
     </div>
   );

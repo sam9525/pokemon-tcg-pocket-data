@@ -4,12 +4,14 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
+import { useLanguage } from "@/components/provider/LanguageProvider";
 
 export default function HeaderTabs() {
   const session = useSession();
   const status = session?.status;
   const path = usePathname();
   const [isAdmin, setIsAdmin] = useState(false);
+  const { currentLanguageLookup } = useLanguage();
 
   useEffect(() => {
     try {
@@ -26,42 +28,42 @@ export default function HeaderTabs() {
 
   if (status === "loading") {
     return (
-      <div className="flex justify-center font-bold header-tabs">
+      <div className="flex justify-center font-bold header-tabs items-center">
         <Link
           className={path.includes("/cards") || path === "/" ? "active" : ""}
           href={"/"}
         >
-          卡牌
+          {currentLanguageLookup.HEADER_TABS.cards}
         </Link>
         <Link
           className={path === "/decks-list" ? "active" : ""}
           href={"/decks-list"}
         >
-          牌組一欄
+          {currentLanguageLookup.HEADER_TABS.decksList}
         </Link>
         <Link className={path === "/search" ? "active" : ""} href={"/search"}>
-          搜尋
+          {currentLanguageLookup.HEADER_TABS.search}
         </Link>
       </div>
     );
   }
 
   return (
-    <div className="flex justify-center font-bold header-tabs">
+    <div className="flex justify-center font-bold header-tabs items-center">
       <Link
         className={path.includes("/cards") || path === "/" ? "active" : ""}
         href={"/"}
       >
-        卡牌
+        {currentLanguageLookup.HEADER_TABS.cards}
       </Link>
       <Link
         className={path === "/decks-list" ? "active" : ""}
         href={"/decks-list"}
       >
-        牌組一欄
+        {currentLanguageLookup.HEADER_TABS.decksList}
       </Link>
       <Link className={path === "/search" ? "active" : ""} href={"/search"}>
-        搜尋
+        {currentLanguageLookup.HEADER_TABS.search}
       </Link>
       {status === "authenticated" && (
         <>
@@ -69,19 +71,19 @@ export default function HeaderTabs() {
             className={path === "/my-decks" ? "active" : ""}
             href={"/my-decks"}
           >
-            我的牌組
+            {currentLanguageLookup.HEADER_TABS.myDecks}
           </Link>
           <Link
             className={path === "/deck-collection" ? "active" : ""}
             href={"/deck-collection"}
           >
-            牌組收藏
+            {currentLanguageLookup.HEADER_TABS.deckCollection}
           </Link>
           <Link
             className={path === "/deck-builder" ? "active" : ""}
             href={"/deck-builder"}
           >
-            組牌
+            {currentLanguageLookup.HEADER_TABS.deckBuilder}
           </Link>
         </>
       )}
@@ -91,13 +93,13 @@ export default function HeaderTabs() {
             className={path === "/dashboard/users" ? "active" : ""}
             href={"/dashboard/users"}
           >
-            使用者
+            {currentLanguageLookup.HEADER_TABS.users}
           </Link>
           <Link
             className={path === "/dashboard/s3Cards" ? "active" : ""}
             href={"/dashboard/s3Cards"}
           >
-            S3 卡牌
+            {currentLanguageLookup.HEADER_TABS.s3Cards}
           </Link>
         </>
       )}

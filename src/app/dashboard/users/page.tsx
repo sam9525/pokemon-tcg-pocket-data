@@ -4,12 +4,14 @@ import { UserDocument } from "@/models/User";
 import { useSession } from "next-auth/react";
 import { useEffect, useRef, useState } from "react";
 import toast from "react-hot-toast";
+import { useLanguage } from "@/components/provider/LanguageProvider";
 
 export default function UsersPage() {
   const hasLoaded = useRef(false);
   const session = useSession();
   const status = session?.status;
   const [users, setUsers] = useState<UserDocument[]>([]);
+  const { currentLanguageLookup } = useLanguage();
 
   useEffect(() => {
     if (hasLoaded.current) return;
@@ -30,12 +32,12 @@ export default function UsersPage() {
       });
 
       toast.promise(toastPromise, {
-        loading: "Loading users...",
-        error: "Failed to load users",
-        success: "Users loaded successfully",
+        loading: currentLanguageLookup.NOTIFICATIONS.loadingUsers,
+        error: currentLanguageLookup.NOTIFICATIONS.failedToLoadUsers,
+        success: currentLanguageLookup.NOTIFICATIONS.usersLoadedSuccessfully,
       });
     }
-  }, [status]);
+  }, [status, currentLanguageLookup]);
   return (
     <div>
       <table
@@ -48,11 +50,11 @@ export default function UsersPage() {
       >
         <thead>
           <tr>
-            <th>Name</th>
-            <th>Email</th>
-            <th>Provider</th>
-            <th>Created At</th>
-            <th>Admin</th>
+            <th>{currentLanguageLookup.USERS.username}</th>
+            <th>{currentLanguageLookup.USERS.email}</th>
+            <th>{currentLanguageLookup.USERS.provider}</th>
+            <th>{currentLanguageLookup.USERS.createdAt}</th>
+            <th>{currentLanguageLookup.USERS.admin}</th>
           </tr>
         </thead>
         <tbody>

@@ -6,12 +6,14 @@ import { signIn } from "next-auth/react";
 import { useState } from "react";
 import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
+import { useLanguage } from "@/components/provider/LanguageProvider";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loginInProgress, setLoginInProgress] = useState(false);
   const router = useRouter();
+  const { currentLanguageLookup } = useLanguage();
 
   async function handleFormSubmit(ev: React.FormEvent<HTMLFormElement>) {
     ev.preventDefault();
@@ -33,8 +35,8 @@ export default function LoginPage() {
       });
 
       await toast.promise(loginPromise, {
-        loading: "Logging in",
-        success: "Login successful",
+        loading: currentLanguageLookup.NOTIFICATIONS.loggingIn,
+        success: currentLanguageLookup.NOTIFICATIONS.loginSuccessful,
         error: (err) => {
           if (err.details) {
             return err.details[0]?.message;
@@ -44,7 +46,7 @@ export default function LoginPage() {
             return err.error;
           }
 
-          return "Login failed";
+          return currentLanguageLookup.NOTIFICATIONS.loginFailed;
         },
       });
 
@@ -57,56 +59,66 @@ export default function LoginPage() {
   }
 
   const handleGoogleSignIn = async () => {
-    const toastId = toast.loading("Connecting to Google...");
+    const toastId = toast.loading(
+      currentLanguageLookup.NOTIFICATIONS.connectingToGoogle
+    );
     try {
       const result = await signIn("google", { callbackUrl: "/" });
       if (result?.error) {
-        toast.error("Failed to login with Google", { id: toastId });
+        toast.error(
+          currentLanguageLookup.NOTIFICATIONS.failedToLoginWithGoogle,
+          { id: toastId }
+        );
       } else {
-        toast.success("Google login successful", { id: toastId });
+        toast.success(
+          currentLanguageLookup.NOTIFICATIONS.googleLoginSuccessful,
+          { id: toastId }
+        );
       }
     } catch (error) {
       console.error("Google login error:", error);
-      toast.error("Failed to login with Google", { id: toastId });
+      toast.error(currentLanguageLookup.NOTIFICATIONS.failedToLoginWithGoogle, {
+        id: toastId,
+      });
     }
   };
 
   return (
     <section className="w-125 h-150 flex flex-col items-center justify-center border-2 border-primary rounded-xl mx-auto my-10 bg-foreground">
       <h2 className="text-2xl font-bold">WELCOME BACK</h2>
-      <h3 className="text-xl mb-4">Log in</h3>
+      <h3 className="text-xl mb-4">{currentLanguageLookup.LOGIN.login}</h3>
       <form
         className="login flex flex-col gap-4 w-62"
         onSubmit={handleFormSubmit}
       >
         <input
           type="email"
-          placeholder="Email"
+          placeholder={currentLanguageLookup.LOGIN.email}
           value={email}
           onChange={(ev) => setEmail(ev.target.value)}
           disabled={loginInProgress}
         />
         <input
           type="password"
-          placeholder="Password"
+          placeholder={currentLanguageLookup.LOGIN.password}
           value={password}
           onChange={(ev) => setPassword(ev.target.value)}
           disabled={loginInProgress}
         />
-        <button type="submit">Log in</button>
+        <button type="submit">{currentLanguageLookup.LOGIN.login}</button>
       </form>
       <Link href="/forgot-password" className="text-sm hover:underline">
-        Forgot password?
+        {currentLanguageLookup.LOGIN.forgotPassword}
       </Link>
       <hr className="text-primary w-62 border-primary border-1 my-4"></hr>
       <button type="button" onClick={handleGoogleSignIn}>
         <Image src="/google-icon.svg" alt="Google" width={20} height={20} />
-        Log in with Google
+        {currentLanguageLookup.LOGIN.loginWithGoogle}
       </button>
       <label htmlFor="" className="text-sm my-4">
-        Not a member?{" "}
+        {currentLanguageLookup.LOGIN.notAMember}
         <Link href="/register" className="underline">
-          Join now
+          {currentLanguageLookup.LOGIN.joinNow}
         </Link>
       </label>
     </section>

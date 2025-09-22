@@ -13,7 +13,7 @@ import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 import Image from "next/image";
 import Profile from "../icons/profile";
-import { getLanguage, setLanguage } from "@/utils/language";
+import { useLanguage } from "../provider/LanguageProvider";
 
 export default function Header() {
   const session = useSession();
@@ -26,7 +26,7 @@ export default function Header() {
   const menuRef = useRef<HTMLDivElement>(null);
   const buttonRef = useRef<HTMLButtonElement>(null);
   const router = useRouter();
-  const [languageInPage, setLanguageInPage] = useState(getLanguage());
+  const { language, setLanguage, currentLanguageLookup } = useLanguage();
 
   useEffect(() => {
     // Fetch user data
@@ -68,10 +68,14 @@ export default function Header() {
     }
   };
 
+  const handleLanguageChange = (newLanguage: string) => {
+    setLanguage(newLanguage);
+  };
+
   return (
     <>
       <header className="sticky top-0 z-50 w-full bg-foreground">
-        <div className="max-w-4xl mx-auto px-4 pt-8">
+        <div className="mx-auto px-4 pt-8">
           <div className="flex justify-center mb-8">
             <Link className="text-primary text-3xl font-bold" href={"/"}>
               POKEMON TCG POCKET
@@ -90,7 +94,6 @@ export default function Header() {
               >
                 {status === "authenticated" && (
                   <>
-                    {/* <EditableAvatar link={image} setLink={setImage} /> */}
                     <Image
                       src={image}
                       alt="avatar"
@@ -106,7 +109,9 @@ export default function Header() {
                       <div className="w-6">
                         <Profile />
                       </div>
-                      <span className="text-sm">個人資料</span>
+                      <span className="text-sm">
+                        {currentLanguageLookup.PROFILES.profile}
+                      </span>
                     </Link>
                   </>
                 )}
@@ -114,14 +119,15 @@ export default function Header() {
                   <div className="w-6">
                     <Earth />
                   </div>
-                  <span className="text-sm">語言：</span>
+                  <span className="text-sm">
+                    {currentLanguageLookup.PROFILES.language}:
+                  </span>
                   <select
                     className="language-dropdown"
                     onChange={(e) => {
-                      setLanguageInPage(e.target.value as string);
-                      setLanguage(e.target.value as string);
+                      handleLanguageChange(e.target.value as string);
                     }}
-                    value={languageInPage}
+                    value={language}
                   >
                     <option value="zh_TW">繁體中文</option>
                     <option value="en_US">English</option>
@@ -136,7 +142,9 @@ export default function Header() {
                     <div className="w-6">
                       <Login />
                     </div>
-                    <span className="text-sm">登入</span>
+                    <span className="text-sm">
+                      {currentLanguageLookup.LOGIN.login}
+                    </span>
                   </Link>
                 )}
                 {status === "authenticated" && (
@@ -147,13 +155,15 @@ export default function Header() {
                     <div className="w-6">
                       <Logout />
                     </div>
-                    <span className="text-sm">登出</span>
+                    <span className="text-sm">
+                      {currentLanguageLookup.PROFILES.logout}
+                    </span>
                   </button>
                 )}
               </div>
             )}
           </div>
-          <hr className="text-primary w-full border-primary border-2"></hr>
+          <hr className="max-w-6xl mx-auto text-primary w-full border-primary border-2"></hr>
           <HeaderTabs />
         </div>
       </header>

@@ -5,6 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
 import toast from "react-hot-toast";
+import { useLanguage } from "@/components/provider/LanguageProvider";
 
 export default function Register() {
   const [name, setName] = useState("");
@@ -14,6 +15,7 @@ export default function Register() {
     "https://pokemon-tcg-pocket-data.s3.ap-southeast-2.amazonaws.com/Avatar/avatar.jpg";
   const [confirmPassword, setConfirmPassword] = useState("");
   const [creatingUser, setCreatingUser] = useState(false);
+  const { currentLanguageLookup } = useLanguage();
 
   async function handleFormSubmit(ev: React.FormEvent<HTMLFormElement>) {
     ev.preventDefault();
@@ -47,8 +49,8 @@ export default function Register() {
       });
 
       await toast.promise(registerPromise, {
-        loading: "Registering",
-        success: "Registration successful",
+        loading: currentLanguageLookup.NOTIFICATIONS.registering,
+        success: currentLanguageLookup.NOTIFICATIONS.registrationSuccessful,
         error: (err) => {
           if (err.details) {
             return err.details[0]?.message;
@@ -58,7 +60,7 @@ export default function Register() {
             return err.error;
           }
 
-          return "Registration failed";
+          return currentLanguageLookup.NOTIFICATIONS.registrationFailed;
         },
       });
 
@@ -81,40 +83,40 @@ export default function Register() {
   return (
     <section className="w-125 h-150 flex flex-col items-center justify-center border-2 border-primary rounded-xl mx-auto my-10 bg-foreground">
       <h2 className="text-2xl font-bold">WELCOME</h2>
-      <h3 className="text-xl mb-4">Sign up</h3>
+      <h3 className="text-xl mb-4">{currentLanguageLookup.LOGIN.register}</h3>
       <form
         className="register flex flex-col gap-4 w-62"
         onSubmit={handleFormSubmit}
       >
         <input
           type="text"
-          placeholder="Username"
+          placeholder={currentLanguageLookup.LOGIN.username}
           value={name}
           onChange={(ev) => setName(ev.target.value)}
           disabled={creatingUser}
         />
         <input
           type="email"
-          placeholder="Email"
+          placeholder={currentLanguageLookup.LOGIN.email}
           value={email}
           onChange={(ev) => setEmail(ev.target.value)}
           disabled={creatingUser}
         />
         <input
           type="password"
-          placeholder="Password"
+          placeholder={currentLanguageLookup.LOGIN.password}
           value={password}
           onChange={(ev) => setPassword(ev.target.value)}
           disabled={creatingUser}
         />
         <input
           type="password"
-          placeholder="Confirm Password"
+          placeholder={currentLanguageLookup.LOGIN.confirmPassword}
           value={confirmPassword}
           onChange={(ev) => setConfirmPassword(ev.target.value)}
           disabled={creatingUser}
         />
-        <button type="submit">Register</button>
+        <button type="submit">{currentLanguageLookup.LOGIN.register}</button>
       </form>
       <hr className="text-primary w-62 border-primary border-1 my-4"></hr>
       <button
@@ -123,12 +125,12 @@ export default function Register() {
         disabled={creatingUser}
       >
         <Image src="/google-icon.svg" alt="Google" width={20} height={20} />
-        Sign up with Google
+        {currentLanguageLookup.LOGIN.loginWithGoogle}
       </button>
       <label htmlFor="" className="text-sm my-4">
-        Already have an account?{" "}
+        {currentLanguageLookup.LOGIN.notAMember}
         <Link href="/login" className="underline">
-          Log in
+          {currentLanguageLookup.LOGIN.login}
         </Link>
       </label>
     </section>

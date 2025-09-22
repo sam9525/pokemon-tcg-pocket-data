@@ -5,6 +5,7 @@ import { useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
+import { useLanguage } from "@/components/provider/LanguageProvider";
 
 // Types
 interface ProfileData {
@@ -80,10 +81,13 @@ export default function Profile() {
   const [image, setImage] = useState("");
   const router = useRouter();
   const [profileFetched, setProfileFetched] = useState(false);
+  const { currentLanguageLookup } = useLanguage();
 
   useEffect(() => {
     if (status === "loading" || !profileFetched) {
-      toast.loading("Loading...", { id: "loading-toast" });
+      toast.loading(currentLanguageLookup.NOTIFICATIONS.loading, {
+        id: "loading-toast",
+      });
     }
     if (status === "unauthenticated") {
       toast.error("Please login to continue", { id: "loading-toast" });
@@ -92,7 +96,7 @@ export default function Profile() {
     if (status === "authenticated") {
       toast.dismiss("loading-toast");
     }
-  }, [status, profileFetched, router]);
+  }, [status, profileFetched, router, currentLanguageLookup]);
 
   useEffect(() => {
     if (status === "authenticated") {
@@ -151,9 +155,9 @@ export default function Profile() {
       });
 
       await toast.promise(putPromise, {
-        loading: "Updating name...",
-        success: "Name updated successfully",
-        error: "Failed to update name",
+        loading: currentLanguageLookup.NOTIFICATIONS.updatingName,
+        success: currentLanguageLookup.NOTIFICATIONS.nameUpdatedSuccessfully,
+        error: currentLanguageLookup.NOTIFICATIONS.failedToUpdateName,
       });
     } catch (err) {
       console.log(err);
@@ -173,13 +177,17 @@ export default function Profile() {
 
   return (
     <div className="flex items-center justify-center gap-10 my-auto mx-auto min-h-150">
-      <EditableAvatar link={image} setLink={handleAvatarChange} />
+      <EditableAvatar
+        link={image}
+        setLink={handleAvatarChange}
+        currentLanguageLookup={currentLanguageLookup}
+      />
       <div className="border-l-2 border-primary h-110"></div>
       <div className="flex flex-col items-start gap-10">
         <div className="flex items-center justify-center gap-10">
           <div className="profile flex flex-col items-start">
             <label htmlFor="name" className="font-semibold">
-              名稱
+              {currentLanguageLookup.PROFILES.username}
             </label>
             <input
               type="text"
@@ -194,19 +202,19 @@ export default function Profile() {
             className="profile-button w-30 h-8 rounded-md text-sm"
             onClick={() => handleNameChange(username)}
           >
-            變更名稱
+            {currentLanguageLookup.PROFILES.changeName}
           </button>
         </div>
         <div className="profile flex flex-col items-start">
           <label htmlFor="email" className="font-semibold">
-            電子郵件
+            {currentLanguageLookup.PROFILES.email}
           </label>
           <input type="email" id="email" value={email} readOnly />
         </div>
         <div className="flex items-center justify-center gap-10">
           <div className="profile flex flex-col items-start">
             <label htmlFor="password" className="font-semibold">
-              密碼
+              {currentLanguageLookup.PROFILES.password}
             </label>
             <input
               type="password"
@@ -216,7 +224,7 @@ export default function Profile() {
             />
           </div>
           <button className="profile-button w-30 h-8 rounded-md text-sm">
-            變更密碼
+            {currentLanguageLookup.PROFILES.changePassword}
           </button>
         </div>
       </div>

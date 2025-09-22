@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import Image from "next/image";
 import { scheduleCacheClear } from "@/utils/cardLookup";
+import { useLanguage } from "@/components/provider/LanguageProvider";
 
 const useWebWorkerPreprocessing = () => {
   const [preprocessingWorker, setPreprocessingWorker] = useState<Worker | null>(
@@ -56,6 +57,7 @@ export default function S3CardsPage() {
   const [s3Cards, setS3Cards] = useState<{ id: string; url: string }[]>([]);
   const [packageInDB, setPackageInDB] = useState<boolean>(false);
   const { preprocessWithWorker } = useWebWorkerPreprocessing();
+  const { currentLanguageLookup } = useLanguage();
 
   const searchCards = () => {
     const toastPromise = new Promise(async (resolve, reject) => {
@@ -82,9 +84,9 @@ export default function S3CardsPage() {
     });
 
     toast.promise(toastPromise, {
-      loading: "Loading S3 cards...",
-      error: "Failed to load S3 cards",
-      success: "S3 cards loaded successfully",
+      loading: currentLanguageLookup.NOTIFICATIONS.loadingS3Cards,
+      error: currentLanguageLookup.NOTIFICATIONS.failedToLoadS3Cards,
+      success: currentLanguageLookup.NOTIFICATIONS.s3CardsLoadedSuccessfully,
     });
   };
 
@@ -141,9 +143,9 @@ export default function S3CardsPage() {
           });
 
           toast.promise(toastPromise, {
-            loading: "Saving cards...",
-            error: "Failed to save cards",
-            success: "Cards saved successfully",
+            loading: currentLanguageLookup.NOTIFICATIONS.savingCards,
+            error: currentLanguageLookup.NOTIFICATIONS.failedToSaveCards,
+            success: currentLanguageLookup.NOTIFICATIONS.cardsSavedSuccessfully,
           });
         } catch (error) {
           console.error(error);
@@ -164,49 +166,59 @@ export default function S3CardsPage() {
           onChange={(e) => setPackageId(e.target.value)}
           className="dropdown"
         >
-          <option value="">Select Package</option>
-          <option value="A1_charizard_genetic-apex">A1 - Genetic Apex</option>
-          <option value="A1a">A1a - Mythical Island</option>
-          <option value="A2">A2 - Space-Time Smackdown</option>
-          <option value="A2a">A2a - Triumphant Light</option>
-          <option value="A2b">A2b - Shining Rivalry</option>
-          <option value="A3">A3 - Celestial Guardians</option>
-          <option value="A3a">A3a - Extradimensional Crisis</option>
-          <option value="A3b">A3b - Eevee Groove</option>
-          <option value="A4">A4 - Wisdom of Sea and Sky</option>
-          <option value="A4a">A4a - Secluded Springs</option>
+          <option value="">
+            {currentLanguageLookup.S3_CARDS.selectPackage}
+          </option>
+          <option value="A1_charizard_genetic-apex">
+            {currentLanguageLookup.PACKAGES.A1}
+          </option>
+          <option value="A1a">{currentLanguageLookup.PACKAGES.A1a}</option>
+          <option value="A2">{currentLanguageLookup.PACKAGES.A2}</option>
+          <option value="A2a">{currentLanguageLookup.PACKAGES.A2a}</option>
+          <option value="A2b">{currentLanguageLookup.PACKAGES.A2b}</option>
+          <option value="A3">{currentLanguageLookup.PACKAGES.A3}</option>
+          <option value="A3a">{currentLanguageLookup.PACKAGES.A3a}</option>
+          <option value="A3b">{currentLanguageLookup.PACKAGES.A3b}</option>
+          <option value="A4">{currentLanguageLookup.PACKAGES.A4}</option>
+          <option value="A4a">{currentLanguageLookup.PACKAGES.A4a}</option>
         </select>
         <select
           value={language}
           onChange={(e) => setLanguage(e.target.value)}
           className="dropdown"
         >
-          <option value="">Select Language</option>
+          <option value="">
+            {currentLanguageLookup.S3_CARDS.selectLanguage}
+          </option>
+          <option value="zh_TW">繁體中文</option>
+          <option value="ja_JP">日本語</option>
           <option value="en_US">English</option>
-          <option value="ja_JP">Japanese</option>
-          <option value="zh_TW">Mandarin</option>
         </select>
         <button className="put-cards mr-5" onClick={searchCards}>
-          Search Cards
+          {currentLanguageLookup.S3_CARDS.searchCards}
         </button>
         {!packageInDB && (
           <button className="put-cards" onClick={putCards}>
-            Put Cards
+            {currentLanguageLookup.S3_CARDS.putCards}
           </button>
         )}
-        {packageInDB && <div className="put-cards">Cards in DB</div>}
+        {packageInDB && (
+          <div className="put-cards">
+            {currentLanguageLookup.S3_CARDS.cardsInDB}
+          </div>
+        )}
       </div>
       <div className="flex flex-col items-center justify-center">
         <h3 className="text-2xl font-bold mb-5">
-          {s3Cards.length} cards found
+          {s3Cards.length} {currentLanguageLookup.S3_CARDS.cardsFound}
         </h3>
         <table className="cards-container w-80 m-auto">
           <thead>
             <tr>
-              <th>IMAGE</th>
-              <th>ID</th>
-              <th>IMAGE</th>
-              <th>ID</th>
+              <th>{currentLanguageLookup.S3_CARDS.image}</th>
+              <th>{currentLanguageLookup.S3_CARDS.id}</th>
+              <th>{currentLanguageLookup.S3_CARDS.image}</th>
+              <th>{currentLanguageLookup.S3_CARDS.id}</th>
             </tr>
           </thead>
           <tbody>

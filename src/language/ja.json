@@ -1,1 +1,114 @@
-{"HEADER_TABS":{"cards":"カード","decksList":"デッキコラム","search":"検索","myDecks":"私のデッキ","deckCollection":"デッキコレクション","deckBuilder":"デッキ構築","users":"ユーザー","s3Cards":"S3カード"},"PROFILES":{"profile":"個人資料","language":"言語","username":"名前","email":"電子メール","password":"パスワード","changeAvatar":"アバターを変更","changeName":"名前を変更する","changePassword":"パスワードを変更する","logout":"サインアウト"},"LOGIN":{"login":"ログイン","username":"ユーザー名","email":"電子メール","password":"パスワード","confirmPassword":"パスワードを認証する","forgotPassword":"パスワードを忘れた","register":"登録する","joinNow":"現在加入","loginWithGoogle":"Googleでログイン"},"FILTER":{"all":"全て","pokemon":"ポケモン","pokemonex":"ポケモンEX","specialArt":"特殊芸術","liveCard":"リアリティカード","crown":"クラウン"},"SEARCH":{"enterPokemonName":"ポケモンの名前を入力してください","type":"財産","rarity":"希少性","package":"シリーズ","boosterPack":"拡張パック","speicalEffect":"特撮","fightEnergy":"エネルギーを動かす","weakness":"弱点"},"USERS":{"username":"ユーザー名","email":"電子メール","provider":"プロバイダー","createdAt":"セットアップ時間","admin":"管理者"},"S3_CARDS":{"selectPackage":"シリーズを選択","selectLanguage":"言語を選択","searchCards":"カードを検索","putCards":"カードをアップロード","cardsInDB":"すでにデータベースに登録されています","cardsFound":"カードが見つかりました","image":"写真","id":"ID"},"NOTIFICATIONS":{"loadingPackages":"シリーズの読み込み","failedToLoadPackages":"シリーズの読み込みに失敗しました","packagesLoaded":"シリーズが正常に読み込まれました","loadingCards":"カードの読み込み","failedToLoadCards":"カードの読み込みに失敗しました","cardsLoadedSuccessfully":"カードが正常に読み込まれました","loading":"読み込み中","loadingSuccessful":"読み込みに成功しました","loadingUsers":"ユーザーを読み込んでいます","failedToLoadUsers":"ユーザーの読み込みに失敗しました","usersLoadedSuccessfully":"ユーザーは正常に読み込まれました","loadingS3Cards":"S3 カードの読み込み","failedToLoadS3Cards":"S3 カードの読み込みに失敗しました","s3CardsLoadedSuccessfully":"S3 カードが正常にロードされました","savingCards":"カードの保管","failedToSaveCards":"カードを保存できませんでした","cardsSavedSuccessfully":"カードは正常に保存されました","updatingName":"名前を更新","failedToUpdateName":"名前の更新に失敗しました","nameUpdatedSuccessfully":"名前が正常に更新されました"}}
+{
+  "HEADER_TABS": {
+    "cards": "カード",
+    "decksList": "デッキコラム",
+    "search": "検索",
+    "myDecks": "私のデッキ",
+    "deckCollection": "デッキコレクション",
+    "deckBuilder": "デッキ構築",
+    "users": "ユーザー",
+    "s3Cards": "S3カード"
+  },
+  "PROFILES": {
+    "profile": "個人資料",
+    "language": "言語",
+    "username": "名前",
+    "email": "電子メール",
+    "password": "パスワード",
+    "changeAvatar": "アバターを変更",
+    "uploadAvatar": "アバターをアップロード",
+    "changeName": "名前を変更する",
+    "changePassword": "パスワードを変更する",
+    "logout": "サインアウト"
+  },
+  "LOGIN": {
+    "login": "ログイン",
+    "username": "ユーザー名",
+    "email": "電子メール",
+    "password": "パスワード",
+    "confirmPassword": "パスワードを認証する",
+    "forgotPassword": "パスワードを忘れた",
+    "register": "登録する",
+    "notAMember": "メンバーではありませんか？",
+    "joinNow": "現在加入",
+    "loginWithGoogle": "Googleでログイン"
+  },
+  "FILTER": {
+    "all": "全て",
+    "pokemon": "ポケモン",
+    "pokemonex": "ポケモンEX",
+    "specialArt": "特殊芸術",
+    "liveCard": "リアリティカード",
+    "crown": "クラウン"
+  },
+  "SEARCH": {
+    "enterPokemonName": "ポケモンの名前を入力してください",
+    "type": "財産",
+    "rarity": "希少性",
+    "package": "シリーズ",
+    "boosterPack": "拡張パック",
+    "speicalEffect": "特撮",
+    "fightEnergy": "エネルギーを動かす",
+    "weakness": "弱点"
+  },
+  "USERS": {
+    "username": "ユーザー名",
+    "email": "電子メール",
+    "provider": "プロバイダー",
+    "createdAt": "セットアップ時間",
+    "admin": "管理者"
+  },
+  "S3_CARDS": {
+    "selectPackage": "シリーズを選択",
+    "selectLanguage": "言語を選択",
+    "searchCards": "カードを検索",
+    "putCards": "カードをアップロード",
+    "cardsInDB": "すでにデータベースに登録されています",
+    "cardsFound": "カードが見つかりました",
+    "image": "写真",
+    "id": "ID"
+  },
+  "PACKAGES": {
+    "A1": "A1 - 最強の遺伝子",
+    "A1a": "A1a - 幻のいる島",
+    "A2": "A2 - 時空の激闘",
+    "A2a": "A2a - 超克の光",
+    "A2b": "A2b - シャイニングハイ",
+    "A3": "A3 - 双天の守護者",
+    "A3a": "A3a - 異次元クライシス",
+    "A3b": "A3b - イーブイガーデン",
+    "A4": "A4 - 空と海の導き",
+    "A4a": "A4a - 未知なる水域"
+  },
+  "NOTIFICATIONS": {
+    "loggingIn": "ログイン中",
+    "loginSuccessful": "ログインに成功しました",
+    "loginFailed": "ログインに失敗しました",
+    "connectingToGoogle": "Google に接続しています",
+    "failedToLoginWithGoogle": "Google でのログインに失敗しました",
+    "googleLoginSuccessful": "Google でのログインに成功しました",
+    "registering": "登録中",
+    "registrationSuccessful": "登録に成功しました",
+    "registrationFailed": "登録に失敗しました",
+    "loadingPackages": "シリーズの読み込み",
+    "failedToLoadPackages": "シリーズの読み込みに失敗しました",
+    "packagesLoaded": "シリーズが正常に読み込まれました",
+    "loadingCards": "カードの読み込み",
+    "failedToLoadCards": "カードの読み込みに失敗しました",
+    "cardsLoadedSuccessfully": "カードが正常に読み込まれました",
+    "loading": "読み込み中",
+    "loadingSuccessful": "読み込みに成功しました",
+    "loadingUsers": "ユーザーを読み込んでいます",
+    "failedToLoadUsers": "ユーザーの読み込みに失敗しました",
+    "usersLoadedSuccessfully": "ユーザーは正常に読み込まれました",
+    "loadingS3Cards": "S3 カードの読み込み",
+    "failedToLoadS3Cards": "S3 カードの読み込みに失敗しました",
+    "s3CardsLoadedSuccessfully": "S3 カードが正常にロードされました",
+    "savingCards": "カードの保管",
+    "failedToSaveCards": "カードを保存できませんでした",
+    "cardsSavedSuccessfully": "カードは正常に保存されました",
+    "updatingName": "名前を更新",
+    "failedToUpdateName": "名前の更新に失敗しました",
+    "nameUpdatedSuccessfully": "名前が正常に更新されました"
+  }
+}

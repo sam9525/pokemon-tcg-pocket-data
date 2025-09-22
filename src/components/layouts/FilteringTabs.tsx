@@ -1,9 +1,11 @@
 export default function FilteringTabs({
   filter,
   setFilter,
+  currentLanguageLookup,
 }: {
   filter: string[];
   setFilter: (filter: string[]) => void;
+  currentLanguageLookup: Record<string, Record<string, string>>;
 }) {
   return (
     <div className="flex gap-6 mb-8">
@@ -11,7 +13,7 @@ export default function FilteringTabs({
         className={`filtering-button ${filter.length === 0 ? "active" : ""}`}
         onClick={() => setFilter([])}
       >
-        全部
+        {currentLanguageLookup.FILTER.all}
       </div>
       <div
         className={`filtering-button ${
@@ -19,7 +21,7 @@ export default function FilteringTabs({
         }`}
         onClick={() => setFilter(["pokemon"])}
       >
-        寶可夢
+        {currentLanguageLookup.FILTER.pokemon}
       </div>
       <div
         className={`filtering-button ${
@@ -27,7 +29,7 @@ export default function FilteringTabs({
         }`}
         onClick={() => setFilter(["pokemon-ex"])}
       >
-        寶可夢ex
+        {currentLanguageLookup.FILTER.pokemonex}
       </div>
       <div
         className={`filtering-button ${
@@ -35,7 +37,7 @@ export default function FilteringTabs({
         }`}
         onClick={() => setFilter(["special-art"])}
       >
-        Special Art
+        {currentLanguageLookup.FILTER.specialArt}
       </div>
       <div
         className={`filtering-button ${
@@ -43,7 +45,7 @@ export default function FilteringTabs({
         }`}
         onClick={() => setFilter(["real-art"])}
       >
-        實境卡
+        {currentLanguageLookup.FILTER.liveCard}
       </div>
       <div
         className={`filtering-button ${
@@ -51,7 +53,7 @@ export default function FilteringTabs({
         }`}
         onClick={() => setFilter(["crown"])}
       >
-        皇冠
+        {currentLanguageLookup.FILTER.crown}
       </div>
     </div>
   );

@@ -4,10 +4,12 @@ import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import toast from "react-hot-toast";
+import { useLanguage } from "@/components/provider/LanguageProvider";
 
 export default function Home() {
   const hasLoaded = useRef(false);
   const [packages, setPackages] = useState<{ id: string; url: string }[]>([]);
+  const { currentLanguageLookup } = useLanguage();
 
   useEffect(() => {
     if (hasLoaded.current) return;
@@ -27,14 +29,14 @@ export default function Home() {
       });
 
       toast.promise(toastPromise, {
-        loading: "Loading packages...",
-        error: "Failed to load packages",
-        success: "Packages loaded successfully",
+        loading: currentLanguageLookup.NOTIFICATIONS.loadingPackages,
+        error: currentLanguageLookup.NOTIFICATIONS.failedToLoadPackages,
+        success: currentLanguageLookup.NOTIFICATIONS.packagesLoaded,
       });
     } catch (error) {
       console.error(error);
     }
-  }, []);
+  }, [currentLanguageLookup]);
   return (
     <div className="flex flex-col items-center justify-center m-10">
       <div className="grid grid-cols-3 gap-15">
