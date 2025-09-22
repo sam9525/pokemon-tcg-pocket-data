@@ -1,6 +1,6 @@
 {
   "apphosting": {
-    "backendId": "pokemon-tcgp-data-backend",
+    "backendId": "pokemon-tcg-pocket-data",
     "rootDir": "/",
     "ignore": [
       "node_modules",
