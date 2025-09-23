@@ -2,10 +2,10 @@ export const TYPE_MAPPINGS: Record<string, string> = {
   cmn_icn_ene_01_gra: "green",
   cmn_icn_ene_02_fir: "fire",
   cmn_icn_ene_03_wat: "water",
-  cmn_icn_ene_04_lig: "lighting",
+  cmn_icn_ene_04_lig: "lightning",
   cmn_icn_ene_05_psy: "psychic",
   cmn_icn_ene_06_fig: "fighting",
-  cmn_icn_ene_07_dar: "dark",
+  cmn_icn_ene_07_dar: "darkness",
   cmn_icn_ene_08_met: "metal",
   cmn_icn_ene_09_dra: "dragon",
   cmn_icn_ene_10_nor: "colorless",
@@ -35,6 +35,8 @@ const PACKAGE_CODES = [
   ["A3", "celestial-guardians"],
   ["A3a", "extradimensional-crisis"],
   ["A3b", "eevee-groove"],
+  ["A4", "wisdom-of-sea-and-sky"],
+  ["A4a", "secluded-springs"],
 ];
 
 const LANGUAGES = ["zh_TW", "ja_JP", "en_US"];
@@ -63,6 +65,9 @@ const BOOSTER_CODES = [
   ["A3_100100_LUNALA", "lunala"],
   ["A3a_100110_CRISIS", "nihilego"],
   ["A3b_100120_EIEVUI", "eevee"],
+  ["A4_100130_HOUOU", "houou"],
+  ["A4_100140_LUGIA", "lugia"],
+  ["A4a_100150_SUICUNE", "suicune"],
 ];
 
 export const BOOSTER_MAPPINGS: Record<
@@ -75,3 +80,39 @@ export const BOOSTER_MAPPINGS: Record<
   }, {} as Record<string, string>);
   return acc;
 }, {} as Record<string, Record<string, string>>);
+
+export const SPECIFIC_EFFECT_MAPPINGS: Record<string, string> = {
+  ba_icn_01_sp_poisoned: "poisoned",
+  ba_icn_02_sp_burned: "burned",
+  ba_icn_03_sp_asleep: "asleep",
+  ba_icn_04_sp_paralyzed: "paralyzed",
+  ba_icn_05_sp_confused: "confused",
+  ba_icn_06_cont_invalid: "invalid",
+  ba_icn_07_cont_ban: "ban",
+  ba_icn_08_cont_buff: "buff",
+  ba_icn_09_cont_debuff: "debuff",
+  ba_icn_10_cont_other_negative: "other negative",
+  ba_icn_11_cont_other_positive: "other positive",
+};
+
+export const FIGHT_ENERGY_MAPPINGS: Record<string, string> = {
+  cmn_icn_ene_01_gra: "green",
+  cmn_icn_ene_02_fir: "fire",
+  cmn_icn_ene_03_wat: "water",
+  cmn_icn_ene_04_lig: "lightning",
+  cmn_icn_ene_05_psy: "psychic",
+  cmn_icn_ene_06_fig: "fighting",
+  cmn_icn_ene_07_dar: "darkness",
+  cmn_icn_ene_08_met: "metal",
+};
+
+export const WEAKNESS_MAPPINGS: Record<string, string> = {
+  cmn_icn_ene_01_gra: "green",
+  cmn_icn_ene_02_fir: "fire",
+  cmn_icn_ene_03_wat: "water",
+  cmn_icn_ene_04_lig: "lightning",
+  cmn_icn_ene_05_psy: "psychic",
+  cmn_icn_ene_06_fig: "fighting",
+  cmn_icn_ene_07_dar: "darkness",
+  cmn_icn_ene_08_met: "metal",
+};

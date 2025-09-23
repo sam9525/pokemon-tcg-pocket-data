@@ -5,6 +5,9 @@ import {
   RARITY_MAPPINGS,
   PACKAGE_MAPPINGS,
   BOOSTER_MAPPINGS,
+  SPECIFIC_EFFECT_MAPPINGS,
+  FIGHT_ENERGY_MAPPINGS,
+  WEAKNESS_MAPPINGS,
 } from "@/utils/constants";
 
 export async function POST(request: Request) {
@@ -51,32 +54,59 @@ export async function POST(request: Request) {
         .flatMap((rarity: string) => RARITY_MAPPINGS[rarity] || rarity)
         .filter(Boolean);
 
-      console.log(mappedRarity);
       if (mappedRarity.length > 0) {
         query.rarity = { $in: mappedRarity };
       }
     }
 
-    // Handle package filter
-    if (filters.package_icons && filters.package_icons.length > 0) {
-      const mappedPackageIcons = filters.package_icons
-        .map((icon: string) => PACKAGE_MAPPINGS[language][icon] || icon)
-        .filter(Boolean);
+    // Handler function
+    function handleFilter(
+      filterKey: string,
+      queryKey: string,
+      mappings: Record<string, string>
+    ) {
+      if (filters[filterKey] && filters[filterKey].length > 0) {
+        const mappedFilter = filters[filterKey]
+          .map((search: string) => mappings[search] || search)
+          .filter(Boolean);
 
-      if (mappedPackageIcons.length > 0) {
-        query.package = { $in: mappedPackageIcons };
+        if (mappedFilter.length > 0) {
+          query[queryKey] = { $in: mappedFilter };
+        }
       }
     }
 
-    // Handle booster filter
-    if (filters.Boosters_icon && filters.Boosters_icon.length > 0) {
-      const mappedBoosterIcon = filters.Boosters_icon.map(
-        (icon: string) => BOOSTER_MAPPINGS[language][icon] || icon
-      ).filter(Boolean);
+    // Iterating over filter definitions
+    const filterConfigs = [
+      {
+        filterKey: "package_icons",
+        queryKey: "package",
+        mappings: PACKAGE_MAPPINGS[language],
+      },
+      {
+        filterKey: "Boosters_icon",
+        queryKey: "boosterPack",
+        mappings: BOOSTER_MAPPINGS[language],
+      },
+      {
+        filterKey: "specific_effect",
+        queryKey: "specificEffect",
+        mappings: SPECIFIC_EFFECT_MAPPINGS,
+      },
+      {
+        filterKey: "fight_energy",
+        queryKey: "fightEnergy",
+        mappings: FIGHT_ENERGY_MAPPINGS,
+      },
+      {
+        filterKey: "weakness",
+        queryKey: "weakness",
+        mappings: WEAKNESS_MAPPINGS,
+      },
+    ];
 
-      if (mappedBoosterIcon.length > 0) {
-        query.boosterPack = { $in: mappedBoosterIcon };
-      }
+    for (const { filterKey, queryKey, mappings } of filterConfigs) {
+      handleFilter(filterKey, queryKey, mappings);
     }
 
     const cards = await Card.find(query);

@@ -147,7 +147,6 @@ export default function SearchPage() {
         return [...prevFiltering, [filterName, id]];
       }
     });
-    console.log(filtering);
   };
 
   // Filter section component
