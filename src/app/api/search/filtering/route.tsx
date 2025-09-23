@@ -17,9 +17,11 @@ export async function POST(request: Request) {
 
     // Get filters from request body
     const filters = await request.json();
+    const language = request.headers.get("language") as string;
 
     // Build MongoDB query based on filters
     const query: Record<string, unknown> = {};
+    query.language = language;
 
     // Handle types filter
     if (
@@ -58,7 +60,7 @@ export async function POST(request: Request) {
     // Handle package filter
     if (filters.package_icons && filters.package_icons.length > 0) {
       const mappedPackageIcons = filters.package_icons
-        .map((icon: string) => PACKAGE_MAPPINGS[icon] || icon)
+        .map((icon: string) => PACKAGE_MAPPINGS[language][icon] || icon)
         .filter(Boolean);
 
       if (mappedPackageIcons.length > 0) {
@@ -69,7 +71,7 @@ export async function POST(request: Request) {
     // Handle booster filter
     if (filters.Boosters_icon && filters.Boosters_icon.length > 0) {
       const mappedBoosterIcon = filters.Boosters_icon.map(
-        (icon: string) => BOOSTER_MAPPINGS[icon] || icon
+        (icon: string) => BOOSTER_MAPPINGS[language][icon] || icon
       ).filter(Boolean);
 
       if (mappedBoosterIcon.length > 0) {

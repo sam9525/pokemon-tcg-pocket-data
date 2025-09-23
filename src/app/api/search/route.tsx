@@ -28,9 +28,10 @@ const ListObjects = async (
   });
 };
 
-export async function GET() {
+export async function GET(request: Request) {
   try {
-    const cachePrefix = "search";
+    const language = request.headers.get("language");
+    const cachePrefix = "search-" + language;
 
     // Get the response from the cache
     const cached = cacheManager.get(cachePrefix);
@@ -56,8 +57,8 @@ export async function GET() {
       await Promise.all([
         ListObjects(s3Client, bucket, "Types/", ""),
         ListObjects(s3Client, bucket, "Rarity/", ""),
-        ListObjects(s3Client, bucket, "Packages-Title-Icon/", "zh_TW"),
-        ListObjects(s3Client, bucket, "Booster-Pack-Icon/", "zh_TW"),
+        ListObjects(s3Client, bucket, "Packages-Title-Icon/", language ?? ""),
+        ListObjects(s3Client, bucket, "Booster-Pack-Icon/", language ?? ""),
         ListObjects(s3Client, bucket, "Special-Effect/", ""),
       ]);
 

@@ -26,30 +26,52 @@ export const RARITY_MAPPINGS: Record<string, string[]> = {
   "pack_icn_rarity_detail_04-1": ["ultra rare"],
 };
 
-export const LANGUAGE = "zh_TW";
+const PACKAGE_CODES = [
+  ["A1", "genetic-apex"],
+  ["A1a", "mythical-island"],
+  ["A2", "space-time-smackdown"],
+  ["A2a", "triumphant-light"],
+  ["A2b", "shining-rivalry"],
+  ["A3", "celestial-guardians"],
+  ["A3a", "extradimensional-crisis"],
+  ["A3b", "eevee-groove"],
+];
 
-export const PACKAGE_MAPPINGS: Record<string, string> = {
-  [`LOGO_expansion_A1_${LANGUAGE}`]: "A1_genetic-apex",
-  [`LOGO_expansion_A1a_${LANGUAGE}`]: "A1a_mythical-island",
-  [`LOGO_expansion_A2_${LANGUAGE}`]: "A2_space-time-smackdown",
-  [`LOGO_expansion_A2a_${LANGUAGE}`]: "A2a_triumphant-light",
-  [`LOGO_expansion_A2b_${LANGUAGE}`]: "A2b_shining-rivalry",
-  [`LOGO_expansion_A3_${LANGUAGE}`]: "A3_celestial-guardians",
-  [`LOGO_expansion_A3a_${LANGUAGE}`]: "A3a_extradimensional-crisis",
-  [`LOGO_expansion_A3b_${LANGUAGE}`]: "A3b_eevee-groove",
-};
+const LANGUAGES = ["zh_TW", "ja_JP", "en_US"];
 
-export const BOOSTER_MAPPINGS: Record<string, string> = {
-  [`EXPANSION_PACK_A1_100020_LIZARDON_${LANGUAGE}`]: "charizard",
-  [`EXPANSION_PACK_A1_100030_PIKACHU_${LANGUAGE}`]: "pikachu",
-  [`EXPANSION_PACK_A1_100010_MEWTWO_${LANGUAGE}`]: "mewtwo",
-  [`EXPANSION_PACK_A1_100040_theme_${LANGUAGE}`]: "mew",
-  [`EXPANSION_PACK_A2_100050_DIALGA_${LANGUAGE}`]: "dialga",
-  [`EXPANSION_PACK_A2_100060_PALKIA_${LANGUAGE}`]: "palkia",
-  [`EXPANSION_PACK_A2a_100070_TRIUMPHAN_${LANGUAGE}`]: "arceus",
-  [`EXPANSION_PACK_A2b_100080_SHINING${LANGUAGE}`]: "shining",
-  [`EXPANSION_PACK_A3_100090_SOLGALEO_${LANGUAGE}`]: "solgaleo",
-  [`EXPANSION_PACK_A3_100100_LUNALA_${LANGUAGE}`]: "lunala",
-  [`EXPANSION_PACK_A3a_100110_CRISIS_${LANGUAGE}`]: "nihilego",
-  [`EXPANSION_PACK_A3b_100120_EIEVUI_${LANGUAGE}`]: "eevee",
-};
+export const PACKAGE_MAPPINGS: Record<
+  string,
+  Record<string, string>
+> = LANGUAGES.reduce((acc, lang) => {
+  acc[lang] = PACKAGE_CODES.reduce((pkgAcc, [code, name]) => {
+    pkgAcc[`LOGO_expansion_${code}_${lang}`] = `${code}_${name}`;
+    return pkgAcc;
+  }, {} as Record<string, string>);
+  return acc;
+}, {} as Record<string, Record<string, string>>);
+
+const BOOSTER_CODES = [
+  ["A1_100020_LIZARDON", "charizard"],
+  ["A1_100030_PIKACHU", "pikachu"],
+  ["A1_100010_MEWTWO", "mewtwo"],
+  ["A1_100040_theme", "mew"],
+  ["A2_100050_DIALGA", "dialga"],
+  ["A2_100060_PALKIA", "palkia"],
+  ["A2a_100070_TRIUMPHAN", "arceus"],
+  ["A2b_100080_SHINING", "shining"],
+  ["A3_100090_SOLGALEO", "solgaleo"],
+  ["A3_100100_LUNALA", "lunala"],
+  ["A3a_100110_CRISIS", "nihilego"],
+  ["A3b_100120_EIEVUI", "eevee"],
+];
+
+export const BOOSTER_MAPPINGS: Record<
+  string,
+  Record<string, string>
+> = LANGUAGES.reduce((acc, lang) => {
+  acc[lang] = BOOSTER_CODES.reduce((pkgAcc, [code, name]) => {
+    pkgAcc[`EXPANSION_PACK_${code}_${lang}`] = `${name}`;
+    return pkgAcc;
+  }, {} as Record<string, string>);
+  return acc;
+}, {} as Record<string, Record<string, string>>);

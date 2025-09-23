@@ -50,13 +50,17 @@ export default function SearchPage() {
   const [specific_effect, setSpecificEffect] = useState<FilterItem[]>([]);
   const [filtering, setFiltering] = useState<[string, string][]>([]);
   const [searchResult, setSearchResult] = useState<FilterItem[]>([]);
-  const { currentLanguageLookup } = useLanguage();
+  const { language, currentLanguageLookup } = useLanguage();
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         setIsLoading(true);
-        const res = await fetch("/api/search");
+        const res = await fetch(`/api/search`, {
+          headers: {
+            language: language,
+          },
+        });
         const data = await res.json();
         setTypes(data.types);
         setRarity(data.rarity);
@@ -71,7 +75,7 @@ export default function SearchPage() {
     };
 
     fetchData();
-  }, []);
+  }, [language]);
 
   useEffect(() => {
     if (hasLoaded.current) return;
@@ -113,6 +117,7 @@ export default function SearchPage() {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
+            language: language,
           },
           body: JSON.stringify(filterObject),
         });
@@ -126,7 +131,7 @@ export default function SearchPage() {
     };
 
     fetchSearchResult();
-  }, [filtering]);
+  }, [filtering, language]);
 
   const mouseClick = (filterName: string, id: string) => {
     setFiltering((prevFiltering) => {
