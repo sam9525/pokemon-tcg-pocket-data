@@ -212,7 +212,7 @@ export default function S3CardsPage() {
         <h3 className="text-2xl font-bold mb-5">
           {s3Cards.length} {currentLanguageLookup.S3_CARDS.cardsFound}
         </h3>
-        <table className="cards-container w-80 m-auto">
+        <table className="cards-container m-auto">
           <thead>
             <tr>
               <th>{currentLanguageLookup.S3_CARDS.image}</th>
