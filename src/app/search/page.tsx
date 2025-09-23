@@ -113,16 +113,30 @@ export default function SearchPage() {
           filterObject[filterName].push(id);
         });
 
-        const res = await fetch("/api/search/filtering", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            language: language,
-          },
-          body: JSON.stringify(filterObject),
+        const toastPromise = new Promise(async (resolve, reject) => {
+          const res = await fetch("/api/search/filtering", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              language: language,
+            },
+            body: JSON.stringify(filterObject),
+          });
+          const data = await res.json();
+          setSearchResult(data);
+
+          if (res.ok) {
+            resolve(res);
+          } else {
+            reject(res);
+          }
         });
-        const data = await res.json();
-        setSearchResult(data);
+
+        toast.promise(toastPromise, {
+          loading: currentLanguageLookup.NOTIFICATIONS.loadingCards,
+          error: currentLanguageLookup.NOTIFICATIONS.failedToLoadCards,
+          success: currentLanguageLookup.NOTIFICATIONS.cardsLoadedSuccessfully,
+        });
       } catch (error) {
         console.error(error);
       } finally {
@@ -131,7 +145,7 @@ export default function SearchPage() {
     };
 
     fetchSearchResult();
-  }, [filtering, language]);
+  }, [filtering, language, currentLanguageLookup]);
 
   const mouseClick = (filterName: string, id: string) => {
     setFiltering((prevFiltering) => {
