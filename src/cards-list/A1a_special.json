@@ -1,0 +1,142 @@
+{
+  "002150": {
+    "fight_energy": "colorless"
+  },
+  "002290": {
+    "fight_energy": "colorless"
+  },
+  "002450": {
+    "fight_energy": "psychic colorless"
+  },
+  "002480": {
+    "weekness": "metal"
+  },
+  "002490": {
+    "weekness": "metal"
+  },
+  "002510": {
+    "weekness": "metal"
+  },
+  "002520": {
+    "weekness": "metal"
+  },
+  "002530": {
+    "weekness": "metal"
+  },
+  "002540": {
+    "weekness": "psychic"
+  },
+  "002550": {
+    "weekness": "psychic"
+  },
+  "002590": {
+    "weekness": "lightning"
+  },
+  "002600": {
+    "weekness": "psychic"
+  },
+  "002640": {
+    "weekness": "grass"
+  },
+  "002650": {
+    "weekness": "grass"
+  },
+  "002690": {
+    "fight_energy": "fire water colorless",
+    "weekness": "none"
+  },
+  "002720": {
+    "weekness": "lightning"
+  },
+  "002730": {
+    "weekness": "lightning"
+  },
+  "002740": {
+    "weekness": "lightning"
+  },
+  "002750": {
+    "weekness": "lightning"
+  },
+  "000330": {
+    "boosterPack": [
+      "promo-a"
+    ]
+  },
+  "000470": {
+    "boosterPack": [
+      "promo-a"
+    ],
+    "weekness": "lightning"
+  },
+  "000530": {
+    "boosterPack": [
+      "promo-a"
+    ]
+  },
+  "000550": {
+    "boosterPack": [
+      "promo-a"
+    ]
+  },
+  "000940": {
+    "boosterPack": [
+      "promo-a"
+    ]
+  },
+  "002110": {
+    "boosterPack": [
+      "promo-a"
+    ]
+  },
+  "002280": {
+    "boosterPack": [
+      "promo-a"
+    ]
+  },
+  "002800": {
+    "boosterPack": [
+      "promo-a"
+    ]
+  },
+  "002810": {
+    "boosterPack": [
+      "promo-a"
+    ]
+  },
+  "MABOROSHINOSEKIBAN": {
+    "type": "none",
+    "trainer": "tool",
+    "fight_energy": "none",
+    "weakness": "none"
+  },
+  "POKEMONNOFUE": {
+    "type": "none",
+    "trainer": "tool",
+    "fight_energy": "none",
+    "weakness": "none"
+  },
+  "GREEN": {
+    "type": "none",
+    "fight_energy": "none",
+    "weakness": "none"
+  },
+  "KAKEDASHICHOSAIN": {
+    "type": "none",
+    "fight_energy": "none",
+    "weakness": "none"
+  },
+  "LEAF": {
+    "type": "none",
+    "fight_energy": "none",
+    "weakness": "none"
+  },
+  "POKEMONZUKAN": {
+    "type": "none",
+    "boosterPack": [
+      "promo-a"
+    ],
+    "trainer": "tool",
+    "fight_energy": "none",
+    "weakness": "none"
+  }
+}

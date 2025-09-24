@@ -55,7 +55,6 @@ self.onmessage = async (event) => {
 
       // Extract card package from packageId
       const packageCode = packageId?.split("_")[0];
-      const card_package = `${packageCode}_${packageId?.split("_")[2]}`;
 
       let card_type = null;
       let card_booster_pack: string[] = [];
@@ -107,7 +106,7 @@ self.onmessage = async (event) => {
         cardId: image_name,
         name: card_name,
         type: card_type,
-        package: card_package,
+        package: packageId,
         boosterPack: card_booster_pack,
         trainer: card_trainer,
         rarity: card_rarity,
