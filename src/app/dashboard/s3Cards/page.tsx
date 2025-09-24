@@ -172,15 +172,33 @@ export default function S3CardsPage() {
           <option value="A1_charizard_genetic-apex">
             {currentLanguageLookup.PACKAGES.A1}
           </option>
-          <option value="A1a">{currentLanguageLookup.PACKAGES.A1a}</option>
-          <option value="A2">{currentLanguageLookup.PACKAGES.A2}</option>
-          <option value="A2a">{currentLanguageLookup.PACKAGES.A2a}</option>
-          <option value="A2b">{currentLanguageLookup.PACKAGES.A2b}</option>
-          <option value="A3">{currentLanguageLookup.PACKAGES.A3}</option>
-          <option value="A3a">{currentLanguageLookup.PACKAGES.A3a}</option>
-          <option value="A3b">{currentLanguageLookup.PACKAGES.A3b}</option>
-          <option value="A4">{currentLanguageLookup.PACKAGES.A4}</option>
-          <option value="A4a">{currentLanguageLookup.PACKAGES.A4a}</option>
+          <option value="A1a_mythical-island">
+            {currentLanguageLookup.PACKAGES.A1a}
+          </option>
+          <option value="A2_space-time-smackdown">
+            {currentLanguageLookup.PACKAGES.A2}
+          </option>
+          <option value="A2a_triumphant-light">
+            {currentLanguageLookup.PACKAGES.A2a}
+          </option>
+          <option value="A2b_shining-rivalry">
+            {currentLanguageLookup.PACKAGES.A2b}
+          </option>
+          <option value="A3_celestial-guardians">
+            {currentLanguageLookup.PACKAGES.A3}
+          </option>
+          <option value="A3a_extradimensional-crisis">
+            {currentLanguageLookup.PACKAGES.A3a}
+          </option>
+          <option value="A3b_eevee-groove">
+            {currentLanguageLookup.PACKAGES.A3b}
+          </option>
+          <option value="A4_wisdom-of-sea-and-sky">
+            {currentLanguageLookup.PACKAGES.A4}
+          </option>
+          <option value="A4a_secluded-springs ">
+            {currentLanguageLookup.PACKAGES.A4a}
+          </option>
         </select>
         <select
           value={language}
