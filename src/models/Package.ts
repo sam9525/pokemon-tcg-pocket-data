@@ -6,4 +6,6 @@ const packageSchema = new Schema({
   inDatabase: { type: Boolean, default: false },
 });
 
+packageSchema.index({ code: 1, language: 1 }, { unique: true });
+
 export const Package = models?.Package || model("Package", packageSchema);

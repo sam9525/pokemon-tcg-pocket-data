@@ -1,4 +1,40 @@
 {
+  "MABOROSHINOSEKIBAN": {
+    "type": "none",
+    "trainer": "tool",
+    "fight_energy": "none",
+    "weakness": "none"
+  },
+  "POKEMONNOFUE": {
+    "type": "none",
+    "trainer": "tool",
+    "fight_energy": "none",
+    "weakness": "none"
+  },
+  "GREEN": {
+    "type": "none",
+    "fight_energy": "none",
+    "weakness": "none"
+  },
+  "KAKEDASHICHOSAIN": {
+    "type": "none",
+    "fight_energy": "none",
+    "weakness": "none"
+  },
+  "LEAF": {
+    "type": "none",
+    "fight_energy": "none",
+    "weakness": "none"
+  },
+  "POKEMONZUKAN": {
+    "type": "none",
+    "boosterPack": [
+      "promo-a"
+    ],
+    "trainer": "tool",
+    "fight_energy": "none",
+    "weakness": "none"
+  },
   "002150": {
     "fight_energy": "colorless"
   },
@@ -102,41 +138,5 @@
     "boosterPack": [
       "promo-a"
     ]
-  },
-  "MABOROSHINOSEKIBAN": {
-    "type": "none",
-    "trainer": "tool",
-    "fight_energy": "none",
-    "weakness": "none"
-  },
-  "POKEMONNOFUE": {
-    "type": "none",
-    "trainer": "tool",
-    "fight_energy": "none",
-    "weakness": "none"
-  },
-  "GREEN": {
-    "type": "none",
-    "fight_energy": "none",
-    "weakness": "none"
-  },
-  "KAKEDASHICHOSAIN": {
-    "type": "none",
-    "fight_energy": "none",
-    "weakness": "none"
-  },
-  "LEAF": {
-    "type": "none",
-    "fight_energy": "none",
-    "weakness": "none"
-  },
-  "POKEMONZUKAN": {
-    "type": "none",
-    "boosterPack": [
-      "promo-a"
-    ],
-    "trainer": "tool",
-    "fight_energy": "none",
-    "weakness": "none"
   }
 }

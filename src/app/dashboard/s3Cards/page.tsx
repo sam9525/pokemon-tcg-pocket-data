@@ -112,6 +112,7 @@ export default function S3CardsPage() {
                 "Content-Type": "application/json",
               },
             });
+            console.log(preprocessedCards);
 
             const resInDB = await fetch(
               `/api/packageInDB?code=${
@@ -135,7 +136,7 @@ export default function S3CardsPage() {
               resolve(resInDB);
 
               // Clear the card lookup cache
-              scheduleCacheClear(packageId?.split("_")[0]);
+              scheduleCacheClear(packageId);
             } else {
               reject(res);
               reject(resInDB);
@@ -169,7 +170,7 @@ export default function S3CardsPage() {
           <option value="">
             {currentLanguageLookup.S3_CARDS.selectPackage}
           </option>
-          <option value="A1_charizard_genetic-apex">
+          <option value="A1_genetic-apex">
             {currentLanguageLookup.PACKAGES.A1}
           </option>
           <option value="A1a_mythical-island">

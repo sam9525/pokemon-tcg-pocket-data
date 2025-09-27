@@ -1,4 +1,131 @@
 {
+  "KOURANOKASEKI": {
+    "type": "none",
+    "trainer": "item_fossil",
+    "fight_energy": "none",
+    "weakness": "none"
+  },
+  "ERIKA": {
+    "type": "none",
+    "trainer": "trainer",
+    "fight_energy": "none",
+    "weakness": "none"
+  },
+  "KATSURA": {
+    "type": "none",
+    "trainer": "trainer",
+    "fight_energy": "none",
+    "weakness": "none"
+  },
+  "NATSUME": {
+    "type": "none",
+    "trainer": "trainer",
+    "fight_energy": "none",
+    "weakness": "none"
+  },
+  "HIMITSUNOKOHAKU": {
+    "type": "none",
+    "trainer": "item_fossil",
+    "fight_energy": "none",
+    "weakness": "none"
+  },
+  "KYOU": {
+    "type": "none",
+    "fight_energy": "none",
+    "weakness": "none"
+  },
+  "SAKAKI": {
+    "type": "none",
+    "fight_energy": "none",
+    "weakness": "none"
+  },
+  "KAINOKASEKI": {
+    "type": "none",
+    "trainer": "item_fossil",
+    "fight_energy": "none",
+    "weakness": "none"
+  },
+  "KASUMI": {
+    "type": "none",
+    "trainer": "trainer",
+    "fight_energy": "none",
+    "weakness": "none"
+  },
+  "TAKESHI": {
+    "type": "none",
+    "trainer": "trainer",
+    "fight_energy": "none",
+    "weakness": "none"
+  },
+  "MATISSE": {
+    "type": "none",
+    "trainer": "trainer",
+    "fight_energy": "none",
+    "weakness": "none"
+  },
+  "KIZUGUSURI": {
+    "type": "none",
+    "boosterPack": [
+      "promo-a"
+    ],
+    "trainer": "tool",
+    "fight_energy": "none",
+    "weakness": "none"
+  },
+  "SPEEDER": {
+    "type": "none",
+    "boosterPack": [
+      "promo-a"
+    ],
+    "trainer": "tool",
+    "fight_energy": "none",
+    "weakness": "none"
+  },
+  "MONSTERBALL": {
+    "type": "none",
+    "boosterPack": [
+      "promo-a"
+    ],
+    "trainer": "tool",
+    "fight_energy": "none",
+    "weakness": "none"
+  },
+  "HAKASENOKENKYU": {
+    "type": "none",
+    "boosterPack": [
+      "promo-a"
+    ],
+    "trainer": "trainer",
+    "fight_energy": "none",
+    "weakness": "none"
+  },
+  "HANDSCOPE": {
+    "type": "none",
+    "boosterPack": [
+      "promo-a"
+    ],
+    "trainer": "tool",
+    "fight_energy": "none",
+    "weakness": "none"
+  },
+  "POKEMONZUKAN": {
+    "type": "none",
+    "boosterPack": [
+      "promo-a"
+    ],
+    "trainer": "tool",
+    "fight_energy": "none",
+    "weakness": "none"
+  },
+  "REDCARD": {
+    "type": "none",
+    "boosterPack": [
+      "promo-a"
+    ],
+    "trainer": "tool",
+    "fight_energy": "none",
+    "weakness": "none"
+  },
   "000050": {
     "fight_energy": "colorless"
   },
@@ -456,132 +583,5 @@
       "mewtwo",
       "pikachu"
     ]
-  },
-  "KOURANOKASEKI": {
-    "type": "none",
-    "trainer": "item_fossil",
-    "fight_energy": "none",
-    "weakness": "none"
-  },
-  "ERIKA": {
-    "type": "none",
-    "trainer": "trainer",
-    "fight_energy": "none",
-    "weakness": "none"
-  },
-  "KATSURA": {
-    "type": "none",
-    "trainer": "trainer",
-    "fight_energy": "none",
-    "weakness": "none"
-  },
-  "NATSUME": {
-    "type": "none",
-    "trainer": "trainer",
-    "fight_energy": "none",
-    "weakness": "none"
-  },
-  "HIMITSUNOKOHAKU": {
-    "type": "none",
-    "trainer": "item_fossil",
-    "fight_energy": "none",
-    "weakness": "none"
-  },
-  "KYOU": {
-    "type": "none",
-    "fight_energy": "none",
-    "weakness": "none"
-  },
-  "SAKAKI": {
-    "type": "none",
-    "fight_energy": "none",
-    "weakness": "none"
-  },
-  "KAINOKASEKI": {
-    "type": "none",
-    "trainer": "item_fossil",
-    "fight_energy": "none",
-    "weakness": "none"
-  },
-  "KASUMI": {
-    "type": "none",
-    "trainer": "trainer",
-    "fight_energy": "none",
-    "weakness": "none"
-  },
-  "TAKESHI": {
-    "type": "none",
-    "trainer": "trainer",
-    "fight_energy": "none",
-    "weakness": "none"
-  },
-  "MATISSE": {
-    "type": "none",
-    "trainer": "trainer",
-    "fight_energy": "none",
-    "weakness": "none"
-  },
-  "KIZUGUSURI": {
-    "type": "none",
-    "boosterPack": [
-      "promo-a"
-    ],
-    "trainer": "tool",
-    "fight_energy": "none",
-    "weakness": "none"
-  },
-  "SPEEDER": {
-    "type": "none",
-    "boosterPack": [
-      "promo-a"
-    ],
-    "trainer": "tool",
-    "fight_energy": "none",
-    "weakness": "none"
-  },
-  "MONSTERBALL": {
-    "type": "none",
-    "boosterPack": [
-      "promo-a"
-    ],
-    "trainer": "tool",
-    "fight_energy": "none",
-    "weakness": "none"
-  },
-  "HAKASENOKENKYU": {
-    "type": "none",
-    "boosterPack": [
-      "promo-a"
-    ],
-    "trainer": "trainer",
-    "fight_energy": "none",
-    "weakness": "none"
-  },
-  "HANDSCOPE": {
-    "type": "none",
-    "boosterPack": [
-      "promo-a"
-    ],
-    "trainer": "tool",
-    "fight_energy": "none",
-    "weakness": "none"
-  },
-  "POKEMONZUKAN": {
-    "type": "none",
-    "boosterPack": [
-      "promo-a"
-    ],
-    "trainer": "tool",
-    "fight_energy": "none",
-    "weakness": "none"
-  },
-  "REDCARD": {
-    "type": "none",
-    "boosterPack": [
-      "promo-a"
-    ],
-    "trainer": "tool",
-    "fight_energy": "none",
-    "weakness": "none"
   }
 }

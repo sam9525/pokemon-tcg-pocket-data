@@ -1,5 +1,5 @@
 export const TYPE_MAPPINGS: Record<string, string> = {
-  cmn_icn_ene_01_gra: "green",
+  cmn_icn_ene_01_gra: "grass",
   cmn_icn_ene_02_fir: "fire",
   cmn_icn_ene_03_wat: "water",
   cmn_icn_ene_04_lig: "lightning",
@@ -96,7 +96,7 @@ export const SPECIFIC_EFFECT_MAPPINGS: Record<string, string> = {
 };
 
 export const FIGHT_ENERGY_MAPPINGS: Record<string, string> = {
-  cmn_icn_ene_01_gra: "green",
+  cmn_icn_ene_01_gra: "grass",
   cmn_icn_ene_02_fir: "fire",
   cmn_icn_ene_03_wat: "water",
   cmn_icn_ene_04_lig: "lightning",
@@ -107,7 +107,7 @@ export const FIGHT_ENERGY_MAPPINGS: Record<string, string> = {
 };
 
 export const WEAKNESS_MAPPINGS: Record<string, string> = {
-  cmn_icn_ene_01_gra: "green",
+  cmn_icn_ene_01_gra: "grass",
   cmn_icn_ene_02_fir: "fire",
   cmn_icn_ene_03_wat: "water",
   cmn_icn_ene_04_lig: "lightning",

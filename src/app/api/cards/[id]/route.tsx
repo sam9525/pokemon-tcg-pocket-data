@@ -49,10 +49,10 @@ export async function GET(
     ];
 
     const { id } = await params;
-    const pack = id.split("_")[0] + "_" + id.split("_")[2];
-    const boosterPack = id.split("_")[1];
+    const parts = id.split("_");
+    const boosterPack = parts[1];
     const cards = await Card.find({
-      package: pack,
+      package: parts[0] + "_" + parts[2],
       boosterPack: boosterPack,
       ...(rarityFilters.length > 0 && { rarity: { $in: rarityFilters } }),
       language: language,

@@ -72,7 +72,7 @@ self.onmessage = async (event) => {
       // Look up card info using the cached maps
       const regularCardInfo = regularLookup.get(card_id);
       const specialCardInfo =
-        specialLookup.get(card_id) || specialLookup.get(card_name);
+        specialLookup.get(card_name) || specialLookup.get(card_id);
 
       if (regularCardInfo) {
         card_type = regularCardInfo.type;
