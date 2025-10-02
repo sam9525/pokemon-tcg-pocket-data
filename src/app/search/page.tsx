@@ -166,10 +166,8 @@ export default function SearchPage() {
   // Filter section component
   const FilterSection = React.memo<FilterSectionProps>(
     ({ title, items, filterName, renderItem, className }) => (
-      <div className="flex items-center justify-left">
-        <div className="rounded-lg mr-10 w-24 font-medium text-right">
-          {title}
-        </div>
+      <div className="flex items-center justify-start max-w-240 w-[90%] md:w-[85%] m-auto">
+        <div className="rounded-lg w-24 font-medium text-start">{title}</div>
         <div className={`flex flex-wrap gap-3 items-center ${className}`}>
           {items.map((item, index) => (
             <React.Fragment key={item.id}>
@@ -259,12 +257,12 @@ export default function SearchPage() {
 
   return (
     <>
-      <div className="w-240 m-auto my-12 bg-search-background rounded-xl border-primary border-2">
-        <div className="flex flex-col gap-5 items-center justify-center p-6">
+      <div className="max-w-240 w-[90%] m-auto my-8 md:my-10 sm:my-12 bg-search-background rounded-xl border-primary border-2">
+        <div className="flex flex-col gap-5 items-center justify-center p-4 sm:p-6">
           <input
             type="text"
             placeholder={currentLanguageLookup.SEARCH.enterPokemonName}
-            className="w-140 px-4 py-2 bg-search-input rounded-lg hover:-webkit-text-fill-color-primary focus:outline-none focus:ring-2 focus:border-transparent"
+            className="max-w-140 w-[80%] px-4 py-2 bg-search-input rounded-lg hover:-webkit-text-fill-color-primary focus:outline-none focus:ring-2 focus:border-transparent"
           />
           <FilterSection
             title={currentLanguageLookup.SEARCH.type}
@@ -278,7 +276,7 @@ export default function SearchPage() {
                 height={32}
               />
             )}
-            className="w-170 types"
+            className="max-w-170 types"
           />
           <FilterSection
             title={currentLanguageLookup.SEARCH.rarity}
@@ -294,9 +292,9 @@ export default function SearchPage() {
                 height={32}
               />
             )}
-            className="w-170 rarity"
+            className="max-w-170 rarity"
           />
-          <div className="w-180 h-0.5 rounded-lg bg-primary"></div>
+          <div className="max-w-180 h-0.5 rounded-lg bg-primary"></div>
           <FilterSection
             title={currentLanguageLookup.SEARCH.package}
             items={package_icons}
@@ -309,9 +307,9 @@ export default function SearchPage() {
                 height={44}
               />
             )}
-            className="w-170 package_icons"
+            className="max-w-170 package_icons"
           />
-          <div className="w-180 h-0.5 rounded-lg bg-primary"></div>
+          <div className="max-w-180 h-0.5 rounded-lg bg-primary"></div>
           <FilterSection
             title={currentLanguageLookup.SEARCH.boosterPack}
             items={Boosters_icon}
@@ -324,9 +322,9 @@ export default function SearchPage() {
                 height={44}
               />
             )}
-            className="w-170 Boosters_icon"
+            className="max-w-170 Boosters_icon"
           />
-          <div className="w-180 m-auto p-6 bg-search-extra rounded-lg">
+          <div className="max-w-180 w-[90%] m-auto p-3 sm:p-6 bg-search-extra rounded-lg">
             <div className="flex flex-col gap-4 items-center justify-center">
               <FilterSection
                 title={currentLanguageLookup.SEARCH.speicalEffect}
@@ -340,7 +338,7 @@ export default function SearchPage() {
                     height={32}
                   />
                 )}
-                className="w-130 specific_effect"
+                className="max-w-130 specific_effect"
               />
               <FilterSection
                 title={currentLanguageLookup.SEARCH.fightEnergy}
@@ -354,7 +352,7 @@ export default function SearchPage() {
                     height={32}
                   />
                 )}
-                className="w-130 fight_energy"
+                className="max-w-150 fight_energy"
               />
               <FilterSection
                 title={currentLanguageLookup.SEARCH.weakness}
@@ -368,7 +366,7 @@ export default function SearchPage() {
                     height={32}
                   />
                 )}
-                className="w-130 weakness"
+                className="max-w-150 weakness"
               />
             </div>
           </div>
