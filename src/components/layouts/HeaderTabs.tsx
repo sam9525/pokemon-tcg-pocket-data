@@ -6,12 +6,21 @@ import { useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
 import { useLanguage } from "@/components/provider/LanguageProvider";
 
-export default function HeaderTabs() {
+export default function HeaderTabs({
+  variant = "default",
+}: {
+  variant?: "default" | "mobile";
+}) {
   const session = useSession();
   const status = session?.status;
   const path = usePathname();
   const [isAdmin, setIsAdmin] = useState(false);
   const { currentLanguageLookup } = useLanguage();
+
+  const containerClass =
+    variant === "mobile"
+      ? "bg-foreground px-4 py-2 flex flex-col items-center gap-5 text-xl text-bold"
+      : "flex justify-center font-bold header-tabs items-center";
 
   useEffect(() => {
     try {
@@ -28,7 +37,7 @@ export default function HeaderTabs() {
 
   if (status === "loading") {
     return (
-      <div className="flex justify-center font-bold header-tabs items-center">
+      <div className={containerClass}>
         <Link
           className={path.includes("/cards") || path === "/" ? "active" : ""}
           href={"/"}
@@ -49,7 +58,7 @@ export default function HeaderTabs() {
   }
 
   return (
-    <div className="flex justify-center font-bold header-tabs items-center">
+    <div className={containerClass}>
       <Link
         className={path.includes("/cards") || path === "/" ? "active" : ""}
         href={"/"}

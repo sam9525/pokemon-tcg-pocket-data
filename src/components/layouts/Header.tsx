@@ -3,30 +3,26 @@
 import Link from "next/link";
 import HeaderTabs from "./HeaderTabs";
 import User from "../icons/user";
-import Earth from "../icons/earth";
-import Login from "../icons/login";
 import { useState, useEffect, useRef } from "react";
 import { usePathname } from "next/navigation";
-import { signOut, useSession } from "next-auth/react";
-import Logout from "../icons/logout";
-import { useRouter } from "next/navigation";
-import toast from "react-hot-toast";
-import Image from "next/image";
-import Profile from "../icons/profile";
-import { useLanguage } from "../provider/LanguageProvider";
+import { useSession } from "next-auth/react";
+import Menu from "../icons/menu";
+import HeaderTabsMenu from "./HeaderTabsMenu";
+import Close from "../icons/close";
+import ProfileMenu from "./ProfileMenu";
 
 export default function Header() {
   const session = useSession();
   const status = session?.status;
   const userData = session.data?.user;
-  const userName = userData?.name;
+  const userName = userData?.name || "";
   const [image, setImage] = useState(userData?.image || "");
   const [showUserMenu, setShowUserMenu] = useState(false);
   const pathname = usePathname();
   const menuRef = useRef<HTMLDivElement>(null);
   const buttonRef = useRef<HTMLButtonElement>(null);
-  const router = useRouter();
-  const { language, setLanguage, currentLanguageLookup } = useLanguage();
+  const [showHeaderTabs, setShowHeaderTabs] = useState(false);
+  const [showHeaderTabsMenu, setShowHeaderTabsMenu] = useState(false);
 
   useEffect(() => {
     // Fetch user data
@@ -38,8 +34,9 @@ export default function Header() {
         });
     }
 
-    // Hide user menu when pathname changes (page navigation)
+    // Hide user menu and header tabs menu when pathname changes
     setShowUserMenu(false);
+    setShowHeaderTabsMenu(false);
 
     // Handle clicks outside the user menu
     const handleClickOutside = (event: MouseEvent) => {
@@ -56,117 +53,84 @@ export default function Header() {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [pathname, status]);
 
-  const handleLogout = async () => {
-    try {
-      await signOut({ redirect: false });
+  // Check the screen size and update on resize
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth >= 850) {
+        setShowHeaderTabs(true);
+      } else {
+        setShowHeaderTabs(false);
+      }
+    };
 
-      toast.success("Logout successful");
+    handleResize(); // Run once on mount
 
-      router.push("/");
-    } catch (error) {
-      console.error("Logout error:", error);
-    }
-  };
+    window.addEventListener("resize", handleResize);
 
-  const handleLanguageChange = (newLanguage: string) => {
-    setLanguage(newLanguage);
-  };
+    // Clean up the event listener on unmount
+    return () => {
+      window.removeEventListener("resize", handleResize);
+    };
+  }, []);
 
   return (
     <>
       <header className="sticky top-0 z-50 w-full bg-foreground">
         <div className="mx-auto px-4 pt-8">
           <div className="flex justify-center mb-8">
-            <Link className="text-primary text-3xl font-bold" href={"/"}>
+            <Link
+              className="text-primary text-2xl sm:text-3xl font-bold"
+              href={"/"}
+            >
               POKEMON TCG POCKET
             </Link>
-            <button
-              ref={buttonRef}
-              className="w-9 absolute right-13 cursor-pointer"
-              onClick={() => setShowUserMenu(!showUserMenu)}
-            >
-              <User />
-            </button>
+            <div className="flex items-center gap-2 absolute right-5 sm:right-13">
+              {showHeaderTabs && (
+                <>
+                  <button
+                    ref={buttonRef}
+                    className="w-7 sm:w-9 cursor-pointer"
+                    onClick={() => setShowUserMenu(!showUserMenu)}
+                  >
+                    <User />
+                  </button>
+                </>
+              )}
+              {!showHeaderTabs && (
+                <button
+                  ref={buttonRef}
+                  className="w-7 sm:w-9 cursor-pointer"
+                  onClick={() => setShowHeaderTabsMenu((prev) => !prev)}
+                >
+                  {showHeaderTabsMenu ? <Close /> : <Menu />}
+                </button>
+              )}
+            </div>
             {showUserMenu && (
               <div
                 ref={menuRef}
-                className="absolute top-20 right-11 border-1 border-primary bg-background rounded-md px-4 py-2 flex flex-col items-start  gap-2"
+                className="z-200 absolute top-20 right-11 border-1 border-primary bg-background rounded-md px-4 py-2 flex flex-col items-start  gap-2"
               >
-                {status === "authenticated" && (
-                  <>
-                    <Image
-                      src={image}
-                      alt="avatar"
-                      width={80}
-                      height={80}
-                      className="rounded-full mx-auto"
-                    />
-                    <div className="text-md mx-auto">Hello, {userName}</div>
-                    <Link
-                      className="w-full flex items-center gap-2 cursor-pointer"
-                      href="/profile"
-                    >
-                      <div className="w-6">
-                        <Profile />
-                      </div>
-                      <span className="text-sm">
-                        {currentLanguageLookup.PROFILES.profile}
-                      </span>
-                    </Link>
-                  </>
-                )}
-                <div className="w-full flex items-center gap-2 cursor-pointer">
-                  <div className="w-6">
-                    <Earth />
-                  </div>
-                  <span className="text-sm">
-                    {currentLanguageLookup.PROFILES.language}:
-                  </span>
-                  <select
-                    className="language-dropdown"
-                    onChange={(e) => {
-                      handleLanguageChange(e.target.value as string);
-                    }}
-                    value={language}
-                  >
-                    <option value="zh_TW">繁體中文</option>
-                    <option value="en_US">English</option>
-                    <option value="ja_JP">Japanese</option>
-                  </select>
-                </div>
-                {status !== "authenticated" && (
-                  <Link
-                    className="w-full flex items-center gap-2 cursor-pointer"
-                    href="/login"
-                  >
-                    <div className="w-6">
-                      <Login />
-                    </div>
-                    <span className="text-sm">
-                      {currentLanguageLookup.LOGIN.login}
-                    </span>
-                  </Link>
-                )}
-                {status === "authenticated" && (
-                  <button
-                    className="w-full flex items-center gap-2 cursor-pointer"
-                    onClick={handleLogout}
-                  >
-                    <div className="w-6">
-                      <Logout />
-                    </div>
-                    <span className="text-sm">
-                      {currentLanguageLookup.PROFILES.logout}
-                    </span>
-                  </button>
-                )}
+                <ProfileMenu
+                  image={image}
+                  userName={userName}
+                  variant="default"
+                />
               </div>
             )}
           </div>
-          <hr className="max-w-6xl mx-auto text-primary w-full border-primary border-2"></hr>
-          <HeaderTabs />
+          <hr className="border-0"></hr>
+          {showHeaderTabs && (
+            <>
+              <hr className="max-w-6xl mx-auto text-primary w-full border-primary border-2"></hr>
+              <HeaderTabs variant="default" />
+            </>
+          )}
         </div>
       </header>
+      {showHeaderTabsMenu && (
+        <HeaderTabsMenu image={image} userName={userName} />
+      )}
     </>
   );
 }

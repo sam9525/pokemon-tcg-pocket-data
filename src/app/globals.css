@@ -211,9 +211,8 @@ button.profile-button {
 }
 
 .language-dropdown {
-  @apply cursor-pointer text-sm;
+  @apply cursor-pointer;
   border-color: var(--primary);
   color: var(--primary);
   outline: none;
-  background-color: var(--background);
 }
