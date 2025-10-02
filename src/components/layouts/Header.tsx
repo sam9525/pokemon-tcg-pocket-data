@@ -8,7 +8,6 @@ import { usePathname } from "next/navigation";
 import { useSession } from "next-auth/react";
 import Menu from "../icons/menu";
 import HeaderTabsMenu from "./HeaderTabsMenu";
-import Close from "../icons/close";
 import ProfileMenu from "./ProfileMenu";
 
 export default function Header() {
@@ -102,7 +101,7 @@ export default function Header() {
                   className="w-7 sm:w-9 cursor-pointer"
                   onClick={() => setShowHeaderTabsMenu((prev) => !prev)}
                 >
-                  {showHeaderTabsMenu ? <Close /> : <Menu />}
+                  <Menu />
                 </button>
               )}
             </div>
@@ -129,7 +128,11 @@ export default function Header() {
         </div>
       </header>
       {showHeaderTabsMenu && (
-        <HeaderTabsMenu image={image} userName={userName} />
+        <HeaderTabsMenu
+          image={image}
+          userName={userName}
+          setShowHeaderTabsMenu={setShowHeaderTabsMenu}
+        />
       )}
     </>
   );
