@@ -3,8 +3,8 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useSession } from "next-auth/react";
-import { useEffect, useState } from "react";
 import { useLanguage } from "@/components/provider/LanguageProvider";
+import { useAdmin } from "@/components/provider/AdminProvider";
 
 export default function HeaderTabs({
   variant = "default",
@@ -14,26 +14,13 @@ export default function HeaderTabs({
   const session = useSession();
   const status = session?.status;
   const path = usePathname();
-  const [isAdmin, setIsAdmin] = useState(false);
+  const { isAdmin } = useAdmin();
   const { currentLanguageLookup } = useLanguage();
 
   const containerClass =
     variant === "mobile"
       ? "bg-foreground px-4 py-2 flex flex-col items-center gap-5 text-xl text-bold"
       : "flex justify-center font-bold header-tabs items-center";
-
-  useEffect(() => {
-    try {
-      // Get user data to check if the user is admin
-      fetch("/api/profile")
-        .then((response) => response.json())
-        .then((data) => {
-          setIsAdmin(data.isAdmin);
-        });
-    } catch (error) {
-      console.log(error);
-    }
-  });
 
   if (status === "loading") {
     return (
