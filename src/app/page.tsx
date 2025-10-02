@@ -38,8 +38,8 @@ export default function Home() {
     }
   }, [currentLanguageLookup]);
   return (
-    <div className="flex flex-col items-center justify-center m-10">
-      <div className="grid grid-cols-3 gap-15">
+    <div className="flex flex-col items-center justify-center m-6 sm:m-10">
+      <div className="grid grid-cols-3 gap-6 sm:gap-15">
         {packages.slice(1, -3).map((pkg) => (
           <Link href={`/cards/${pkg.id}`} key={pkg.id} className="m-auto">
             <Image
