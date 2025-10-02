@@ -8,7 +8,7 @@ export default function FilteringTabs({
   currentLanguageLookup: Record<string, Record<string, string>>;
 }) {
   return (
-    <div className="flex gap-6 mb-8">
+    <div className="flex flex-row flex-wrap gap-4 sm:gap-5 md:gap-6 mb-5 sm:mb-7 md:mb-10 items-center justify-center">
       <div
         className={`filtering-button ${filter.length === 0 ? "active" : ""}`}
         onClick={() => setFilter([])}

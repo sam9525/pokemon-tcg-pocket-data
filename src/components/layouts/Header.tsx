@@ -56,7 +56,7 @@ export default function Header() {
   // Check the screen size and update on resize
   useEffect(() => {
     const handleResize = () => {
-      if (window.innerWidth >= 850) {
+      if (window.innerWidth >= 870) {
         setShowHeaderTabs(true);
       } else {
         setShowHeaderTabs(false);

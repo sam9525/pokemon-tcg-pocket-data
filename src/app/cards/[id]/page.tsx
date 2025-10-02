@@ -46,7 +46,7 @@ export default function PackagePage({
   }, [resolvedParams.id, filter, language, currentLanguageLookup]);
 
   return (
-    <div className="flex flex-col items-center justify-center m-10">
+    <div className="flex flex-col items-center justify-center m-5 sm:m-7 md:m-10">
       <FilteringTabs
         filter={filter}
         setFilter={setFilter}
