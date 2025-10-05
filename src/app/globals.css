@@ -65,7 +65,7 @@ div.search-container > input[type="text"] {
 
 div.profile > input {
   border-bottom: 1px solid var(--primary);
-  @apply w-60 focus:outline-none focus:border-b-2;
+  @apply w-50 sm:w-60 focus:outline-none focus:border-b-2;
 }
 
 button[type="submit"] {

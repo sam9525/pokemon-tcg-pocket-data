@@ -176,7 +176,7 @@ export default function Profile() {
   }
 
   return (
-    <div className="flex items-center justify-center gap-10 my-auto mx-auto min-h-150">
+    <div className="flex items-center justify-center gap-5 sm:gap-10 my-auto mx-auto min-h-150">
       <EditableAvatar
         link={image}
         setLink={handleAvatarChange}
@@ -184,7 +184,7 @@ export default function Profile() {
       />
       <div className="border-l-2 border-primary h-110"></div>
       <div className="flex flex-col items-start gap-10">
-        <div className="flex items-center justify-center gap-10">
+        <div className="flex items-center justify-center gap-5 sm:gap-10 flex-col sm:flex-row">
           <div className="profile flex flex-col items-start">
             <label htmlFor="name" className="font-semibold">
               {currentLanguageLookup.PROFILES.username}
@@ -211,7 +211,7 @@ export default function Profile() {
           </label>
           <input type="email" id="email" value={email} readOnly />
         </div>
-        <div className="flex items-center justify-center gap-10">
+        <div className="flex items-center justify-center gap-5 sm:gap-10 sm:flex-row flex-col">
           <div className="profile flex flex-col items-start">
             <label htmlFor="password" className="font-semibold">
               {currentLanguageLookup.PROFILES.password}
