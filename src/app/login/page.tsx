@@ -84,7 +84,7 @@ export default function LoginPage() {
   };
 
   return (
-    <section className="w-125 h-150 flex flex-col items-center justify-center border-2 border-primary rounded-xl mx-auto my-10 bg-foreground">
+    <section className="max-w-125 h-150 flex flex-col items-center justify-center border-2 border-primary rounded-xl mx-5 sm:mx-auto my-10 bg-foreground">
       <h2 className="text-2xl font-bold">WELCOME BACK</h2>
       <h3 className="text-xl mb-4">{currentLanguageLookup.LOGIN.login}</h3>
       <form
