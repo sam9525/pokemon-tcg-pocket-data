@@ -2,7 +2,7 @@
 
 import FilteredItems from "@/components/layouts/FilteredItems";
 import Image from "next/image";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState, useCallback } from "react";
 import toast from "react-hot-toast";
 import { useLanguage } from "@/components/provider/LanguageProvider";
 
@@ -50,6 +50,9 @@ export default function SearchPage() {
   const [specific_effect, setSpecificEffect] = useState<FilterItem[]>([]);
   const [filtering, setFiltering] = useState<[string, string][]>([]);
   const [searchResult, setSearchResult] = useState<FilterItem[]>([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [hasMore, setHasMore] = useState(false);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
   const { language, currentLanguageLookup } = useLanguage();
 
   useEffect(() => {
@@ -94,13 +97,22 @@ export default function SearchPage() {
   }, [isLoading, currentLanguageLookup]);
 
   useEffect(() => {
-    const fetchSearchResult = async () => {
+    const fetchSearchResult = async (
+      page: number = 1,
+      append: boolean = false
+    ) => {
       try {
-        setIsLoading(true);
+        if (page === 1) {
+          setIsLoading(true);
+        } else {
+          setIsLoadingMore(true);
+        }
 
         // If filtering array is empty, clear search results and return early
         if (filtering.length === 0) {
           setSearchResult([]);
+          setHasMore(false);
+          setCurrentPage(1);
           return;
         }
 
@@ -120,10 +132,22 @@ export default function SearchPage() {
               "Content-Type": "application/json",
               language: language,
             },
-            body: JSON.stringify(filterObject),
+            body: JSON.stringify({
+              ...filterObject,
+              page: page,
+              limit: 100,
+            }),
           });
           const data = await res.json();
-          setSearchResult(data);
+
+          if (append) {
+            setSearchResult((prev) => [...prev, ...data.results]);
+          } else {
+            setSearchResult(data.results);
+          }
+
+          setHasMore(data.hasMore);
+          setCurrentPage(page);
 
           if (res.ok) {
             resolve(res);
@@ -132,20 +156,72 @@ export default function SearchPage() {
           }
         });
 
-        toast.promise(toastPromise, {
-          loading: currentLanguageLookup.NOTIFICATIONS.loadingCards,
-          error: currentLanguageLookup.NOTIFICATIONS.failedToLoadCards,
-          success: currentLanguageLookup.NOTIFICATIONS.cardsLoadedSuccessfully,
-        });
+        if (page === 1) {
+          toast.promise(toastPromise, {
+            loading: currentLanguageLookup.NOTIFICATIONS.loadingCards,
+            error: currentLanguageLookup.NOTIFICATIONS.failedToLoadCards,
+            success:
+              currentLanguageLookup.NOTIFICATIONS.cardsLoadedSuccessfully,
+          });
+        }
       } catch (error) {
         console.error(error);
       } finally {
         setIsLoading(false);
+        setIsLoadingMore(false);
       }
     };
 
-    fetchSearchResult();
+    fetchSearchResult(1, false);
   }, [filtering, language, currentLanguageLookup]);
+
+  const handleLoadMore = useCallback(() => {
+    if (!isLoadingMore && hasMore) {
+      const fetchMoreResults = async () => {
+        try {
+          setIsLoadingMore(true);
+
+          // If filtering array is empty, return
+          if (filtering.length === 0) {
+            return;
+          }
+
+          // Convert filtering array to structured object
+          const filterObject: Record<string, string[]> = {};
+          filtering.forEach(([filterName, id]) => {
+            if (!filterObject[filterName]) {
+              filterObject[filterName] = [];
+            }
+            filterObject[filterName].push(id);
+          });
+
+          const res = await fetch("/api/search/filtering", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              language: language,
+            },
+            body: JSON.stringify({
+              ...filterObject,
+              page: currentPage + 1,
+              limit: 100,
+            }),
+          });
+          const data = await res.json();
+
+          setSearchResult((prev) => [...prev, ...data.results]);
+          setHasMore(data.hasMore);
+          setCurrentPage(currentPage + 1);
+        } catch (error) {
+          console.error(error);
+        } finally {
+          setIsLoadingMore(false);
+        }
+      };
+
+      fetchMoreResults();
+    }
+  }, [isLoadingMore, hasMore, filtering, language, currentPage]);
 
   const mouseClick = (filterName: string, id: string) => {
     setFiltering((prevFiltering) => {
@@ -373,7 +449,12 @@ export default function SearchPage() {
         </div>
       </div>
       <div className="flex flex-col items-center justify-center m-10">
-        <FilteredItems files={searchResult} />
+        <FilteredItems
+          files={searchResult}
+          onLoadMore={handleLoadMore}
+          hasMore={hasMore}
+          isLoading={isLoadingMore}
+        />
       </div>
     </>
   );

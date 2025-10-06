@@ -22,6 +22,11 @@ export async function POST(request: Request) {
     const filters = await request.json();
     const language = request.headers.get("language") as string;
 
+    // Extract pagination parameters
+    const page = parseInt(filters.page) || 1;
+    const limit = parseInt(filters.limit) || 100;
+    const skip = (page - 1) * limit;
+
     // Build MongoDB query based on filters
     const query: Record<string, unknown> = {};
     query.language = language;
@@ -109,14 +114,27 @@ export async function POST(request: Request) {
       handleFilter(filterKey, queryKey, mappings);
     }
 
-    const cards = await Card.find(query);
+    // Get total count for pagination
+    const totalCount = await Card.countDocuments(query);
+
+    // Get paginated results
+    const cards = await Card.find(query).skip(skip).limit(limit);
 
     const transformedCards = cards.map((card) => ({
       id: card.cardId,
       url: card.imageUrl,
     }));
 
-    return Response.json(transformedCards);
+    // Calculate if there are more results
+    const hasMore = skip + cards.length < totalCount;
+
+    return Response.json({
+      results: transformedCards,
+      hasMore: hasMore,
+      totalCount: totalCount,
+      currentPage: page,
+      totalPages: Math.ceil(totalCount / limit),
+    });
   } catch (error) {
     console.error("Error fetching cards:", error);
     return Response.json(
