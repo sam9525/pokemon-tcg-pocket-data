@@ -216,3 +216,8 @@ button.profile-button {
   color: var(--primary);
   outline: none;
 }
+
+.scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: var(--primary) var(--background);
+}

@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import Image from "next/image";
+import { List } from "react-window";
 import { scheduleCacheClear } from "@/utils/cardLookup";
 import { useLanguage } from "@/components/provider/LanguageProvider";
 
@@ -49,6 +50,52 @@ const useWebWorkerPreprocessing = () => {
   };
 
   return { preprocessWithWorker };
+};
+
+// CardRow component for virtualized list
+interface CardRowProps {
+  index: number;
+  style: React.CSSProperties;
+  cards: { id: string; url: string }[];
+}
+
+const CardRow = ({ index, style, cards }: CardRowProps) => {
+  const card1 = cards[index * 2];
+  const card2 = cards[index * 2 + 1];
+
+  return (
+    <div style={style} className="flex border-b">
+      <div className="flex-1 p-4 flex items-center border-r">
+        <Image
+          src={card1.url}
+          alt={card1.id}
+          width={50}
+          height={50}
+          className="mr-4"
+        />
+        <span className="text-sm">{card1.id}</span>
+      </div>
+      <div className="flex-1 p-4 flex items-center">
+        {card2 ? (
+          <>
+            <Image
+              src={card2.url}
+              alt={card2.id}
+              width={50}
+              height={50}
+              className="mr-4"
+            />
+            <span className="text-sm">{card2.id}</span>
+          </>
+        ) : (
+          <div className="flex items-center">
+            <div className="w-12 h-12 mr-4 bg-gray-100 rounded"></div>
+            <span className="text-sm text-gray-400">-</span>
+          </div>
+        )}
+      </div>
+    </div>
+  );
 };
 
 export default function S3CardsPage() {
@@ -231,55 +278,38 @@ export default function S3CardsPage() {
         <h3 className="text-2xl font-bold mb-5">
           {s3Cards.length} {currentLanguageLookup.S3_CARDS.cardsFound}
         </h3>
-        <table className="cards-container m-auto">
-          <thead>
-            <tr>
-              <th>{currentLanguageLookup.S3_CARDS.image}</th>
-              <th>{currentLanguageLookup.S3_CARDS.id}</th>
-              <th>{currentLanguageLookup.S3_CARDS.image}</th>
-              <th>{currentLanguageLookup.S3_CARDS.id}</th>
-            </tr>
-          </thead>
-          <tbody>
-            {(() => {
-              const rows = [];
-              for (let i = 0; i < s3Cards.length; i += 2) {
-                rows.push(
-                  <tr key={s3Cards[i].id + (s3Cards[i + 1]?.id || "")}>
-                    <td>
-                      <Image
-                        src={s3Cards[i].url}
-                        alt={s3Cards[i].id}
-                        width={50}
-                        height={50}
-                      />
-                    </td>
-                    <td>{s3Cards[i].id}</td>
-                    {s3Cards[i + 1] ? (
-                      <>
-                        <td>
-                          <Image
-                            src={s3Cards[i + 1].url}
-                            alt={s3Cards[i + 1].id}
-                            width={50}
-                            height={50}
-                          />
-                        </td>
-                        <td>{s3Cards[i + 1].id}</td>
-                      </>
-                    ) : (
-                      <>
-                        <td></td>
-                        <td></td>
-                      </>
-                    )}
-                  </tr>
-                );
-              }
-              return rows;
-            })()}
-          </tbody>
-        </table>
+
+        <div className="w-full max-w-5xl mb-2">
+          <div className="flex bg-primary border-2">
+            <div className="flex-1 p-4 font-semibold text-center border-r-2 text-foreground">
+              {currentLanguageLookup.S3_CARDS.image} &{" "}
+              {currentLanguageLookup.S3_CARDS.id}
+            </div>
+            <div className="flex-1 p-4 font-semibold text-center text-foreground">
+              {currentLanguageLookup.S3_CARDS.image} &{" "}
+              {currentLanguageLookup.S3_CARDS.id}
+            </div>
+          </div>
+        </div>
+
+        <div className="w-full max-w-5xl border rounded-lg overflow-hidden">
+          {s3Cards.length > 0 ? (
+            <List
+              style={{ height: 600 }}
+              rowCount={Math.ceil(s3Cards.length / 2)}
+              rowHeight={82} // Height of each row
+              rowComponent={({ index, style }) => (
+                <CardRow index={index} style={style} cards={s3Cards} />
+              )}
+              rowProps={{}}
+              className="scrollbar"
+            />
+          ) : (
+            <div className="flex items-center justify-center h-32 text-gray-500">
+              {currentLanguageLookup.S3_CARDS.noCardsFound || "No cards found"}
+            </div>
+          )}
+        </div>
       </div>
     </>
   );

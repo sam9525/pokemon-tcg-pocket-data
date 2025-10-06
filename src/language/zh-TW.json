@@ -66,7 +66,8 @@
     "cardsInDB": "已在資料庫中",
     "cardsFound": "卡牌找到",
     "image": "圖片",
-    "id": "ID"
+    "id": "ID",
+    "noCardsFound": "找不到卡牌"
   },
   "PACKAGES": {
     "A1": "A1 - 基因頂點",
