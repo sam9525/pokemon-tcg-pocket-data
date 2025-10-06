@@ -187,21 +187,6 @@ button.profile-button {
   @apply font-semibold rounded-md cursor-pointer p-3 my-3;
 }
 
-.users-table > thead > tr > th,
-.cards-container > thead > tr > th {
-  border: 1px solid var(--primary);
-  padding: 8px;
-  background-color: var(--primary);
-  color: var(--foreground);
-}
-
-.users-table > tbody > tr > td,
-.cards-container > tbody > tr > td {
-  border: 1px solid var(--primary);
-  padding: 8px;
-  text-align: center;
-}
-
 .dropdown {
   @apply w-80 rounded-md border-2 cursor-pointer text-sm p-2.5 mr-4;
   font-size: 14px;

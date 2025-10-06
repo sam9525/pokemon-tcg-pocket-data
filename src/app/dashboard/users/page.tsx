@@ -5,6 +5,8 @@ import { useSession } from "next-auth/react";
 import { useEffect, useRef, useState } from "react";
 import toast from "react-hot-toast";
 import { useLanguage } from "@/components/provider/LanguageProvider";
+import { List } from "react-window";
+import Image from "next/image";
 
 export default function UsersPage() {
   const hasLoaded = useRef(false);
@@ -38,47 +40,61 @@ export default function UsersPage() {
       });
     }
   }, [status, currentLanguageLookup]);
+
+  interface UserRowProps {
+    index: number;
+    users: UserDocument[];
+  }
+  const UserRow = ({ index, users }: UserRowProps) => {
+    const user = users[index];
+    if (!user) return null;
+
+    return (
+      <div className="flex flex-row items-center gap-2 px-2 text-center p-2 border-b-1">
+        <div className="flex-1 border-r-1">{user.name}</div>
+        <div className="flex-2 border-r-1">{user.email}</div>
+        <div className="flex-1 border-r-1 flex justify-center">
+          {user.provider === "google" ? (
+            <Image src="/google-icon.svg" width={20} height={20} alt="Google" />
+          ) : (
+            user.provider
+          )}
+        </div>
+        <div className="flex-1 border-r-1">
+          {user.createdAt
+            ? new Date(user.createdAt).toLocaleDateString()
+            : "N/A"}
+        </div>
+        <div className="flex-1 flex justify-center">
+          {user.isAdmin ? (
+            <div className="w-10 text-sm font-semibold">
+              <span role="img" aria-label="Admin">
+                ✓
+              </span>
+            </div>
+          ) : null}
+        </div>
+      </div>
+    );
+  };
   return (
-    <div>
-      <table
-        className="users-table"
-        style={{
-          width: "80%",
-          borderCollapse: "collapse",
-          margin: "30px auto",
-        }}
-      >
-        <thead>
-          <tr>
-            <th>{currentLanguageLookup.USERS.username}</th>
-            <th>{currentLanguageLookup.USERS.email}</th>
-            <th>{currentLanguageLookup.USERS.provider}</th>
-            <th>{currentLanguageLookup.USERS.createdAt}</th>
-            <th>{currentLanguageLookup.USERS.admin}</th>
-          </tr>
-        </thead>
-        <tbody>
-          {users.map((user: UserDocument) => (
-            <tr key={user.name || user.email}>
-              <td>{user.name}</td>
-              <td>{user.email}</td>
-              <td>{user.provider}</td>
-              <td>
-                {user.createdAt
-                  ? new Date(user.createdAt).toLocaleDateString()
-                  : "N/A"}
-              </td>
-              <td>
-                {user.isAdmin ? (
-                  <span role="img" aria-label="Admin">
-                    ✓
-                  </span>
-                ) : null}
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
+    <>
+      <div className="w-[80%] my-[30px] mx-auto border-collapse border-1">
+        <div className="flex flex-row items-center gap-2 px-2 text-center p-2 border-b bg-primary text-foreground font-semibold">
+          <div className="flex-1">{currentLanguageLookup.USERS.username}</div>
+          <div className="flex-2">{currentLanguageLookup.USERS.email}</div>
+          <div className="flex-1">{currentLanguageLookup.USERS.provider}</div>
+          <div className="flex-1">{currentLanguageLookup.USERS.createdAt}</div>
+          <div className="flex-1">{currentLanguageLookup.USERS.admin}</div>
+        </div>
+        <List
+          rowCount={users.length}
+          rowHeight={0}
+          rowComponent={({ index }) => <UserRow index={index} users={users} />}
+          rowProps={{}}
+          className="scrollbar"
+        />
+      </div>
+    </>
   );
 }
