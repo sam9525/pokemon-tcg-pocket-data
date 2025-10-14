@@ -1,8 +1,9 @@
-import { S3Client, ListObjectsCommand } from "@aws-sdk/client-s3";
+import { ListObjectsCommand } from "@aws-sdk/client-s3";
 import connectDB from "@/lib/mongodb";
 import { Card } from "@/models/Card";
 import { CACHE_CONFIG } from "@/utils/cacheConfig";
 import { cacheManager } from "@/utils/cache";
+import { getS3Client, S3_BUCKET } from "@/lib/s3Client";
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
@@ -19,18 +20,11 @@ export async function GET(request: Request) {
     return Response.json(cached);
   }
 
-  // Create a new S3 client
-  const s3Client = new S3Client({
-    region: "ap-southeast-2",
-    credentials: {
-      accessKeyId: process.env.AWS_ACCESS_KEY as string,
-      secretAccessKey: process.env.AWS_SECRET_KEY as string,
-    },
-  });
+  const s3Client = getS3Client();
 
   try {
     // Fetch cards
-    const bucket = "pokemon-tcg-pocket-data";
+    const bucket = S3_BUCKET;
 
     // Construct the prefix path using the id parameter
     const prefix = `Booster-Pack/${packageId}/${language}/`;

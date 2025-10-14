@@ -1,6 +1,7 @@
 import { cacheManager } from "@/utils/cache";
 import { CACHE_CONFIG } from "@/utils/cacheConfig";
-import { ListObjectsCommand, S3Client } from "@aws-sdk/client-s3";
+import { ListObjectsCommand } from "@aws-sdk/client-s3";
+import { getS3Client, S3_BUCKET } from "@/lib/s3Client";
 
 export async function GET() {
   try {
@@ -14,16 +15,8 @@ export async function GET() {
       return Response.json({ packages: cached });
     }
 
-    // Create a new S3 client
-    const s3Client = new S3Client({
-      region: "ap-southeast-2",
-      credentials: {
-        accessKeyId: process.env.AWS_ACCESS_KEY as string,
-        secretAccessKey: process.env.AWS_SECRET_KEY as string,
-      },
-    });
-
-    const bucket = "pokemon-tcg-pocket-data";
+    const s3Client = getS3Client();
+    const bucket = S3_BUCKET;
 
     // List objects in the cards folder
     const command = new ListObjectsCommand({

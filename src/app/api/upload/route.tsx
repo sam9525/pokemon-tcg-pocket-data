@@ -1,5 +1,6 @@
-import { PutObjectCommand, S3Client } from "@aws-sdk/client-s3";
+import { PutObjectCommand } from "@aws-sdk/client-s3";
 import uniqid from "uniqid";
+import { getS3Client, S3_BUCKET } from "@/lib/s3Client";
 
 export async function POST(req: Request) {
   try {
@@ -10,14 +11,7 @@ export async function POST(req: Request) {
       return Response.json({ error: "No file provided" }, { status: 400 });
     }
 
-    // Create a new S3 client
-    const s3Client = new S3Client({
-      region: "ap-southeast-2",
-      credentials: {
-        accessKeyId: process.env.AWS_ACCESS_KEY as string,
-        secretAccessKey: process.env.AWS_SECRET_KEY as string,
-      },
-    });
+    const s3Client = getS3Client();
 
     // Get the extension of the file
     const ext = file.name.split(".").slice(-1)[0];
@@ -27,7 +21,7 @@ export async function POST(req: Request) {
     // Convert file to buffer using arrayBuffer
     const arrayBuffer = await file.arrayBuffer();
     const buffer = Buffer.from(arrayBuffer);
-    const bucket = "pokemon-tcg-pocket-data";
+    const bucket = S3_BUCKET;
 
     // Upload the file to S3
     await s3Client.send(

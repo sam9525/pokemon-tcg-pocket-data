@@ -1,6 +1,7 @@
 import { ListObjectsCommand, S3Client } from "@aws-sdk/client-s3";
 import { cacheManager } from "@/utils/cache";
 import { CACHE_CONFIG } from "@/utils/cacheConfig";
+import { getS3Client, S3_BUCKET } from "@/lib/s3Client";
 
 const ListObjects = async (
   s3Client: S3Client,
@@ -41,16 +42,8 @@ export async function GET(request: Request) {
       return Response.json(cached);
     }
 
-    // Connect to s3
-    const s3Client = new S3Client({
-      region: "ap-southeast-2",
-      credentials: {
-        accessKeyId: process.env.AWS_ACCESS_KEY as string,
-        secretAccessKey: process.env.AWS_SECRET_KEY as string,
-      },
-    });
-
-    const bucket = "pokemon-tcg-pocket-data";
+    const s3Client = getS3Client();
+    const bucket = S3_BUCKET;
 
     // Fetch all resources in parallel
     const [types, rarity, package_icons, Boosters_icon, specific_effect] =
