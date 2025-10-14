@@ -1,13 +1,9 @@
 import { Package } from "@/models/Package";
-import mongoose from "mongoose";
-
-let isConnected = false;
+import connectDB from "@/lib/mongodb";
 
 export async function GET(request: Request) {
-  if (!isConnected) {
-    await mongoose.connect(process.env.MONGO_URL as string);
-    isConnected = true;
-  }
+  // Connect to MongoDB
+  await connectDB();
 
   try {
     const { searchParams } = new URL(request.url);
@@ -27,10 +23,8 @@ export async function GET(request: Request) {
 }
 
 export async function POST(request: Request) {
-  if (!isConnected) {
-    await mongoose.connect(process.env.MONGO_URL as string);
-    isConnected = true;
-  }
+  // Connect to MongoDB
+  await connectDB();
 
   try {
     const { searchParams } = new URL(request.url);

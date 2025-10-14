@@ -1,5 +1,5 @@
 import { Card } from "@/models/Card";
-import mongoose from "mongoose";
+import connectDB from "@/lib/mongodb";
 import {
   TYPE_MAPPINGS,
   RARITY_MAPPINGS,
@@ -12,11 +12,8 @@ import {
 
 export async function POST(request: Request) {
   try {
-    // Create to mongoosedb
-    await mongoose.connect(process.env.MONGO_URL as string).catch((err) => {
-      console.error("Failed to connect to MongoDB:", err);
-      throw new Error("Database connection failed");
-    });
+    // Connect to MongoDB
+    await connectDB();
 
     // Get filters from request body
     const filters = await request.json();

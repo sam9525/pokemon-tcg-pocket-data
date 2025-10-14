@@ -1,5 +1,5 @@
 import { S3Client, ListObjectsCommand } from "@aws-sdk/client-s3";
-import mongoose from "mongoose";
+import connectDB from "@/lib/mongodb";
 import { Card } from "@/models/Card";
 import { CACHE_CONFIG } from "@/utils/cacheConfig";
 import { cacheManager } from "@/utils/cache";
@@ -79,13 +79,9 @@ export async function GET(request: Request) {
   }
 }
 
-let isConnected = false;
-
 export async function POST(request: Request) {
-  if (!isConnected) {
-    await mongoose.connect(process.env.MONGO_URL as string);
-    isConnected = true;
-  }
+  // Connect to MongoDB
+  await connectDB();
 
   const data = await request.json();
 

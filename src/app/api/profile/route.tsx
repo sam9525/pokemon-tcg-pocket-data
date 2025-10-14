@@ -1,14 +1,11 @@
-import mongoose from "mongoose";
+import connectDB from "@/lib/mongodb";
 import { auth } from "@/../auth";
 import { User } from "@/models/User";
 import { DeleteObjectCommand, S3Client } from "@aws-sdk/client-s3";
 
 export async function GET(req: Request) {
-  // Connecting to database
-  await mongoose.connect(process.env.MONGO_URL as string).catch((err) => {
-    console.error("Failed to connect to MongoDB:", err);
-    throw new Error("Database connection failed");
-  });
+  // Connect to MongoDB
+  await connectDB();
 
   const url = new URL(req.url);
   const _id = url.searchParams.get("_id");
@@ -33,11 +30,8 @@ export async function GET(req: Request) {
 }
 
 export async function PUT(req: Request) {
-  // Connecting to database
-  await mongoose.connect(process.env.MONGO_URL as string).catch((err) => {
-    console.error("Failed to connect to MongoDB:", err);
-    throw new Error("Database connection failed");
-  });
+  // Connect to MongoDB
+  await connectDB();
 
   const data = await req.json();
   const { _id, name, image } = data;

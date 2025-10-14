@@ -1,7 +1,7 @@
 import { Card } from "@/models/Card";
 import { cacheManager } from "@/utils/cache";
 import { CACHE_CONFIG } from "@/utils/cacheConfig";
-import mongoose from "mongoose";
+import connectDB from "@/lib/mongodb";
 
 export async function GET(
   request: Request,
@@ -26,11 +26,8 @@ export async function GET(
       return Response.json(cached);
     }
 
-    // Create to mongoosedb
-    await mongoose.connect(process.env.MONGO_URL as string).catch((err) => {
-      console.error("Failed to connect to MongoDB:", err);
-      throw new Error("Database connection failed");
-    });
+    // Connect to MongoDB
+    await connectDB();
 
     const rarityMap = {
       pokemon: ["common", "uncommon", "rare"],

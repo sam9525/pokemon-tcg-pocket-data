@@ -1,5 +1,5 @@
 import { registerSchema } from "@/lib/zod";
-import mongoose from "mongoose";
+import connectDB from "@/lib/mongodb";
 import { ZodError } from "zod";
 import { User } from "@/models/User";
 import { NextResponse } from "next/server";
@@ -10,11 +10,8 @@ export async function POST(req: Request) {
     const body = await req.json();
     const confirmPassword = body.confirmPassword;
 
-    // Connecting to database
-    await mongoose.connect(process.env.MONGO_URL as string).catch((err) => {
-      console.error("Failed to connect to MongoDB:", err);
-      throw new Error("Database connection failed");
-    });
+    // Connect to MongoDB
+    await connectDB();
 
     // Parsing the body
     const { name, email, password, image } = await registerSchema.parseAsync(
