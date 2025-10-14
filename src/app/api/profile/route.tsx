@@ -3,8 +3,17 @@ import { auth } from "@/../auth";
 import { User } from "@/models/User";
 import { DeleteObjectCommand } from "@aws-sdk/client-s3";
 import { getS3Client, S3_BUCKET } from "@/lib/s3Client";
+import { NextRequest } from "next/server";
+import { rateLimit } from "@/lib/rateLimit";
+import { PROFILE_RATE_LIMIT } from "@/utils/rateLimitConfig";
 
-export async function GET(req: Request) {
+export async function GET(req: NextRequest) {
+  // Rate limiting to profile GET requests
+  const rateLimitResult = await rateLimit(req, PROFILE_RATE_LIMIT);
+  if (!rateLimitResult.success) {
+    return rateLimitResult.response;
+  }
+
   // Connect to MongoDB
   await connectDB();
 
@@ -30,7 +39,13 @@ export async function GET(req: Request) {
   return Response.json(user);
 }
 
-export async function PUT(req: Request) {
+export async function PUT(req: NextRequest) {
+  // Rate limiting to profile PUT requests
+  const rateLimitResult = await rateLimit(req, PROFILE_RATE_LIMIT);
+  if (!rateLimitResult.success) {
+    return rateLimitResult.response;
+  }
+
   // Connect to MongoDB
   await connectDB();
 
@@ -57,7 +72,12 @@ export async function PUT(req: Request) {
   return Response.json({ message: "User updated" }, { status: 200 });
 }
 
-export async function DELETE(req: Request) {
+export async function DELETE(req: NextRequest) {
+  // Apply rate limiting to profile DELETE requests
+  const rateLimitResult = await rateLimit(req, PROFILE_RATE_LIMIT);
+  if (!rateLimitResult.success) {
+    return rateLimitResult.response;
+  }
   try {
     const { url } = await req.json();
 

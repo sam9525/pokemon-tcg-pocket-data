@@ -2,6 +2,9 @@ import { ListObjectsCommand, S3Client } from "@aws-sdk/client-s3";
 import { cacheManager } from "@/utils/cache";
 import { CACHE_CONFIG } from "@/utils/cacheConfig";
 import { getS3Client, S3_BUCKET } from "@/lib/s3Client";
+import { NextRequest } from "next/server";
+import { rateLimit } from "@/lib/rateLimit";
+import { SEARCH_RATE_LIMIT } from "@/utils/rateLimitConfig";
 
 const ListObjects = async (
   s3Client: S3Client,
@@ -29,7 +32,13 @@ const ListObjects = async (
   });
 };
 
-export async function GET(request: Request) {
+export async function GET(request: NextRequest) {
+  // Rate limiting to search requests
+  const rateLimitResult = await rateLimit(request, SEARCH_RATE_LIMIT);
+  if (!rateLimitResult.success) {
+    return rateLimitResult.response;
+  }
+
   try {
     const language = request.headers.get("language");
     const cachePrefix = "search-" + language;

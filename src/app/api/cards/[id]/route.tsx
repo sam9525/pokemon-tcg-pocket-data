@@ -2,11 +2,20 @@ import { Card } from "@/models/Card";
 import { cacheManager } from "@/utils/cache";
 import { CACHE_CONFIG } from "@/utils/cacheConfig";
 import connectDB from "@/lib/mongodb";
+import { NextRequest } from "next/server";
+import { rateLimit } from "@/lib/rateLimit";
+import { API_RATE_LIMIT } from "@/utils/rateLimitConfig";
 
 export async function GET(
-  request: Request,
+  request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  // Rate limiting to card queries
+  const rateLimitResult = await rateLimit(request, API_RATE_LIMIT);
+  if (!rateLimitResult.success) {
+    return rateLimitResult.response;
+  }
+
   try {
     // Get filter from URL search params
     const url = new URL(request.url);

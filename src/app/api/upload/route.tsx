@@ -1,8 +1,17 @@
 import { PutObjectCommand } from "@aws-sdk/client-s3";
 import uniqid from "uniqid";
 import { getS3Client, S3_BUCKET } from "@/lib/s3Client";
+import { NextRequest } from "next/server";
+import { rateLimit } from "@/lib/rateLimit";
+import { UPLOAD_RATE_LIMIT } from "@/utils/rateLimitConfig";
 
-export async function POST(req: Request) {
+export async function POST(req: NextRequest) {
+  // Rate limiting to upload endpoint
+  const rateLimitResult = await rateLimit(req, UPLOAD_RATE_LIMIT);
+  if (!rateLimitResult.success) {
+    return rateLimitResult.response;
+  }
+
   try {
     const formData = await req.formData();
     const file = formData.get("file") as File;

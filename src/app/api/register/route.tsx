@@ -2,10 +2,18 @@ import { registerSchema } from "@/lib/zod";
 import connectDB from "@/lib/mongodb";
 import { ZodError } from "zod";
 import { User } from "@/models/User";
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { saltAndHashPassword } from "@/utils/password";
+import { rateLimit } from "@/lib/rateLimit";
+import { AUTH_RATE_LIMIT } from "@/utils/rateLimitConfig";
 
-export async function POST(req: Request) {
+export async function POST(req: NextRequest) {
+  // Rate limiting to prevent brute force registration attempts
+  const rateLimitResult = await rateLimit(req, AUTH_RATE_LIMIT);
+  if (!rateLimitResult.success) {
+    return rateLimitResult.response;
+  }
+
   try {
     const body = await req.json();
     const confirmPassword = body.confirmPassword;
