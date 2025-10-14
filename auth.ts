@@ -2,10 +2,10 @@ import NextAuth from "next-auth";
 import Credentials from "next-auth/providers/credentials";
 import { ZodError } from "zod";
 import { signInSchema } from "@/lib/zod";
-import mongoose from "mongoose";
 import { User } from "@/models/User";
 import GoogleProvider from "next-auth/providers/google";
 import { verifyPassword } from "@/utils/password";
+import connectDB from "@/lib/mongodb";
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
   secret: process.env.AUTH_SECRET,
@@ -34,12 +34,8 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
             credentials
           );
 
-          await mongoose
-            .connect(process.env.MONGO_URL as string)
-            .catch((err) => {
-              console.error("Failed to connect to MongoDB:", err);
-              throw new Error("Database connection failed");
-            });
+          // connect to mongodb
+          await connectDB();
 
           // logic to verify if the user exists
           const user = await User.findOne({ email });
@@ -72,12 +68,8 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     async signIn({ user, account }) {
       if (account?.provider === "google") {
         try {
-          await mongoose
-            .connect(process.env.MONGO_URL as string)
-            .catch((err) => {
-              console.error("Failed to connect to MongoDB:", err);
-              throw new Error("Database connection failed");
-            });
+          // connect to mongodb
+          await connectDB();
 
           // Check if user already exists in our custom User model
           const existingUser = await User.findOne({ email: user.email });
