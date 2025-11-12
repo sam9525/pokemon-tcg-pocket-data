@@ -1,12 +1,12 @@
 import { S3Client } from "@aws-sdk/client-s3";
 
 const AWS_REGION = "ap-southeast-2";
-const AWS_ACCESS_KEY = process.env.AWS_ACCESS_KEY as string;
-const AWS_SECRET_KEY = process.env.AWS_SECRET_KEY as string;
+const AWS_ACCESS_KEY_ID = process.env.AWS_ACCESS_KEY_ID as string;
+const AWS_SECRET_ACCESS_KEY = process.env.AWS_SECRET_ACCESS_KEY as string;
 
-if (!AWS_ACCESS_KEY || !AWS_SECRET_KEY) {
+if (!AWS_ACCESS_KEY_ID || !AWS_SECRET_ACCESS_KEY) {
   throw new Error(
-    "Please define AWS_ACCESS_KEY and AWS_SECRET_KEY environment variables"
+    "Please define AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY environment variables"
   );
 }
 
@@ -18,8 +18,8 @@ export function getS3Client(): S3Client {
     s3ClientInstance = new S3Client({
       region: AWS_REGION,
       credentials: {
-        accessKeyId: AWS_ACCESS_KEY,
-        secretAccessKey: AWS_SECRET_KEY,
+        accessKeyId: AWS_ACCESS_KEY_ID,
+        secretAccessKey: AWS_SECRET_ACCESS_KEY,
       },
     });
   }
