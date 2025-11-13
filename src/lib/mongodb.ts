@@ -1,13 +1,5 @@
 import mongoose from "mongoose";
 
-const MONGODB_URI = process.env.MONGO_URL as string;
-
-if (!MONGODB_URI) {
-  throw new Error(
-    "Please define the MONGO_URL environment variable inside .env.local"
-  );
-}
-
 declare global {
   let mongooseCache:
     | {
@@ -38,6 +30,14 @@ if (!cached) {
 }
 
 async function connectDB() {
+  const MONGODB_URI = process.env.MONGO_URL;
+
+  if (!MONGODB_URI) {
+    throw new Error(
+      "Please define the MONGO_URL environment variable inside .env.local"
+    );
+  }
+
   if (!cached) {
     throw new Error("MongoDB cache not initialized");
   }
