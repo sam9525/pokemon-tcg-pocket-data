@@ -4,6 +4,7 @@ import "./globals.css";
 import Header from "@/components/layouts/Header";
 import { AppProvider } from "@/components/AppContext";
 import { Toaster } from "react-hot-toast";
+import Chatbot from "@/components/layouts/Chatbot";
 
 export const metadata: Metadata = {
   title: "Pokemon tcg pocket",
@@ -24,6 +25,7 @@ export default function RootLayout({
           <AppProvider>
             <Toaster />
             <Header />
+            <Chatbot />
             {children}
           </AppProvider>
         </main>
