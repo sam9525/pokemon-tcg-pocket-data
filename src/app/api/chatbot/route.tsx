@@ -26,6 +26,17 @@ export async function POST(req: NextRequest) {
           const response = await ai.models.generateContentStream({
             model: "gemini-2.5-flash",
             contents: msg,
+            config: {
+              temperature: 0.7,
+              topP: 0.95,
+              topK: 40,
+              maxOutputTokens: 60000,
+              tools: [
+                {
+                  googleSearch: {},
+                },
+              ],
+            },
           });
 
           // Stream each chunk in SSE format
