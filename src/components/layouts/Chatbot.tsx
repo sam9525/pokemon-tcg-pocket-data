@@ -20,7 +20,10 @@ function useChatScroll<T>(dep: T): React.RefObject<HTMLDivElement | null> {
   const ref = useRef<HTMLDivElement | null>(null);
   useEffect(() => {
     if (ref.current) {
-      ref.current.scrollTop = ref.current.scrollHeight;
+      ref.current.scrollTo({
+        top: ref.current.scrollHeight,
+        behavior: "smooth",
+      });
     }
   }, [dep]);
   return ref;
@@ -110,6 +113,22 @@ export default function Chatbot() {
         document.removeEventListener("mousedown", handleClickOutsideChatbot);
     }
   }, [isOpen, handleClickOutsideChatbot]);
+
+  // Scroll to bottom when chatbot opens
+  useEffect(() => {
+    if (isOpen && ref.current) {
+      // Use setTimeout to ensure DOM is fully rendered
+      setTimeout(() => {
+        if (ref.current) {
+          ref.current.scrollTo({
+            top: ref.current.scrollHeight,
+            behavior: "smooth",
+          });
+        }
+      }, 0);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isOpen]);
 
   const sendMessage = useCallback(async (message: string): Promise<string> => {
     const response = await fetch("/api/chatbot", {
@@ -233,8 +252,7 @@ export default function Chatbot() {
       setIsLoading(true);
 
       try {
-        const aiResponse = await sendMessage(msg);
-        addMessage({ isUser: false, message: aiResponse });
+        await sendMessage(msg);
       } catch (error) {
         console.error("Chat error:", error);
         addMessage({
