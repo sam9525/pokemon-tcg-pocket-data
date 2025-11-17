@@ -7,7 +7,6 @@ const ai = new GoogleGenAI({
 
 export async function POST(req: NextRequest) {
   try {
-    // Parse request body
     const { msg } = await req.json();
 
     if (!msg || typeof msg !== "string") {
@@ -17,23 +16,52 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Get response from AI
-    const response = await ai.models.generateContent({
-      model: "gemini-2.5-flash",
-      contents: msg,
+    // Create a ReadableStream for SSE
+    const stream = new ReadableStream({
+      async start(controller) {
+        const encoder = new TextEncoder();
+
+        try {
+          // Get streaming response from Gemini
+          const response = await ai.models.generateContentStream({
+            model: "gemini-2.5-flash",
+            contents: msg,
+          });
+
+          // Stream each chunk in SSE format
+          for await (const chunk of response) {
+            const text = chunk.candidates?.[0]?.content?.parts?.[0]?.text ?? "";
+
+            if (text) {
+              // Send chunk in SSE format: "data: {json}\n\n"
+              const data = `data: ${JSON.stringify({ text })}\n\n`;
+              controller.enqueue(encoder.encode(data));
+            }
+          }
+
+          // Send completion signal
+          controller.enqueue(encoder.encode("data: [DONE]\n\n"));
+        } catch (error) {
+          // Send error in SSE format
+          const errorData = `data: ${JSON.stringify({
+            error: "Streaming failed",
+            details: error instanceof Error ? error.message : String(error),
+          })}\n\n`;
+          controller.enqueue(encoder.encode(errorData));
+        } finally {
+          controller.close();
+        }
+      },
     });
 
-    const aiMessage =
-      response.candidates &&
-      response.candidates[0] &&
-      response.candidates[0].content &&
-      response.candidates[0].content.parts &&
-      response.candidates[0].content.parts[0] &&
-      typeof response.candidates[0].content.parts[0].text === "string"
-        ? response.candidates[0].content.parts[0].text
-        : "";
-
-    return Response.json({ aiMessage });
+    // Return stream with SSE headers
+    return new Response(stream, {
+      headers: {
+        "Content-Type": "text/event-stream",
+        "Cache-Control": "no-cache",
+        Connection: "keep-alive",
+      },
+    });
   } catch (error) {
     console.error("Chatbot API error:", error);
     return Response.json(

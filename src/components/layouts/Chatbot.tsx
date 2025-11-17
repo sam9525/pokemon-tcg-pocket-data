@@ -10,12 +10,6 @@ interface ChatbotMessage {
   message: string;
 }
 
-interface ChatbotResponse {
-  aiMessage?: string;
-  error?: string;
-  details?: string;
-}
-
 const USER_CLASS = "max-w-110 m-4 p-2 bg-primary text-background rounded-md";
 const AI_CLASS =
   "max-w-110 m-4 p-2 bg-background text-primary rounded-md border-2 border-primary";
@@ -118,23 +112,92 @@ export default function Chatbot() {
   }, [isOpen, handleClickOutsideChatbot]);
 
   const sendMessage = useCallback(async (message: string): Promise<string> => {
-    const result = await fetch("/api/chatbot", {
+    const response = await fetch("/api/chatbot", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+      },
       body: JSON.stringify({ msg: message }),
     });
 
-    if (!result.ok) {
-      throw new Error(`HTTP error! status: ${result.status}`);
+    // Check if it's an error response (JSON)
+    const contentType = response.headers.get("content-type");
+    if (contentType?.includes("application/json")) {
+      const errorData = await response.json();
+      throw new Error(errorData.error || "Unknown error");
     }
 
-    const response: ChatbotResponse = await result.json();
-
-    if (response.error) {
-      throw new Error(response.error);
+    // Read SSE stream
+    const reader = response.body?.getReader();
+    if (!reader) {
+      throw new Error("No response body");
     }
 
-    return response.aiMessage || "";
+    const decoder = new TextDecoder();
+    let buffer = ""; // Buffer for incomplete chunks
+    let fullResponse = "";
+    const currentMessageId = crypto.randomUUID();
+
+    // Add initial empty AI message
+    setMessages((prev) => [
+      ...prev,
+      { isUser: false, message: "", id: currentMessageId },
+    ]);
+
+    try {
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+
+        // Decode and add to buffer
+        buffer += decoder.decode(value, { stream: true });
+
+        // Split by newlines
+        const lines = buffer.split("\n");
+
+        // Keep last incomplete line in buffer
+        buffer = lines.pop() || "";
+
+        for (const line of lines) {
+          if (!line.trim()) continue;
+
+          if (line.startsWith("data: ")) {
+            const data = line.substring(6);
+
+            if (data === "[DONE]") {
+              return fullResponse;
+            }
+
+            try {
+              const parsed = JSON.parse(data);
+
+              if (parsed.error) {
+                throw new Error(parsed.error);
+              }
+
+              if (parsed.text) {
+                fullResponse += parsed.text;
+
+                // Update the AI message progressively
+                setMessages((prev) =>
+                  prev.map((msg) =>
+                    msg.id === currentMessageId
+                      ? { ...msg, message: fullResponse }
+                      : msg
+                  )
+                );
+              }
+            } catch (parseError) {
+              console.warn("Failed to parse SSE data:", parseError);
+            }
+          }
+        }
+      }
+    } finally {
+      reader.releaseLock();
+    }
+
+    return fullResponse;
   }, []);
 
   const handleTextareaResize = useCallback(() => {
