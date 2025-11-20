@@ -4,6 +4,7 @@ import ChatbotIcon from "../icons/chatbot";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
+import Close from "../icons/close";
 
 interface ChatbotMessage {
   id: string;
@@ -342,12 +343,18 @@ export default function Chatbot() {
       {isOpen && (
         <div
           ref={chatbotRef}
-          className={`w-150 h-180 bg-foreground border-4 border-primary rounded-md fixed bottom-30 right-10 z-200 flex flex-col ${
+          className={`md:w-150 w-full md:max-h-[80%] md:h-180 h-full bg-foreground border-4 border-primary rounded-md fixed md:bottom-30 bottom-0 md:right-10 z-300 flex flex-col ${
             isClosing ? "chatbot-close" : "chatbot-open"
           }`}
         >
           <div className="w-full h-15 bg-primary flex items-center justify-center text-2xl font-bold text-background">
             Pokebot
+          </div>
+          <div
+            className="w-10 h-10 absolute top-2 right-2 text-foreground"
+            onClick={handleToggle}
+          >
+            <Close />
           </div>
           <div ref={ref} className="flex-1 overflow-y-auto overflow-x-hidden">
             {messages.map((msg) => (
