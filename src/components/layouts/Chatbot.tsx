@@ -1,4 +1,5 @@
 "use client";
+import Link from "next/link";
 import ChatbotIcon from "../icons/chatbot";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import ReactMarkdown from "react-markdown";
@@ -8,6 +9,7 @@ interface ChatbotMessage {
   id: string;
   isUser: boolean;
   message: string;
+  links?: Array<{ title: string; uri: string }>;
 }
 
 const USER_CLASS = "max-w-110 m-4 p-2 bg-primary text-background rounded-md";
@@ -37,11 +39,27 @@ const MessageItem = React.memo(({ msg }: { msg: ChatbotMessage }) =>
       </div>
     </div>
   ) : (
-    <div className="flex justify-start animate-slideInLeft">
-      <div className={AI_CLASS}>
-        <ReactMarkdown remarkPlugins={[remarkGfm]}>{msg.message}</ReactMarkdown>
+    <>
+      <div className="flex justify-start animate-slideInLeft">
+        <div className={AI_CLASS}>
+          <ReactMarkdown remarkPlugins={[remarkGfm]}>
+            {msg.message}
+          </ReactMarkdown>
+        </div>
       </div>
-    </div>
+      <div className="flex flex-wrap max-w-150">
+        {msg.links?.map((link, idx) => (
+          <div
+            key={`${msg.id}-link-${idx}`}
+            className="m-1.5 p-2 bg-primary rounded-2xl break-words"
+          >
+            <Link href={link.uri} className="text-background">
+              {link.title || link.uri}
+            </Link>
+          </div>
+        ))}
+      </div>
+    </>
   )
 );
 MessageItem.displayName = "MessageItem";
@@ -208,6 +226,35 @@ export default function Chatbot() {
               }
             } catch (parseError) {
               console.warn("Failed to parse SSE data:", parseError);
+            }
+          } else if (line.startsWith("links: ")) {
+            const data = line.substring(6);
+
+            try {
+              const parsed = JSON.parse(data);
+
+              if (parsed.error) {
+                throw new Error(parsed.error);
+              }
+
+              // Batch all links into single update for better performance
+              const newLinks = parsed.links.map((link: { web: { title: string; uri: string } }) => ({
+                title: link.web.title,
+                uri: link.web.uri,
+              }));
+
+              setMessages((prev) =>
+                prev.map((msg) =>
+                  msg.id === currentMessageId
+                    ? {
+                        ...msg,
+                        links: [...(msg.links || []), ...newLinks],
+                      }
+                    : msg
+                )
+              );
+            } catch (parseError) {
+              console.warn("Failed to parse links:", parseError);
             }
           }
         }

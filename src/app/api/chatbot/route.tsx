@@ -55,11 +55,19 @@ export async function POST(req: NextRequest) {
 
           // Stream each chunk in SSE format
           for await (const chunk of response) {
+            const links =
+              chunk.candidates?.[0]?.groundingMetadata?.groundingChunks;
+
             const text = chunk.candidates?.[0]?.content?.parts?.[0]?.text ?? "";
 
             if (text) {
               // Send chunk in SSE format: "data: {json}\n\n"
               const data = `data: ${JSON.stringify({ text })}\n\n`;
+              controller.enqueue(encoder.encode(data));
+            }
+
+            if (links != undefined) {
+              const data = `links: ${JSON.stringify({ links })}\n\n`;
               controller.enqueue(encoder.encode(data));
             }
           }
