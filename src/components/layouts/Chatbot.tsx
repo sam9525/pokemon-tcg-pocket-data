@@ -53,7 +53,12 @@ const MessageItem = React.memo(({ msg }: { msg: ChatbotMessage }) =>
             key={`${msg.id}-link-${idx}`}
             className="m-1.5 p-2 bg-primary rounded-2xl break-words"
           >
-            <Link href={link.uri} className="text-background">
+            <Link
+              href={link.uri}
+              className="text-background"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
               {link.title || link.uri}
             </Link>
           </div>
@@ -237,11 +242,12 @@ export default function Chatbot() {
                 throw new Error(parsed.error);
               }
 
-              // Batch all links into single update for better performance
-              const newLinks = parsed.links.map((link: { web: { title: string; uri: string } }) => ({
-                title: link.web.title,
-                uri: link.web.uri,
-              }));
+              const newLinks = parsed.links.map(
+                (link: { web: { title: string; uri: string } }) => ({
+                  title: link.web.title,
+                  uri: link.web.uri,
+                })
+              );
 
               setMessages((prev) =>
                 prev.map((msg) =>
