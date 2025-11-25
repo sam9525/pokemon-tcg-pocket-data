@@ -1,21 +1,101 @@
 import Image from "next/image";
-import { useRef, useEffect } from "react";
+import { useRef, useEffect, useCallback } from "react";
 
 interface FilteredItemsProps {
   files: { id: string; url: string }[];
+  packageId?: string;
   onLoadMore?: () => void;
   hasMore?: boolean;
   isLoading?: boolean;
+  focusedCardId?: string;
 }
 
 export default function FilteredItems({
   files,
+  packageId,
   onLoadMore,
   hasMore = false,
   isLoading = false,
+  focusedCardId,
 }: FilteredItemsProps) {
   const cardRefs = useRef<Map<string, HTMLDivElement>>(new Map());
   const observerRef = useRef<HTMLDivElement>(null);
+  const initialFocusRef = useRef(false);
+
+  const handleClick = useCallback(
+    (cardId: string) => {
+      const card = cardRefs.current.get(cardId);
+      if (!card) return;
+
+      // Toggle focus class - add if not present, remove if already present
+      if (card.classList.contains("focus")) {
+        // Remove focus with animation
+        card.classList.add("unfocus");
+        setTimeout(() => {
+          card.classList.remove("focus", "unfocus");
+          // Remove mask when card is unfocused
+          document.getElementById("background-mask")?.remove();
+          window.history.pushState(null, "", `/cards/${packageId}`);
+        }, 300); // Match the transition duration
+      } else {
+        // Remove focus from any other cards first
+        document
+          .querySelectorAll(".card-container > div.focus")
+          .forEach((el) => {
+            el.classList.remove("focus");
+          });
+
+        // Calculate the card's position relative to the viewport
+        const rect = card.getBoundingClientRect();
+
+        // Calculate the position as a percentage of the viewport
+        // We need to account for the card's center point
+        const startX = rect.left + rect.width / 2;
+        const startY = rect.top + rect.height / 2;
+
+        // Set CSS variables for the animation
+        card.style.setProperty("--start-x", `${startX}px`);
+        card.style.setProperty("--start-y", `${startY}px`);
+
+        // Add focus to the clicked card
+        card.classList.add("focus");
+
+        // Create and add background mask
+        const mask = document.createElement("div");
+        mask.id = "background-mask";
+
+        // Remove focus and mask when clicked again
+        mask.addEventListener("click", () => {
+          card.classList.add("unfocus");
+          setTimeout(() => {
+            card.classList.remove("focus", "unfocus");
+            mask.remove();
+            window.history.pushState(null, "", `/cards/${packageId}`);
+          }, 300);
+        });
+
+        document.body.appendChild(mask);
+        window.history.pushState(null, "", `/cards/${packageId}/${cardId}`);
+      }
+      return;
+    },
+    [packageId]
+  );
+
+  // Handle initial focus
+  useEffect(() => {
+    if (
+      focusedCardId &&
+      !initialFocusRef.current &&
+      cardRefs.current.has(focusedCardId)
+    ) {
+      initialFocusRef.current = true;
+      // Small delay to ensure layout is stable
+      setTimeout(() => {
+        handleClick(focusedCardId);
+      }, 100);
+    }
+  }, [focusedCardId, files, handleClick]);
 
   // Intersection Observer for infinite scroll
   useEffect(() => {
@@ -90,58 +170,6 @@ export default function FilteredItems({
     cardImage.style.transform = transformString;
   };
 
-  const handleClick = (cardId: string) => {
-    const card = cardRefs.current.get(cardId);
-    if (!card) return;
-
-    // Toggle focus class - add if not present, remove if already present
-    if (card.classList.contains("focus")) {
-      // Remove focus with animation
-      card.classList.add("unfocus");
-      setTimeout(() => {
-        card.classList.remove("focus", "unfocus");
-        // Remove mask when card is unfocused
-        document.getElementById("background-mask")?.remove();
-      }, 300); // Match the transition duration
-    } else {
-      // Remove focus from any other cards first
-      document.querySelectorAll(".card-container > div.focus").forEach((el) => {
-        el.classList.remove("focus");
-      });
-
-      // Calculate the card's position relative to the viewport
-      const rect = card.getBoundingClientRect();
-
-      // Calculate the position as a percentage of the viewport
-      // We need to account for the card's center point
-      const startX = rect.left + rect.width / 2;
-      const startY = rect.top + rect.height / 2;
-
-      // Set CSS variables for the animation
-      card.style.setProperty("--start-x", `${startX}px`);
-      card.style.setProperty("--start-y", `${startY}px`);
-
-      // Add focus to the clicked card
-      card.classList.add("focus");
-
-      // Create and add background mask
-      const mask = document.createElement("div");
-      mask.id = "background-mask";
-
-      // Remove focus and mask when clicked again
-      mask.addEventListener("click", () => {
-        card.classList.add("unfocus");
-        setTimeout(() => {
-          card.classList.remove("focus", "unfocus");
-          mask.remove();
-        }, 300);
-      });
-
-      document.body.appendChild(mask);
-    }
-    return;
-  };
-
   return (
     <>
       <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 xl:grid-cols-6 gap-4 sm:gap-6 md:gap-8 xl:gap-10">
@@ -152,7 +180,10 @@ export default function FilteredItems({
             onMouseMove={(e) => handleMove(e, file.id)}
             onMouseOut={() => handleMouseOut(file.id)}
             onMouseUp={() => handleMouseUp(file.id)}
-            onClick={() => handleClick(file.id)}
+            onClick={(e) => {
+              e.preventDefault();
+              handleClick(file.id);
+            }}
           >
             <div
               ref={(el) => {

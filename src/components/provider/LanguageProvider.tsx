@@ -33,10 +33,10 @@ const LanguageContext = createContext<LanguageContextType | undefined>(
 
 // Language Provider Component
 export function LanguageProvider({ children }: { children: ReactNode }) {
-  const [language, setLanguageState] = useState<string>("zh_TW");
+  const [language, setLanguageState] = useState<string>("en_US");
   const [currentLanguageLookup, setCurrentLanguageLookup] = useState<
     Record<string, Record<string, string>>
-  >(languageLookup["zh_TW"]);
+  >(languageLookup["en_US"]);
 
   // Initialize language from localStorage on mount
   useEffect(() => {

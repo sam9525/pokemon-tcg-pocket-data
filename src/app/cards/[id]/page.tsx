@@ -1,58 +1,32 @@
-"use client";
+import PackagePageClient from "./PackagePageClient";
 
-import { useEffect, useState } from "react";
-import toast from "react-hot-toast";
-import { use } from "react";
-import FilteringTabs from "@/components/layouts/FilteringTabs";
-import FilteredItems from "@/components/layouts/FilteredItems";
-import { useLanguage } from "@/components/provider/LanguageProvider";
+import { Metadata } from "next";
 
-export default function PackagePage({
-  params,
-}: {
+type Props = {
   params: Promise<{ id: string }>;
-}) {
-  const resolvedParams = use(params);
-  const [files, setFiles] = useState<{ id: string; url: string }[]>([]);
-  const [filter, setFilter] = useState<string[]>([]);
-  const { language, currentLanguageLookup } = useLanguage();
+};
 
-  useEffect(() => {
-    try {
-      const toastPromise = new Promise(async (resolve, reject) => {
-        const response = await fetch(
-          `/api/cards/${resolvedParams.id}?filter=${filter.join(
-            ","
-          )}&language=${language}`
-        );
-        const data = await response.json();
-        setFiles(data.cards || []);
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { id } = await params;
+  const packageName = id.replace(/_/g, " ");
 
-        if (response.ok) {
-          resolve(response);
-        } else {
-          reject(response);
-        }
-      });
+  return {
+    title: `Package ${packageName}`,
+    description: `Browse cards from the ${packageName} package in Pokemon TCG Pocket.`,
+    openGraph: {
+      title: `Package ${packageName} | Pokemon TCG Pocket`,
+      description: `Browse cards from the ${packageName} package in Pokemon TCG Pocket.`,
+    },
+  };
+}
 
-      toast.promise(toastPromise, {
-        loading: currentLanguageLookup.NOTIFICATIONS.loadingCards,
-        error: currentLanguageLookup.NOTIFICATIONS.failedToLoadCards,
-        success: currentLanguageLookup.NOTIFICATIONS.cardsLoadedSuccessfully,
-      });
-    } catch (error) {
-      console.error(error);
-    }
-  }, [resolvedParams.id, filter, language, currentLanguageLookup]);
+export default async function PackagePage({ params }: Props) {
+  const { id } = await params;
 
-  return (
-    <div className="flex flex-col items-center justify-center m-5 sm:m-7 md:m-10">
-      <FilteringTabs
-        filter={filter}
-        setFilter={setFilter}
-        currentLanguageLookup={currentLanguageLookup}
-      />
-      <FilteredItems files={files} />
-    </div>
+  const response = await fetch(
+    `${process.env.AUTH_URL}/api/cards/${id}?language=en_US`
   );
+  const data = await response.json();
+
+  return <PackagePageClient packageId={id} initialCards={data.cards} />;
 }

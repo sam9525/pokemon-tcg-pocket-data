@@ -1,46 +1,24 @@
-"use client";
-
 import Image from "next/image";
 import Link from "next/link";
-import { useEffect, useRef, useState } from "react";
-import toast from "react-hot-toast";
-import { useLanguage } from "@/components/provider/LanguageProvider";
 
-export default function Home() {
-  const hasLoaded = useRef(false);
-  const [packages, setPackages] = useState<{ id: string; url: string }[]>([]);
-  const { currentLanguageLookup } = useLanguage();
+import { Metadata } from "next";
 
-  useEffect(() => {
-    if (hasLoaded.current) return;
-    hasLoaded.current = true;
+export const metadata: Metadata = {
+  title: "Card List",
+  description: "Browse all available Pokemon TCG Pocket card packages.",
+};
 
-    try {
-      const toastPromise = new Promise(async (resolve, reject) => {
-        const response = await fetch("/api/packages");
-        const data = await response.json();
-        setPackages(data.packages || []);
+export default async function Home() {
+  const response = await fetch(`${process.env.AUTH_URL}/api/packages`, {
+    cache: "no-cache",
+  });
 
-        if (response.ok) {
-          resolve(response);
-        } else {
-          reject(response);
-        }
-      });
+  const { packages } = await response.json();
 
-      toast.promise(toastPromise, {
-        loading: currentLanguageLookup.NOTIFICATIONS.loadingPackages,
-        error: currentLanguageLookup.NOTIFICATIONS.failedToLoadPackages,
-        success: currentLanguageLookup.NOTIFICATIONS.packagesLoaded,
-      });
-    } catch (error) {
-      console.error(error);
-    }
-  }, [currentLanguageLookup]);
   return (
     <div className="flex flex-col items-center justify-center m-6 sm:m-10">
       <div className="grid grid-cols-3 gap-6 sm:gap-15">
-        {packages.slice(1, -3).map((pkg) => (
+        {packages.slice(1, -3).map((pkg: { id: string; url: string }) => (
           <Link href={`/cards/${pkg.id}`} key={pkg.id} className="m-auto">
             <Image
               src={pkg.url}

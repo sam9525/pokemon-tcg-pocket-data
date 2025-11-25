@@ -12,7 +12,7 @@ export default function HeaderTabsMenu({
   setShowHeaderTabsMenu: (show: boolean) => void;
 }) {
   return (
-    <div className="z-100 absolute w-full h-full bg-foreground px-6 py-6 flex flex-col items-center justify-center gap-5 text-xl text-bold fixed top-0 left-0">
+    <div className="z-100 w-full h-full bg-foreground px-6 py-6 flex flex-col items-center justify-center gap-5 text-xl text-bold fixed top-0 left-0">
       <button
         className="absolute top-8 right-8 w-7 sm:w-9"
         onClick={() => setShowHeaderTabsMenu(false)}

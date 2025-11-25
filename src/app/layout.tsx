@@ -7,8 +7,22 @@ import { Toaster } from "react-hot-toast";
 import Chatbot from "@/components/layouts/Chatbot";
 
 export const metadata: Metadata = {
-  title: "Pokemon tcg pocket",
-  description: "Pokemon tcg pocket",
+  title: {
+    template: "%s | Pokemon TCG Pocket",
+    default: "Pokemon TCG Pocket",
+  },
+  description: "Browse and filter Pokemon TCG Pocket cards and packages.",
+  openGraph: {
+    title: "Pokemon TCG Pocket",
+    description: "Browse and filter Pokemon TCG Pocket cards and packages.",
+    type: "website",
+    siteName: "Pokemon TCG Pocket",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Pokemon TCG Pocket",
+    description: "Browse and filter Pokemon TCG Pocket cards and packages.",
+  },
 };
 
 const roboto = Roboto({ subsets: ["latin"], weight: ["400", "500", "700"] });
