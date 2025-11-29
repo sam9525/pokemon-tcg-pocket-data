@@ -1,0 +1,24 @@
+name: Web Crawler
+on:
+  schedule:
+    - cron: "0 0 * * *" # Every day at 0:00 AM
+  workflow_dispatch: # Manual trigger
+
+jobs:
+  scrape:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: "20"
+          cache: "yarn"
+
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+
+      - name: Run crawler
+        run: npx tsx deckCrawler.ts
+        timeout-minutes: 60
+        env:
+          MONGO_URL: ${{ secrets.MONGO_URL }}
