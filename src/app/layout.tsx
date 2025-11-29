@@ -5,6 +5,7 @@ import Header from "@/components/layouts/Header";
 import { AppProvider } from "@/components/AppContext";
 import { Toaster } from "react-hot-toast";
 import Chatbot from "@/components/layouts/Chatbot";
+import { Analytics } from "@vercel/analytics/next";
 
 export const metadata: Metadata = {
   title: {
@@ -41,6 +42,7 @@ export default function RootLayout({
             <Header />
             <Chatbot />
             {children}
+            <Analytics />
           </AppProvider>
         </main>
       </body>
