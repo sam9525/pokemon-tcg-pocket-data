@@ -19,6 +19,6 @@ jobs:
 
       - name: Run crawler
         run: yarn tsx scripts/deckCrawler.ts
-        timeout-minutes: 60
+        timeout-minutes: 30
         env:
           MONGO_URL: ${{ secrets.MONGO_URL }}

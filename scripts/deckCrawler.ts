@@ -305,4 +305,8 @@ async function crawlWebsite() {
   await browser.close();
 }
 
-crawlWebsite();
+crawlWebsite().then(() => {
+  console.log("Crawler completed successfully");
+  // Force exit
+  process.exit(0);
+});
