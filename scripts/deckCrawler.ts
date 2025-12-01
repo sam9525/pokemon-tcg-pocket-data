@@ -158,11 +158,15 @@ async function crawlWebsite() {
       if (!url) continue;
 
       const parts = deckName.split(" ");
-      let highlightName = parts[0];
-      if (parts.length > 1) {
-        highlightName += " " + parts[1];
+      let highlightName;
+      if (parts[0] === "Mega") {
+        highlightName = parts[0] + " " + parts[1];
+      } else {
+        highlightName = parts[0];
       }
-      if (parts.length > 2 && parts[2].toLowerCase() === "ex") {
+      if (parts.length > 2 && parts[1].toLowerCase() === "ex") {
+        highlightName += " " + parts[1];
+      } else if (parts.length > 2 && parts[2].toLowerCase() === "ex") {
         highlightName += " " + parts[2];
       }
 
