@@ -40,7 +40,9 @@ export async function GET(request: NextRequest) {
   }
 
   try {
-    const language = request.headers.get("language");
+    const searchParams = request.nextUrl.searchParams;
+    const language =
+      request.headers.get("language") || searchParams.get("language");
     const cachePrefix = "search-" + language;
 
     // Get the response from the cache
