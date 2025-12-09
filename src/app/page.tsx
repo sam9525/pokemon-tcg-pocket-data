@@ -1,7 +1,7 @@
-import Image from "next/image";
 import Link from "next/link";
 
 import { Metadata } from "next";
+import CardImage from "@/components/CardImage";
 
 export const metadata: Metadata = {
   title: "Card List",
@@ -20,9 +20,10 @@ export default async function Home() {
       <div className="grid grid-cols-3 gap-6 sm:gap-15">
         {packages.slice(1, -3).map((pkg: { id: string; url: string }) => (
           <Link href={`/cards/${pkg.id}`} key={pkg.id} className="m-auto">
-            <Image
+            <CardImage
               src={pkg.url}
               alt={`card ${pkg.id}`}
+              variant="card"
               width={150}
               height={200}
             />
@@ -33,9 +34,10 @@ export default async function Home() {
             href={`/package/${packages[packages.length - 1]?.id}`}
             className="m-auto"
           >
-            <Image
+            <CardImage
               src={packages[packages.length - 1]?.url}
               alt={`Featured Package ${packages[packages.length - 1]?.id}`}
+              variant="card"
               width={300}
               height={200}
             />

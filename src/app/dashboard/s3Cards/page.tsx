@@ -2,10 +2,10 @@
 
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
-import Image from "next/image";
 import { List } from "react-window";
 import { scheduleCacheClear } from "@/utils/cardLookup";
 import { useLanguage } from "@/components/provider/LanguageProvider";
+import CardImage from "@/components/CardImage";
 
 const useWebWorkerPreprocessing = () => {
   const [preprocessingWorker, setPreprocessingWorker] = useState<Worker | null>(
@@ -66,11 +66,10 @@ const CardRow = ({ index, style, cards }: CardRowProps) => {
   return (
     <div style={style} className="flex border-b">
       <div className="flex-1 p-4 flex items-center border-r">
-        <Image
+        <CardImage
           src={card1.url}
           alt={card1.id}
-          width={50}
-          height={50}
+          variant="thumbnailCard"
           className="mr-4"
         />
         <span className="text-sm">{card1.id}</span>
@@ -78,11 +77,10 @@ const CardRow = ({ index, style, cards }: CardRowProps) => {
       <div className="flex-1 p-4 flex items-center">
         {card2 ? (
           <>
-            <Image
+            <CardImage
               src={card2.url}
               alt={card2.id}
-              width={50}
-              height={50}
+              variant="thumbnailCard"
               className="mr-4"
             />
             <span className="text-sm">{card2.id}</span>

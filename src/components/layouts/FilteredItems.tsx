@@ -1,4 +1,4 @@
-import Image from "next/image";
+import CardImage from "@/components/CardImage";
 import { useRef, useEffect, useCallback } from "react";
 
 interface FilteredItemsProps {
@@ -172,7 +172,7 @@ export default function FilteredItems({
 
   return (
     <>
-      <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 xl:grid-cols-6 gap-4 sm:gap-6 md:gap-8 xl:gap-10">
+      <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 xl:grid-cols-6 gap-4 sm:gap-5 md:gap-6 xl:gap-10">
         {files.map((file) => (
           <div
             key={file.id}
@@ -191,20 +191,18 @@ export default function FilteredItems({
               }}
               className="card"
             >
-              <Image
+              <CardImage
                 src={file.url}
+                variant="card"
                 alt={file.id}
-                width={200}
-                height={280}
                 onMouseMove={(e) => handleMove(e, file.id)}
                 onMouseOut={() => handleMouseOut(file.id)}
                 onMouseUp={() => handleMouseUp(file.id)}
               />
-              <Image
+              <CardImage
                 src="https://pokemon-tcg-pocket-data.s3.ap-southeast-2.amazonaws.com/pokemon_card_backside.png"
+                variant="card"
                 alt="card-backside"
-                width={200}
-                height={280}
                 className="card-backside"
               />
             </div>

@@ -1,7 +1,7 @@
 "use client";
 
 import FilteredItems from "@/components/layouts/FilteredItems";
-import Image from "next/image";
+import CardImage from "@/components/CardImage";
 import React, { useEffect, useRef, useState, useCallback } from "react";
 import toast from "react-hot-toast";
 import { useLanguage } from "@/components/provider/LanguageProvider";
@@ -288,8 +288,9 @@ export default function SearchPageClient({
             mouseClick(filterName || "", item.id);
           }}
         >
-          <Image
+          <CardImage
             src={item.url}
+            variant="thumbnail"
             alt={item.id}
             width={width}
             height={height}
@@ -327,9 +328,10 @@ export default function SearchPageClient({
                 onClick={() => mouseClick(filterName || "", itemId)}
               >
                 {Array.from({ length: starCount }, (_, index) => (
-                  <Image
+                  <CardImage
                     key={index}
                     src={rarity.url}
+                    variant="thumbnail"
                     alt={itemId}
                     width={width}
                     height={height}
