@@ -18,7 +18,7 @@ export default async function Home() {
   return (
     <div className="flex flex-col items-center justify-center m-6 sm:m-10">
       <div className="grid grid-cols-3 gap-6 sm:gap-15">
-        {packages.slice(1, -3).map((pkg: { id: string; url: string }) => (
+        {packages.slice(1, -6).map((pkg: { id: string; url: string }) => (
           <Link href={`/cards/${pkg.id}`} key={pkg.id} className="m-auto">
             <CardImage
               src={pkg.url}
@@ -29,20 +29,20 @@ export default async function Home() {
             />
           </Link>
         ))}
-        {packages.length > 0 && (
-          <Link
-            href={`/package/${packages[packages.length - 1]?.id}`}
-            className="m-auto"
-          >
+        {[
+          { id: "promo_a_pink", width: 300 },
+          { id: "promo_b_pink", width: 150 },
+        ].map(({ id, width }) => (
+          <Link href={`/cards/${id}`} key={id} className="m-auto">
             <CardImage
-              src={packages[packages.length - 1]?.url}
-              alt={`Featured Package ${packages[packages.length - 1]?.id}`}
+              src={`${process.env.S3_URL}Package/${id}.png`}
+              alt={`Featured Package ${id}`}
               variant="card"
-              width={300}
+              width={width}
               height={200}
             />
           </Link>
-        )}
+        ))}
       </div>
     </div>
   );

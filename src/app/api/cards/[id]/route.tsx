@@ -57,11 +57,21 @@ export async function GET(
     const { id } = await params;
     const parts = id.split("_");
     const isExtended = parts.length >= 3;
+    const isPromo = parts[0] === "promo";
+    const pkg = isPromo
+      ? `${parts[0]}-${parts[1]}`
+      : `${parts[0]}_${isExtended ? parts[2] : parts[1]}`;
+    const boosterPack = isPromo
+      ? pkg
+      : isExtended
+      ? parts[1]
+      : parts[1].replace(/-/g, " ");
+
     const cards = await Card.find({
-      package: `${parts[0]}_${isExtended ? parts[2] : parts[1]}`,
-      boosterPack: isExtended ? parts[1] : parts[1].replace(/-/g, " "),
-      ...(rarityFilters.length > 0 && { rarity: { $in: rarityFilters } }),
+      package: pkg,
+      boosterPack,
       language,
+      ...(rarityFilters.length > 0 && { rarity: { $in: rarityFilters } }),
     });
 
     const cardsMap = {

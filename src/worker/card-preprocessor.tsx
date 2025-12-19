@@ -53,8 +53,11 @@ self.onmessage = async (event) => {
       const card_name = parts[4];
       const rarity = parts[5];
 
+      // Check if the package is promo
+      const isPromo = packageId?.split("_")[0] === "promo";
+
       // Extract card package from packageId
-      const packageCode = packageId?.split("_")[0];
+      const packageCode = isPromo ? packageId : packageId?.split("_")[0];
 
       let card_type = null;
       let card_booster_pack: string[] = [];

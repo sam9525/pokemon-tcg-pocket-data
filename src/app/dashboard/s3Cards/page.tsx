@@ -254,6 +254,8 @@ export default function S3CardsPage() {
           <option value="B1a_crimson-blaze">
             {currentLanguageLookup.PACKAGES.B1a}
           </option>
+          <option value="promo-a">PROMO-A</option>
+          <option value="promo-b">PROMO-B</option>
         </select>
         <select
           value={language}
