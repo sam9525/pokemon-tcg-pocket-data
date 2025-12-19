@@ -8,7 +8,7 @@ const specialCardLookupCache = new Map();
 const cacheClearTimers = new Map<string, NodeJS.Timeout>();
 
 // S3 bucket configuration
-const S3_BASE_URL = `${process.env.AUTH_URL}/Card-List-Json`;
+const S3_BASE_URL = `${process.env.NEXT_PUBLIC_S3_URL}Card-List-Json`;
 
 // Load card list data from S3
 async function getCardList(packageCode: string, special: boolean = false) {
