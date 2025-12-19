@@ -18,7 +18,7 @@ const CardSchema = new Schema(
   { timestamps: true }
 );
 
-// Create a unique index for cardId
-CardSchema.index({ cardId: 1 }, { unique: true });
+// Create a unique index for cardId and package
+CardSchema.index({ cardId: 1, package: 1 }, { unique: true });
 
 export const Card = models?.Card || model("Card", CardSchema);
