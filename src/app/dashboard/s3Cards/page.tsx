@@ -242,8 +242,17 @@ export default function S3CardsPage() {
           <option value="A4_wisdom-of-sea-and-sky">
             {currentLanguageLookup.PACKAGES.A4}
           </option>
-          <option value="A4a_secluded-springs ">
+          <option value="A4a_secluded-springs">
             {currentLanguageLookup.PACKAGES.A4a}
+          </option>
+          <option value="A4b_deluxe-pack-ex">
+            {currentLanguageLookup.PACKAGES.A4b}
+          </option>
+          <option value="B1_mega-rising">
+            {currentLanguageLookup.PACKAGES.B1}
+          </option>
+          <option value="B1a_crimson-blaze">
+            {currentLanguageLookup.PACKAGES.B1a}
           </option>
         </select>
         <select

@@ -34,9 +34,12 @@ const PACKAGE_CODES = [
   ["A2b", "shining-rivalry"],
   ["A3", "celestial-guardians"],
   ["A3a", "extradimensional-crisis"],
-  ["A3b", "eevee-groove"],
+  ["A3b", "eevee-grove"],
   ["A4", "wisdom-of-sea-and-sky"],
   ["A4a", "secluded-springs"],
+  ["A4b", "deluxe-pack-ex"],
+  ["B1", "mega-rising"],
+  ["B1a", "crimson-blaze"],
 ];
 
 const LANGUAGES = ["zh_TW", "ja_JP", "en_US"];
@@ -63,11 +66,16 @@ const BOOSTER_CODES = [
   ["A2b_100080_SHINING", "shining"],
   ["A3_100090_SOLGALEO", "solgaleo"],
   ["A3_100100_LUNALA", "lunala"],
-  ["A3a_100110_CRISIS", "nihilego"],
-  ["A3b_100120_EIEVUI", "eevee"],
-  ["A4_100130_HOUOU", "houou"],
+  ["A3a_100110_CRISIS", "extradimensional crisis"],
+  ["A3b_100120_EIEVUI", "eevee grove"],
+  ["A4_100130_HOUOU", "ho ou"],
   ["A4_100140_LUGIA", "lugia"],
-  ["A4a_100150_SUICUNE", "suicune"],
+  ["A4a_100150_SUICUNE", "secluded springs"],
+  ["A4b_100160_PIKACHU", "deluxe pack ex"],
+  ["B1_100170_MEGABURSYAMO", "burzymo"],
+  ["B1_100180_MEGAGYARADOS", "gyarados"],
+  ["B1_100190_MEGATYLTALIS", "tyltalis"],
+  ["B1a_100200_BLAZE", "crimson blaze"],
 ];
 
 export const BOOSTER_MAPPINGS: Record<
