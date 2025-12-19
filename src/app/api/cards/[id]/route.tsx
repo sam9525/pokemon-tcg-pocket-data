@@ -56,12 +56,12 @@ export async function GET(
 
     const { id } = await params;
     const parts = id.split("_");
-    const boosterPack = parts[1];
+    const isExtended = parts.length >= 3;
     const cards = await Card.find({
-      package: parts[0] + "_" + parts[2],
-      boosterPack: boosterPack,
+      package: `${parts[0]}_${isExtended ? parts[2] : parts[1]}`,
+      boosterPack: isExtended ? parts[1] : parts[1].replace(/-/g, " "),
       ...(rarityFilters.length > 0 && { rarity: { $in: rarityFilters } }),
-      language: language,
+      language,
     });
 
     const cardsMap = {
