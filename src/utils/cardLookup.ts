@@ -1,29 +1,3 @@
-// Type definitions for card lists
-type RegularCardList = Record<string, Record<string, string[]>>;
-type SpecialCardData = Record<string, string | string[] | undefined>;
-type SpecialCardList = Record<string, SpecialCardData>;
-
-// Static imports for all card lists (removes webpack warning)
-import A1CardList from "../cards-list/A1.json";
-import A1SpecialCardList from "../cards-list/A1_special.json";
-import A1aCardList from "../cards-list/A1a.json";
-import A1aSpecialCardList from "../cards-list/A1a_special.json";
-import A2CardList from "../cards-list/A2.json";
-import A2SpecialCardList from "../cards-list/A2_special.json";
-
-// Static mapping of all available card lists
-const CARD_LISTS: Record<string, RegularCardList> = {
-  A1: A1CardList as RegularCardList,
-  A1a: A1aCardList as RegularCardList,
-  A2: A2CardList as RegularCardList,
-};
-
-const SPECIAL_CARD_LISTS: Record<string, SpecialCardList> = {
-  A1: A1SpecialCardList as SpecialCardList,
-  A1a: A1aSpecialCardList as SpecialCardList,
-  A2: A2SpecialCardList as SpecialCardList,
-};
-
 // Global caches
 const cardListCache = new Map();
 const specialCardListCache = new Map();
@@ -33,27 +7,45 @@ const specialCardLookupCache = new Map();
 // Cache clearing timers
 const cacheClearTimers = new Map<string, NodeJS.Timeout>();
 
-// Load card list data using static imports
+// S3 bucket configuration
+const S3_BASE_URL = `${process.env.AUTH_URL}/Card-List-Json`;
+
+// Load card list data from S3
 async function getCardList(packageCode: string, special: boolean = false) {
   const cache = special ? specialCardListCache : cardListCache;
-  const lists = special ? SPECIAL_CARD_LISTS : CARD_LISTS;
 
   if (!cache.has(packageCode)) {
+    let cardData = null;
+
     try {
-      const cardData = lists[packageCode];
-      if (!cardData) {
-        throw new Error(`Card list not found for package: ${packageCode}`);
+      const fileName = `${packageCode}${special ? "_special" : ""}.json`;
+      const response = await fetch(`${S3_BASE_URL}/${fileName}`);
+
+      if (response.ok) {
+        cardData = await response.json();
+      } else {
+        console.warn(
+          `Failed to fetch ${fileName} from S3. Status: ${response.status}.`
+        );
       }
-      cache.set(packageCode, cardData);
     } catch (error) {
-      console.error("Error loading card list:", error);
+      console.warn(
+        `Error fetching from S3 for package: ${packageCode}.`,
+        error
+      );
+    }
+
+    if (!cardData) {
       if (special) {
         console.log("No special cards file found for:", packageCode);
         cache.set(packageCode, null);
+        return null;
       } else {
-        throw new Error(`Card list not found for package: ${packageCode}`);
+        throw new Error(`Card list not found (S3) for package: ${packageCode}`);
       }
     }
+
+    cache.set(packageCode, cardData);
   }
   return cache.get(packageCode);
 }
