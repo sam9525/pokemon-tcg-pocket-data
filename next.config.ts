@@ -12,7 +12,7 @@ const nextConfig: NextConfig = {
         hostname: "pokemon-tcg-pocket-data.s3.ap-southeast-2.amazonaws.com",
       },
     ],
-    loader: "custom",
+    loader: process.env.NODE_ENV === "development" ? "default" : "custom",
     loaderFile: "./src/lib/cloudflareLoader.ts",
     deviceSizes: [],
     imageSizes: [180, 360],
