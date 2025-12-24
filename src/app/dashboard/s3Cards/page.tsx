@@ -161,33 +161,30 @@ export default function S3CardsPage() {
             if (res.ok) {
               resolve(res);
 
-              // Clear the card lookup cache
-              scheduleCacheClear(packageId);
+              const resInDB = await fetch(
+                `/api/packageInDB?code=${
+                  packageId?.split("_")[0]
+                }&language=${language}`,
+                {
+                  method: "POST",
+                  body: JSON.stringify({
+                    packageInDB: true,
+                  }),
+                  headers: {
+                    "Content-Type": "application/json",
+                  },
+                }
+              );
+              if (resInDB.ok) {
+                resolve(resInDB);
+
+                // Clear the card lookup cache
+                scheduleCacheClear(packageId);
+              } else {
+                reject(resInDB);
+              }
             } else {
               reject(res);
-            }
-
-            const resInDB = await fetch(
-              `/api/packageInDB?code=${
-                packageId?.split("_")[0]
-              }&language=${language}`,
-              {
-                method: "POST",
-                body: JSON.stringify({
-                  packageInDB: true,
-                }),
-                headers: {
-                  "Content-Type": "application/json",
-                },
-              }
-            );
-            if (resInDB.ok) {
-              resolve(resInDB);
-
-              // Clear the card lookup cache
-              scheduleCacheClear(packageId);
-            } else {
-              reject(resInDB);
             }
           });
 
