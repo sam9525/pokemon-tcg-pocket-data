@@ -38,8 +38,11 @@ export default function AdminProvider({ children }: AdminProviderProps) {
       if (status === "authenticated") {
         try {
           const response = await fetch("/api/profile");
+          if (!response.ok) {
+            throw new Error(`Request failed with status ${response.status}`);
+          }
           const data = await response.json();
-          setIsAdmin(data.isAdmin || false);
+          setIsAdmin(data?.isAdmin || false);
         } catch (error) {
           console.error("Failed to fetch admin status:", error);
           setIsAdmin(false);

@@ -36,7 +36,7 @@ export async function GET(req: NextRequest) {
   // Get the user with the given filter
   const user = await User.findOne(filterUser).lean();
 
-  return Response.json(user);
+  return Response.json(user || null);
 }
 
 export async function PUT(req: NextRequest) {

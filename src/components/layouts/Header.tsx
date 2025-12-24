@@ -29,7 +29,7 @@ export default function Header() {
       fetch("/api/profile")
         .then((res) => res.json())
         .then((data) => {
-          setImage(data.image);
+          setImage(data?.image || "");
         });
     }
 

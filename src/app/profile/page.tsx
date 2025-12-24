@@ -103,9 +103,9 @@ export default function Profile() {
       fetch("/api/profile")
         .then((res) => res.json())
         .then((data) => {
-          setUsername(data.name || "");
-          setEmail(data.email || "");
-          setImage(data.image || "");
+          setUsername(data?.name || "");
+          setEmail(data?.email || "");
+          setImage(data?.image || "");
           setProfileFetched(true);
         });
     }
