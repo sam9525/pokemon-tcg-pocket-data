@@ -159,6 +159,15 @@ export default function S3CardsPage() {
             });
             console.log(preprocessedCards);
 
+            if (res.ok) {
+              resolve(res);
+
+              // Clear the card lookup cache
+              scheduleCacheClear(packageId);
+            } else {
+              reject(res);
+            }
+
             const resInDB = await fetch(
               `/api/packageInDB?code=${
                 packageId?.split("_")[0]
@@ -173,17 +182,12 @@ export default function S3CardsPage() {
                 },
               }
             );
-            const dataInDB = await resInDB.json();
-            setPackageInDB(dataInDB.packageInDB);
-
-            if (res.ok && resInDB) {
-              resolve(res);
+            if (resInDB.ok) {
               resolve(resInDB);
 
               // Clear the card lookup cache
               scheduleCacheClear(packageId);
             } else {
-              reject(res);
               reject(resInDB);
             }
           });
