@@ -70,6 +70,7 @@ export default function SearchPageClient({
   const [hasMore, setHasMore] = useState(false);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
   const { language, currentLanguageLookup } = useLanguage();
+  const [searchCardName, setSearchCardName] = useState("");
 
   useEffect(() => {
     const fetchData = async () => {
@@ -347,6 +348,24 @@ export default function SearchPageClient({
     }
   );
 
+  const handleSearchByCardName = async (cardName: string) => {
+    try {
+      const res = await fetch(`/api/search/searchCardName`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          language: language,
+        },
+        body: JSON.stringify({ cardName }),
+      });
+      const data = await res.json();
+
+      setSearchResult(data.results);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
   RarityFilterItem.displayName = "RarityFilterItem";
 
   return (
@@ -354,9 +373,16 @@ export default function SearchPageClient({
       <div className="max-w-240 w-[90%] m-auto my-8 md:my-10 sm:my-12 bg-search-background rounded-xl border-primary border-2">
         <div className="flex flex-col gap-5 items-center justify-center p-4 sm:p-6">
           <input
+            value={searchCardName}
+            onChange={(e) => setSearchCardName(e.target.value)}
             type="text"
             placeholder={currentLanguageLookup.SEARCH.enterPokemonName}
             className="max-w-140 w-[80%] px-4 py-2 bg-search-input rounded-lg hover:-webkit-text-fill-color-primary focus:outline-none focus:ring-2 focus:border-transparent"
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                handleSearchByCardName(searchCardName);
+              }
+            }}
           />
           <FilterSection
             title={currentLanguageLookup.SEARCH.type}
