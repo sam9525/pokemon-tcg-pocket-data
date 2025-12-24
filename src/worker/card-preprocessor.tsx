@@ -63,7 +63,6 @@ self.onmessage = async (event) => {
       const trainer = `${parts[0]}_${parts[1]}`;
       const card_id = parts[2];
       const card_name = cardNamesLookup.get(parts[4])?.[language] || "";
-      console.log(card_name);
 
       const rarity = parts[5];
 

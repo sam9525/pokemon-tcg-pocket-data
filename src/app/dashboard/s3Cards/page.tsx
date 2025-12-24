@@ -157,7 +157,6 @@ export default function S3CardsPage() {
                 "Content-Type": "application/json",
               },
             });
-            console.log(preprocessedCards);
 
             if (res.ok) {
               resolve(res);
