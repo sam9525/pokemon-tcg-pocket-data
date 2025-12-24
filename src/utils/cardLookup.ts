@@ -3,6 +3,8 @@ const cardListCache = new Map();
 const specialCardListCache = new Map();
 const cardLookupCache = new Map();
 const specialCardLookupCache = new Map();
+const cardNamesListCache = new Map();
+const cardNamesLookupCache = new Map();
 
 // Cache clearing timers
 const cacheClearTimers = new Map<string, NodeJS.Timeout>();
@@ -173,6 +175,58 @@ export function scheduleCacheClear(
   console.log(
     `Scheduled cache clear for package: ${packageCode} in ${delayMinutes} minutes`
   );
+}
+
+export async function getCardNamesList() {
+  const cache = cardNamesListCache;
+
+  if (!cache.has("card_names")) {
+    let cardNamesData = null;
+    const fileName = `card_names.json`;
+
+    try {
+      const response = await fetch(`${S3_BASE_URL}/${fileName}`);
+
+      if (response.ok) {
+        cardNamesData = await response.json();
+      } else {
+        console.warn(
+          `Failed to fetch ${fileName} from S3. Status: ${response.status}.`
+        );
+      }
+    } catch (error) {
+      console.warn(
+        `Error fetching from S3 for card names: ${fileName}.`,
+        error
+      );
+    }
+
+    if (!cardNamesData) {
+      throw new Error(`Card names list not found from S3: ${fileName}`);
+    }
+
+    cache.set("card_names", cardNamesData);
+  }
+  return cache.get("card_names");
+}
+
+function createCardNamesLookupMap(cardList: Record<string, string>) {
+  const lookup = new Map<string, Record<string, string>>();
+
+  for (const [cardId, names] of Object.entries(cardList)) {
+    lookup.set(cardId, names as unknown as Record<string, string>);
+  }
+
+  return lookup;
+}
+
+export async function getCardNamesLookupMap() {
+  if (!cardNamesLookupCache.has("card_names")) {
+    const cardNamesList = await getCardNamesList();
+    const cardNamesLookup = createCardNamesLookupMap(cardNamesList);
+    cardNamesLookupCache.set("card_names", cardNamesLookup);
+  }
+  return cardNamesLookupCache.get("card_names");
 }
 
 // Get cache status (useful for debugging)

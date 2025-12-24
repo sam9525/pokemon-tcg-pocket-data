@@ -1,4 +1,4 @@
-import { getCardLookupMaps } from "@/utils/cardLookup";
+import { getCardLookupMaps, getCardNamesLookupMap } from "@/utils/cardLookup";
 
 self.onmessage = async (event) => {
   const { cards, packageId, language } = event.data;
@@ -39,6 +39,18 @@ self.onmessage = async (event) => {
     colorless: "fighting",
   };
 
+  // Check if the package is promo
+  const isPromo = packageId?.split("_")[0] === "promo";
+
+  // Extract card package from packageId
+  const packageCode = isPromo ? packageId : packageId?.split("_")[0];
+
+  const [cardNamesLookup, { regular: regularLookup, special: specialLookup }] =
+    await Promise.all([
+      getCardNamesLookupMap(),
+      getCardLookupMaps(packageCode as string),
+    ]);
+
   // Process all cards in parallel
   const preprocessedCards = await Promise.all(
     cards.map(async (card: { id: string; url: string }) => {
@@ -50,14 +62,10 @@ self.onmessage = async (event) => {
 
       const trainer = `${parts[0]}_${parts[1]}`;
       const card_id = parts[2];
-      const card_name = parts[4];
+      const card_name = cardNamesLookup.get(parts[4])?.[language] || "";
+      console.log(card_name);
+
       const rarity = parts[5];
-
-      // Check if the package is promo
-      const isPromo = packageId?.split("_")[0] === "promo";
-
-      // Extract card package from packageId
-      const packageCode = isPromo ? packageId : packageId?.split("_")[0];
 
       let card_type = null;
       let card_booster_pack: string[] = [];
@@ -67,10 +75,6 @@ self.onmessage = async (event) => {
         rarityMap[rarity as keyof typeof rarityMap] || "unknown";
 
       let special_effect = "none";
-
-      // Get lookup maps (this will be cached after first call)
-      const { regular: regularLookup, special: specialLookup } =
-        await getCardLookupMaps(packageCode as string);
 
       // Look up card info using the cached maps
       const regularCardInfo = regularLookup.get(card_id);
