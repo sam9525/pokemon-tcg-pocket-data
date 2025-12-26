@@ -20,5 +20,7 @@ const CardSchema = new Schema(
 
 // Create a unique index for cardId and package
 CardSchema.index({ cardId: 1, package: 1 }, { unique: true });
+// Add index for package for filtering by package
+CardSchema.index({ package: 1 });
 
 export const Card = models?.Card || model("Card", CardSchema);

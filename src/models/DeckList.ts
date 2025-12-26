@@ -33,6 +33,9 @@ const DeckListSchema = new Schema<IDeckList>({
   deckListHash: { type: String, required: true, unique: true },
 });
 
+// Add index for package to optimize queries
+DeckListSchema.index({ package: 1 });
+
 export const DeckList =
   (models?.DeckList as Model<IDeckList>) ||
   model<IDeckList>("DeckList", DeckListSchema);
