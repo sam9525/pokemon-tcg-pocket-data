@@ -113,6 +113,9 @@
     "cardsSavedSuccessfully": "卡牌儲存成功",
     "updatingName": "更新名稱中",
     "failedToUpdateName": "更新名稱失敗",
-    "nameUpdatedSuccessfully": "名稱更新成功"
+    "nameUpdatedSuccessfully": "名稱更新成功",
+    "loadingDeckLists": "載入牌組中",
+    "failedToLoadDeckLists": "載入牌組失敗",
+    "deckListsLoadedSuccessfully": "牌組載入成功"
   }
 }

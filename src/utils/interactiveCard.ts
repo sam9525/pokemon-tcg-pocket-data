@@ -2,10 +2,15 @@ import { MouseEvent } from "react";
 
 export const handleClick = <T extends HTMLElement>(
   cardId: string,
-  cardMap: Map<string, T>,
-  packageId?: string
+  cardMapOrElement: Map<string, T> | T
 ) => {
-  const card = cardMap.get(cardId);
+  let card: T | undefined;
+  if (cardMapOrElement instanceof Map) {
+    card = cardMapOrElement.get(cardId);
+  } else {
+    card = cardMapOrElement;
+  }
+
   if (!card) return;
 
   // Toggle focus class - add if not present, remove if already present
@@ -16,7 +21,7 @@ export const handleClick = <T extends HTMLElement>(
       card.classList.remove("focus", "unfocus");
       // Remove mask when card is unfocused
       document.getElementById("background-mask")?.remove();
-      window.history.pushState(null, "", `/cards/${packageId}`);
+      window.history.back();
     }, 300); // Match the transition duration
   } else {
     // Remove focus from any other cards first
@@ -39,8 +44,6 @@ export const handleClick = <T extends HTMLElement>(
     // Add focus to the clicked card
     card.classList.add("focus");
 
-    const basePath = packageId ? `/cards/${packageId}` : "/search";
-
     // Create and add background mask
     const mask = document.createElement("div");
     mask.id = "background-mask";
@@ -51,12 +54,13 @@ export const handleClick = <T extends HTMLElement>(
       setTimeout(() => {
         card.classList.remove("focus", "unfocus");
         mask.remove();
-        window.history.pushState(null, "", `${basePath}`);
+        window.history.back();
       }, 300);
     });
 
     document.body.appendChild(mask);
 
+    const basePath = window.location.pathname;
     window.history.pushState(null, "", `${basePath}/${cardId}`);
   }
   return;
@@ -64,10 +68,17 @@ export const handleClick = <T extends HTMLElement>(
 
 export const handleMove = <T extends HTMLElement>(
   e: MouseEvent<T>,
-  cardId: string,
-  cardMap: Map<string, T>
+  cardIdOrElement: string | T,
+  cardMap?: Map<string, T>
 ) => {
-  const card = cardMap.get(cardId);
+  let card: T | undefined;
+  if (typeof cardIdOrElement === "string") {
+    if (!cardMap) return;
+    card = cardMap.get(cardIdOrElement);
+  } else {
+    card = cardIdOrElement;
+  }
+
   if (!card) return;
   // onMouseMove(e as unknown as MouseEvent<HTMLElement>, card);
   const cardImage = card.querySelector("img");
@@ -91,10 +102,16 @@ export const handleMove = <T extends HTMLElement>(
 };
 
 export const handleMouseOut = <T extends HTMLElement>(
-  cardId: string,
-  cardMap: Map<string, T>
+  cardIdOrElement: string | T,
+  cardMap?: Map<string, T>
 ) => {
-  const card = cardMap.get(cardId);
+  let card: T | undefined;
+  if (typeof cardIdOrElement === "string") {
+    if (!cardMap) return;
+    card = cardMap.get(cardIdOrElement);
+  } else {
+    card = cardIdOrElement;
+  }
   if (!card) return;
   // onMouseOut(card);
   const cardImage = card.querySelector("img");
@@ -107,10 +124,16 @@ export const handleMouseOut = <T extends HTMLElement>(
 };
 
 export const handleMouseUp = <T extends HTMLElement>(
-  cardId: string,
-  cardMap: Map<string, T>
+  cardIdOrElement: string | T,
+  cardMap?: Map<string, T>
 ) => {
-  const card = cardMap.get(cardId);
+  let card: T | undefined;
+  if (typeof cardIdOrElement === "string") {
+    if (!cardMap) return;
+    card = cardMap.get(cardIdOrElement);
+  } else {
+    card = cardIdOrElement;
+  }
   if (!card) return;
   // onMouseUp(card);
   const cardImage = card.querySelector("img");

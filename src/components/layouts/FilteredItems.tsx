@@ -33,7 +33,7 @@ export default function FilteredItems({
       initialFocusRef.current = true;
       // Small delay to ensure layout is stable
       setTimeout(() => {
-        interactiveCard.handleClick(focusedCardId, cardRefs.current, packageId);
+        interactiveCard.handleClick(focusedCardId, cardRefs.current);
       }, 100);
     }
   }, [focusedCardId, files, packageId]);
@@ -82,7 +82,7 @@ export default function FilteredItems({
             }
             onClick={(e) => {
               e.preventDefault();
-              interactiveCard.handleClick(file.id, cardRefs.current, packageId);
+              interactiveCard.handleClick(file.id, cardRefs.current);
             }}
           >
             <div
@@ -91,20 +91,7 @@ export default function FilteredItems({
               }}
               className="card"
             >
-              <CardImage
-                src={file.url}
-                variant="card"
-                alt={file.id}
-                onMouseMove={(e) =>
-                  interactiveCard.handleMove(e, file.id, cardRefs.current)
-                }
-                onMouseOut={() =>
-                  interactiveCard.handleMouseOut(file.id, cardRefs.current)
-                }
-                onMouseUp={() =>
-                  interactiveCard.handleMouseUp(file.id, cardRefs.current)
-                }
-              />
+              <CardImage src={file.url} variant="card" alt={file.id} />
               <CardImage
                 src="https://pokemon-tcg-pocket-data.s3.ap-southeast-2.amazonaws.com/pokemon_card_backside.png"
                 variant="card"

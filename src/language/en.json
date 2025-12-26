@@ -113,6 +113,9 @@
     "cardsSavedSuccessfully": "Card stored successfully",
     "updatingName": "Update name",
     "failedToUpdateName": "Update name failed",
-    "nameUpdatedSuccessfully": "Name updated successfully"
+    "nameUpdatedSuccessfully": "Name updated successfully",
+    "loadingDeckLists": "Loading deck lists",
+    "failedToLoadDeckLists": "Failed to load deck lists",
+    "deckListsLoadedSuccessfully": "Deck lists loaded successfully"
   }
 }

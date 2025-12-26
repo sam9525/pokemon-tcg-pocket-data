@@ -113,6 +113,9 @@
     "cardsSavedSuccessfully": "カードは正常に保存されました",
     "updatingName": "名前を更新",
     "failedToUpdateName": "名前の更新に失敗しました",
-    "nameUpdatedSuccessfully": "名前が正常に更新されました"
+    "nameUpdatedSuccessfully": "名前が正常に更新されました",
+    "loadingDeckLists": "デッキを読み込んでいます",
+    "failedToLoadDeckLists": "デッキの読み込みに失敗しました",
+    "deckListsLoadedSuccessfully": "デッキの読み込みに成功しました"
   }
 }

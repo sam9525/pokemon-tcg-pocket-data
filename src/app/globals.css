@@ -268,3 +268,20 @@ button.profile-button {
 .animate-slideInRight {
   animation: slideInRight 0.3s ease-out;
 }
+
+.decklist-button {
+  @apply w-full md:w-auto px-6 py-2 border-2 border-primary rounded-full font-bold bg-foreground text-primary;
+  transition: all 0.2s ease-in-out;
+}
+
+.decklist-button:hover {
+  box-shadow: 2px 2px 0 0 var(--primary);
+  transform: translate(-2px, -2px);
+}
+
+.decklist-button:active {
+  background-color: var(--primary);
+  color: var(--background);
+  box-shadow: 0;
+  transform: translate(0px, 0px);
+}
