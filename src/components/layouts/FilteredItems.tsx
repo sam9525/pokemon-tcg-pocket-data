@@ -1,5 +1,6 @@
 import CardImage from "@/components/CardImage";
-import { useRef, useEffect, useCallback } from "react";
+import { useRef, useEffect } from "react";
+import * as interactiveCard from "@/utils/interactiveCard";
 
 interface FilteredItemsProps {
   files: { id: string; url: string }[];
@@ -22,66 +23,6 @@ export default function FilteredItems({
   const observerRef = useRef<HTMLDivElement>(null);
   const initialFocusRef = useRef(false);
 
-  const handleClick = useCallback(
-    (cardId: string) => {
-      const card = cardRefs.current.get(cardId);
-      if (!card) return;
-
-      // Toggle focus class - add if not present, remove if already present
-      if (card.classList.contains("focus")) {
-        // Remove focus with animation
-        card.classList.add("unfocus");
-        setTimeout(() => {
-          card.classList.remove("focus", "unfocus");
-          // Remove mask when card is unfocused
-          document.getElementById("background-mask")?.remove();
-          window.history.pushState(null, "", `/cards/${packageId}`);
-        }, 300); // Match the transition duration
-      } else {
-        // Remove focus from any other cards first
-        document
-          .querySelectorAll(".card-container > div.focus")
-          .forEach((el) => {
-            el.classList.remove("focus");
-          });
-
-        // Calculate the card's position relative to the viewport
-        const rect = card.getBoundingClientRect();
-
-        // Calculate the position as a percentage of the viewport
-        // We need to account for the card's center point
-        const startX = rect.left + rect.width / 2;
-        const startY = rect.top + rect.height / 2;
-
-        // Set CSS variables for the animation
-        card.style.setProperty("--start-x", `${startX}px`);
-        card.style.setProperty("--start-y", `${startY}px`);
-
-        // Add focus to the clicked card
-        card.classList.add("focus");
-
-        // Create and add background mask
-        const mask = document.createElement("div");
-        mask.id = "background-mask";
-
-        // Remove focus and mask when clicked again
-        mask.addEventListener("click", () => {
-          card.classList.add("unfocus");
-          setTimeout(() => {
-            card.classList.remove("focus", "unfocus");
-            mask.remove();
-            window.history.pushState(null, "", `/cards/${packageId}`);
-          }, 300);
-        });
-
-        document.body.appendChild(mask);
-        window.history.pushState(null, "", `/cards/${packageId}/${cardId}`);
-      }
-      return;
-    },
-    [packageId]
-  );
-
   // Handle initial focus
   useEffect(() => {
     if (
@@ -92,10 +33,10 @@ export default function FilteredItems({
       initialFocusRef.current = true;
       // Small delay to ensure layout is stable
       setTimeout(() => {
-        handleClick(focusedCardId);
+        interactiveCard.handleClick(focusedCardId, cardRefs.current, packageId);
       }, 100);
     }
-  }, [focusedCardId, files, handleClick]);
+  }, [focusedCardId, files, packageId]);
 
   // Intersection Observer for infinite scroll
   useEffect(() => {
@@ -123,53 +64,6 @@ export default function FilteredItems({
     };
   }, [hasMore, isLoading, onLoadMore]);
 
-  const handleMove = (e: React.MouseEvent<HTMLDivElement>, cardId: string) => {
-    const card = cardRefs.current.get(cardId);
-    if (!card) return;
-    const cardImage = card.querySelector("img");
-
-    const rect = card.getBoundingClientRect();
-    const height = rect.height;
-    const width = rect.width;
-
-    // Calculate mouse position relative to the card
-    const xVal = e.clientX - rect.left;
-    const yVal = e.clientY - rect.top;
-
-    const xRotation = -20 * ((yVal - height / 2) / height);
-    const yRotation = 20 * ((xVal - width / 2) / width);
-
-    const transformString = `perspective(500px) rotateX(${xRotation}deg) rotateY(${yRotation}deg)`;
-
-    card.style.transform = transformString + " scale(1.1)";
-    if (!cardImage) return;
-    cardImage.style.transform = transformString;
-  };
-
-  const handleMouseOut = (cardId: string) => {
-    const card = cardRefs.current.get(cardId);
-    const cardImage = card?.querySelector("img");
-
-    const transformString = "perspective(500px) scale(1) rotateX(0) rotateY(0)";
-
-    if (!card) return;
-    card.style.transform = transformString;
-    if (!cardImage) return;
-    cardImage.style.transform = transformString;
-  };
-
-  const handleMouseUp = (cardId: string) => {
-    const card = cardRefs.current.get(cardId);
-    const cardImage = card?.querySelector("img");
-
-    const transformString = "perspective(500px) rotateX(0) rotateY(0)";
-
-    if (!card) return;
-    card.style.transform = transformString + " scale(1.1)";
-    if (!cardImage) return;
-    cardImage.style.transform = transformString;
-  };
-
   return (
     <>
       <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 xl:grid-cols-6 gap-4 sm:gap-5 md:gap-6 xl:gap-10">
@@ -177,12 +71,18 @@ export default function FilteredItems({
           <div
             key={file.id}
             className="card-container"
-            onMouseMove={(e) => handleMove(e, file.id)}
-            onMouseOut={() => handleMouseOut(file.id)}
-            onMouseUp={() => handleMouseUp(file.id)}
+            onMouseMove={(e) =>
+              interactiveCard.handleMove(e, file.id, cardRefs.current)
+            }
+            onMouseOut={() =>
+              interactiveCard.handleMouseOut(file.id, cardRefs.current)
+            }
+            onMouseUp={() =>
+              interactiveCard.handleMouseUp(file.id, cardRefs.current)
+            }
             onClick={(e) => {
               e.preventDefault();
-              handleClick(file.id);
+              interactiveCard.handleClick(file.id, cardRefs.current, packageId);
             }}
           >
             <div
@@ -195,9 +95,15 @@ export default function FilteredItems({
                 src={file.url}
                 variant="card"
                 alt={file.id}
-                onMouseMove={(e) => handleMove(e, file.id)}
-                onMouseOut={() => handleMouseOut(file.id)}
-                onMouseUp={() => handleMouseUp(file.id)}
+                onMouseMove={(e) =>
+                  interactiveCard.handleMove(e, file.id, cardRefs.current)
+                }
+                onMouseOut={() =>
+                  interactiveCard.handleMouseOut(file.id, cardRefs.current)
+                }
+                onMouseUp={() =>
+                  interactiveCard.handleMouseUp(file.id, cardRefs.current)
+                }
               />
               <CardImage
                 src="https://pokemon-tcg-pocket-data.s3.ap-southeast-2.amazonaws.com/pokemon_card_backside.png"
