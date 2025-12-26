@@ -32,12 +32,15 @@ export default function HeaderTabs({
           {currentLanguageLookup.HEADER_TABS.cards}
         </Link>
         <Link
-          className={path === "/decks-list" ? "active" : ""}
+          className={path.includes("/decks-list") ? "active" : ""}
           href={"/decks-list"}
         >
           {currentLanguageLookup.HEADER_TABS.decksList}
         </Link>
-        <Link className={path === "/search" ? "active" : ""} href={"/search"}>
+        <Link
+          className={path.includes("/search") ? "active" : ""}
+          href={"/search"}
+        >
           {currentLanguageLookup.HEADER_TABS.search}
         </Link>
       </div>
@@ -53,30 +56,33 @@ export default function HeaderTabs({
         {currentLanguageLookup.HEADER_TABS.cards}
       </Link>
       <Link
-        className={path === "/decks-list" ? "active" : ""}
+        className={path.includes("/decks-list") ? "active" : ""}
         href={"/decks-list"}
       >
         {currentLanguageLookup.HEADER_TABS.decksList}
       </Link>
-      <Link className={path === "/search" ? "active" : ""} href={"/search"}>
+      <Link
+        className={path.includes("/search") ? "active" : ""}
+        href={"/search"}
+      >
         {currentLanguageLookup.HEADER_TABS.search}
       </Link>
       {status === "authenticated" && (
         <>
           <Link
-            className={path === "/my-decks" ? "active" : ""}
+            className={path.includes("/my-decks") ? "active" : ""}
             href={"/my-decks"}
           >
             {currentLanguageLookup.HEADER_TABS.myDecks}
           </Link>
           <Link
-            className={path === "/deck-collection" ? "active" : ""}
+            className={path.includes("/deck-collection") ? "active" : ""}
             href={"/deck-collection"}
           >
             {currentLanguageLookup.HEADER_TABS.deckCollection}
           </Link>
           <Link
-            className={path === "/deck-builder" ? "active" : ""}
+            className={path.includes("/deck-builder") ? "active" : ""}
             href={"/deck-builder"}
           >
             {currentLanguageLookup.HEADER_TABS.deckBuilder}
@@ -86,13 +92,13 @@ export default function HeaderTabs({
       {status === "authenticated" && isAdmin && (
         <>
           <Link
-            className={path === "/dashboard/users" ? "active" : ""}
+            className={path.includes("/dashboard/users") ? "active" : ""}
             href={"/dashboard/users"}
           >
             {currentLanguageLookup.HEADER_TABS.users}
           </Link>
           <Link
-            className={path === "/dashboard/s3Cards" ? "active" : ""}
+            className={path.includes("/dashboard/s3Cards") ? "active" : ""}
             href={"/dashboard/s3Cards"}
           >
             {currentLanguageLookup.HEADER_TABS.s3Cards}
