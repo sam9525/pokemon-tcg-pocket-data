@@ -95,10 +95,30 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       // For credentials login, we already verified in the authorize function
       return true;
     },
+    // After using google to log in, check if the user is an admin
+    // If yes, add true to isAdmin in token
+    async jwt({ token, user, account }) {
+      if (user) {
+        if (account?.provider === "google") {
+          await connectDB();
+          if (user.email) {
+            const dbUser = await User.findOne({ email: user.email });
+            token.isAdmin = dbUser?.isAdmin || false;
+          }
+        } else {
+          token.isAdmin = user.isAdmin || false;
+        }
+      }
+      return token;
+    },
+    // Add isAdmin to session
     async session({ session, token }) {
       // Add user ID to session if available
       if (session.user && token.sub) {
         session.user.id = token.sub;
+      }
+      if (token.isAdmin !== undefined) {
+        session.user.isAdmin = token.isAdmin;
       }
       return session;
     },

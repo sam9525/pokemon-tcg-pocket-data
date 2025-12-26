@@ -30,30 +30,17 @@ interface AdminProviderProps {
 }
 
 export default function AdminProvider({ children }: AdminProviderProps) {
-  const { status } = useSession();
+  const { data: session, status } = useSession();
   const [isAdmin, setIsAdmin] = useState(false);
 
+  // Get isAdmin from session for user
   useEffect(() => {
-    const fetchAdminStatus = async () => {
-      if (status === "authenticated") {
-        try {
-          const response = await fetch("/api/profile");
-          if (!response.ok) {
-            throw new Error(`Request failed with status ${response.status}`);
-          }
-          const data = await response.json();
-          setIsAdmin(data?.isAdmin || false);
-        } catch (error) {
-          console.error("Failed to fetch admin status:", error);
-          setIsAdmin(false);
-        }
-      } else {
-        setIsAdmin(false);
-      }
-    };
-
-    fetchAdminStatus();
-  }, [status]);
+    if (status === "authenticated" && session?.user) {
+      setIsAdmin(session.user.isAdmin || false);
+    } else {
+      setIsAdmin(false);
+    }
+  }, [status, session]);
 
   return (
     <AdminContext.Provider value={{ isAdmin }}>
