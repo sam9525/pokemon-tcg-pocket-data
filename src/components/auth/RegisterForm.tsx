@@ -1,11 +1,11 @@
 "use client";
 
 import { signIn } from "next-auth/react";
-import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
 import toast from "react-hot-toast";
 import { useLanguage } from "@/components/provider/LanguageProvider";
+import GoogleIcon from "../icons/google";
 
 export default function RegisterForm() {
   const [name, setName] = useState("");
@@ -124,7 +124,9 @@ export default function RegisterForm() {
         onClick={() => signIn("google", { callbackUrl: "/" })}
         disabled={creatingUser}
       >
-        <Image src="/google-icon.svg" alt="Google" width={20} height={20} />
+        <div className="w-7 h-7">
+          <GoogleIcon />
+        </div>
         {currentLanguageLookup.LOGIN.loginWithGoogle}
       </button>
       <label htmlFor="" className="text-sm my-4">

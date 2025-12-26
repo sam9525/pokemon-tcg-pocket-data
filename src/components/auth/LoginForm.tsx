@@ -1,6 +1,6 @@
 "use client";
 
-import Image from "next/image";
+import GoogleIcon from "@/components/icons/google";
 import Link from "next/link";
 import { signIn } from "next-auth/react";
 import { useState } from "react";
@@ -112,7 +112,9 @@ export default function LoginForm() {
       </Link>
       <hr className="text-primary w-62 border-primary border-1 my-4"></hr>
       <button type="button" onClick={handleGoogleSignIn}>
-        <Image src="/google-icon.svg" alt="Google" width={20} height={20} />
+        <div className="w-7 h-7">
+          <GoogleIcon />
+        </div>
         {currentLanguageLookup.LOGIN.loginWithGoogle}
       </button>
       <label htmlFor="" className="text-sm my-4">
