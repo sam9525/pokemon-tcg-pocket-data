@@ -104,31 +104,37 @@ export default function DecksListClient({
   const [packages, setPackages] = useState("A1_genetic-apex");
   const [visibleCount, setVisibleCount] = useState(3);
   const observerRef = useRef<HTMLDivElement>(null);
+  const isMounted = useRef(false);
 
   useEffect(() => {
-    try {
-      if (language !== "en_US" || packages !== "A1_genetic-apex") {
-        const toastPromise = new Promise(async (resolve, reject) => {
-          const response = await fetch(
-            `/api/decks-list?packages=${packages}&language=${language}`
-          );
-          const data = await response.json();
-          setDeckList(data.decklists || []);
-
-          if (response.ok) {
-            resolve(response);
-          } else {
-            reject(response);
-          }
-        });
-
-        toast.promise(toastPromise, {
-          loading: currentLanguageLookup.NOTIFICATIONS.loadingDeckLists,
-          error: currentLanguageLookup.NOTIFICATIONS.failedToLoadDeckLists,
-          success:
-            currentLanguageLookup.NOTIFICATIONS.deckListsLoadedSuccessfully,
-        });
+    if (!isMounted.current) {
+      isMounted.current = true;
+      if (language === "en_US" && packages === "A1_genetic-apex") {
+        return;
       }
+    }
+
+    try {
+      const toastPromise = new Promise(async (resolve, reject) => {
+        const response = await fetch(
+          `/api/decks-list?packages=${packages}&language=${language}`
+        );
+        const data = await response.json();
+        setDeckList(data.decklists || []);
+
+        if (response.ok) {
+          resolve(response);
+        } else {
+          reject(response);
+        }
+      });
+
+      toast.promise(toastPromise, {
+        loading: currentLanguageLookup.NOTIFICATIONS.loadingDeckLists,
+        error: currentLanguageLookup.NOTIFICATIONS.failedToLoadDeckLists,
+        success:
+          currentLanguageLookup.NOTIFICATIONS.deckListsLoadedSuccessfully,
+      });
     } catch (error) {
       console.error(error);
     }
