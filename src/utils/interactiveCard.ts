@@ -5,10 +5,16 @@ export const handleClick = <T extends HTMLElement>(
   cardMapOrElement: Map<string, T> | T
 ) => {
   let card: T | undefined;
+  let boosterPack: T | undefined;
+  let cardCount: T | undefined;
   if (cardMapOrElement instanceof Map) {
     card = cardMapOrElement.get(cardId);
+    boosterPack = card?.querySelector(".booster-pack") as T;
+    cardCount = card?.querySelector(".card-count") as T;
   } else {
     card = cardMapOrElement;
+    boosterPack = card.querySelector(".booster-pack") as T;
+    cardCount = card.querySelector(".card-count") as T;
   }
 
   if (!card) return;
@@ -19,6 +25,10 @@ export const handleClick = <T extends HTMLElement>(
     card.classList.add("unfocus");
     setTimeout(() => {
       card.classList.remove("focus", "unfocus");
+      if (boosterPack != undefined) {
+        boosterPack.classList.remove("hidden");
+      }
+      cardCount.classList.remove("hidden");
       // Remove mask when card is unfocused
       document.getElementById("background-mask")?.remove();
       window.history.back();
@@ -43,6 +53,10 @@ export const handleClick = <T extends HTMLElement>(
 
     // Add focus to the clicked card
     card.classList.add("focus");
+    if (boosterPack != undefined) {
+      boosterPack.classList.add("hidden");
+    }
+    cardCount.classList.add("hidden");
 
     // Create and add background mask
     const mask = document.createElement("div");
@@ -53,6 +67,10 @@ export const handleClick = <T extends HTMLElement>(
       card.classList.add("unfocus");
       setTimeout(() => {
         card.classList.remove("focus", "unfocus");
+        if (boosterPack != undefined) {
+          boosterPack.classList.remove("hidden");
+        }
+        cardCount.classList.remove("hidden");
         mask.remove();
         window.history.back();
       }, 300);

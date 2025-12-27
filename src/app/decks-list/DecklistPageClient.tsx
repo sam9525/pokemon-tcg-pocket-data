@@ -29,10 +29,14 @@ interface IDeckList {
 const Card = ({
   cardName,
   imageUrl,
+  boosterPack,
+  cardCount,
   cardClass,
 }: {
   cardName: string;
   imageUrl: string;
+  boosterPack?: string;
+  cardCount?: number;
   cardClass?: string;
 }) => {
   return (
@@ -62,7 +66,7 @@ const Card = ({
         );
       }}
     >
-      <div className="card">
+      <div className="card relative">
         <CardImage
           src={imageUrl}
           variant="card"
@@ -75,6 +79,15 @@ const Card = ({
           alt="card-backside"
           className="card-backside"
         />
+        {boosterPack && (
+          <div className="booster-pack w-1/3 h-4 bg-primary text-sm font-bold text-foreground text-center absolute left-0 bottom-0 rounded-bl-md rounded-tr-md">
+            {boosterPack}
+          </div>
+        )}
+
+        <div className="card-count w-1/3 h-4 bg-primary text-sm font-bold text-foreground text-center absolute right-0 bottom-0 rounded-tl-md rounded-br-md">
+          {cardCount}
+        </div>
       </div>
     </div>
   );
@@ -212,6 +225,8 @@ export default function DecksListClient({
                     <Card
                       cardName={deck.highlight[0].cardName}
                       imageUrl={deck.highlight[0].imageUrl}
+                      boosterPack={deck.highlight[0].boosterPack}
+                      cardCount={deck.highlight[0].cardCount}
                     />
                     <div className="flex-grow" />
                     <div className="flex flex-col gap-2">
@@ -231,6 +246,8 @@ export default function DecksListClient({
                       <Card
                         cardName={deck.highlight[0].cardName}
                         imageUrl={deck.highlight[0].imageUrl}
+                        boosterPack={deck.highlight[0].boosterPack}
+                        cardCount={deck.highlight[0].cardCount}
                       />
                     </div>
                     {Array.from({
@@ -246,6 +263,14 @@ export default function DecksListClient({
                           imageUrl={
                             Object.values(deck.cardList)[deckIndex][cardIndex]
                               .imageUrl
+                          }
+                          boosterPack={
+                            Object.values(deck.cardList)[deckIndex][cardIndex]
+                              .boosterPack
+                          }
+                          cardCount={
+                            Object.values(deck.cardList)[deckIndex][cardIndex]
+                              .cardCount
                           }
                         />
                       </div>
