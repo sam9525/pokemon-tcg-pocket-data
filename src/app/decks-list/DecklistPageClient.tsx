@@ -101,15 +101,17 @@ export default function DecksListClient({
   console.log(defaultDeckList);
   const { currentLanguageLookup, language } = useLanguage();
   const [deckList, setDeckList] = useState(defaultDeckList || []);
-  const [packages, setPackages] = useState("");
+  const [packages, setPackages] = useState("A1_genetic-apex");
   const [visibleCount, setVisibleCount] = useState(3);
   const observerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     try {
-      if (language !== "en_US") {
+      if (language !== "en_US" || packages !== "A1_genetic-apex") {
         const toastPromise = new Promise(async (resolve, reject) => {
-          const response = await fetch(`/api/decks-list?packages=${packages}`);
+          const response = await fetch(
+            `/api/decks-list?packages=${packages}&language=${language}`
+          );
           const data = await response.json();
           setDeckList(data.decklists || []);
 

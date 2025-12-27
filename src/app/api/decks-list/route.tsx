@@ -9,7 +9,7 @@ import { Card } from "@/models/Card";
 export async function GET(request: NextRequest) {
   const searchParams = request.nextUrl.searchParams;
   const packages = searchParams.get("packages") as string;
-  const language = searchParams.get("language") as string;
+  const language = (searchParams.get("language") as string) || "en_US";
 
   // Rate limiting to decklist queries
   const rateLimitResult = await rateLimit(request, API_RATE_LIMIT);
@@ -22,7 +22,7 @@ export async function GET(request: NextRequest) {
 
   // Get the specific packages' deck lists first
   const decklists = (await DeckList.find({
-    package: packages,
+    package: { $regex: packages, $options: "i" },
   }).lean()) as any[];
 
   // Extract all unique card names from the deck lists
@@ -51,9 +51,9 @@ export async function GET(request: NextRequest) {
 
   // Fetch only the relevant cards using case-insensitive matching
   const cards = (await Card.find({
-    package: packages,
+    package: { $regex: packages, $options: "i" },
     name: { $in: uniqueCardNames },
-    language: language,
+    language: "en_US",
     rarity: {
       $regex: `^(Immersive Rare|Super Rare|Art Rare|Double Rare|Rare|Uncommon|Common)$`,
       $options: "i",
@@ -69,8 +69,17 @@ export async function GET(request: NextRequest) {
     { cardId: string; imageUrl: string | undefined }
   >();
   cards.forEach((card: any) => {
-    // Store both exact and normalized keys
-    cardMap.set(card.name, { cardId: card.cardId, imageUrl: card.imageUrl });
+    if (card.cardId && language !== "en_US") {
+      card.cardId = card.cardId.replace(/en_US/gi, language);
+    }
+    if (card.imageUrl && language !== "en_US") {
+      card.imageUrl = card.imageUrl.replace(/en_US/gi, language);
+    }
+
+    cardMap.set(card.name, {
+      cardId: card.cardId,
+      imageUrl: card.imageUrl,
+    });
     if (card.name) {
       cardMap.set(card.name.toLowerCase().trim(), {
         cardId: card.cardId,
