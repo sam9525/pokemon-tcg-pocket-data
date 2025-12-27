@@ -25,6 +25,10 @@ export const handleClick = <T extends HTMLElement>(
     card.classList.add("unfocus");
     setTimeout(() => {
       card.classList.remove("focus", "unfocus");
+      if (card.parentElement) {
+        card.parentElement.style.width = "";
+        card.parentElement.style.height = "";
+      }
       if (boosterPack != undefined) {
         boosterPack.classList.remove("hidden");
       }
@@ -37,10 +41,21 @@ export const handleClick = <T extends HTMLElement>(
     // Remove focus from any other cards first
     document.querySelectorAll(".card-container > div.focus").forEach((el) => {
       el.classList.remove("focus");
+      if (el.parentElement) {
+        el.parentElement.style.width = "";
+        el.parentElement.style.height = "";
+      }
     });
 
     // Calculate the card's position relative to the viewport
     const rect = card.getBoundingClientRect();
+
+    // Lock the parent container size to prevent layout shift
+    if (card.parentElement) {
+      const parentRect = card.parentElement.getBoundingClientRect();
+      card.parentElement.style.width = `${parentRect.width}px`;
+      card.parentElement.style.height = `${parentRect.height}px`;
+    }
 
     // Calculate the position as a percentage of the viewport
     // We need to account for the card's center point
@@ -67,6 +82,10 @@ export const handleClick = <T extends HTMLElement>(
       card.classList.add("unfocus");
       setTimeout(() => {
         card.classList.remove("focus", "unfocus");
+        if (card.parentElement) {
+          card.parentElement.style.width = "";
+          card.parentElement.style.height = "";
+        }
         if (boosterPack != undefined) {
           boosterPack.classList.remove("hidden");
         }

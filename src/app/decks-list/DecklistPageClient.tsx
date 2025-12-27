@@ -219,7 +219,10 @@ export default function DecksListClient({
                 className="w-full flex flex-col gap-4 p-4 md:p-6 sm:p-5 border-2 border-primary rounded-2xl bg-search-background shadow-lg"
               >
                 <div className="text-xl font-bold">{deck.deckName}</div>
-                <div key={deckIndex} className="flex flex-col md:flex-row ">
+                <div
+                  key={deckIndex}
+                  className="flex flex-col md:flex-row gap-2 md:gap-4"
+                >
                   {/* Featured Image */}
                   <div className="hidden md:flex md:flex-col justify-center md:justify-start">
                     <Card
@@ -240,7 +243,7 @@ export default function DecksListClient({
                   </div>
 
                   {/* Grid of Cards */}
-                  <div className="flex-1 grid grid-cols-3 sm:grid-cols-4 lg:grid-cols-5 gap-2 pl-2 md:pl-4 pb-4 sm:pb-0">
+                  <div className="flex-1 grid grid-cols-3 sm:grid-cols-4 lg:grid-cols-5 gap-2 pb-4 sm:pb-0">
                     {/* Featured Image (Mobile) */}
                     <div className="relative group md:hidden">
                       <Card
