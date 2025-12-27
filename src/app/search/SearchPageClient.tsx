@@ -97,6 +97,25 @@ export default function SearchPageClient({
     fetchData();
   }, [language]);
 
+  // When language change,
+  // copy the filtering icons and replace the filtering icons to new language
+  useEffect(() => {
+    setFiltering((prev) => {
+      const languages = ["zh_TW", "ja_JP", "en_US"];
+      return prev.map(([name, id]) => {
+        if (name === "package_icons" || name === "Boosters_icon") {
+          const previousLang = languages.find((lang) => id.endsWith(lang));
+          if (previousLang && previousLang !== language) {
+            const baseId = id.slice(0, -previousLang.length);
+            return [name, baseId + language];
+          }
+        }
+        return [name, id];
+      });
+    });
+    setCurrentPage((prev) => prev);
+  }, [language]);
+
   useEffect(() => {
     if (hasLoaded.current) return;
     hasLoaded.current = true;
@@ -124,6 +143,18 @@ export default function SearchPageClient({
         } else {
           setIsLoadingMore(true);
         }
+
+        // Check if filtering matches current language for language-specific filters
+        const languages = ["zh_TW", "ja_JP", "en_US"];
+        const hasInvalidSuffix = filtering.some(([name, id]) => {
+          if (name === "package_icons" || name === "Boosters_icon") {
+            const suffix = languages.find((l) => id.endsWith(l));
+            return suffix && suffix !== language;
+          }
+          return false;
+        });
+
+        if (hasInvalidSuffix) return;
 
         // If filtering array is empty, clear search results and return early
         if (filtering.length === 0) {
