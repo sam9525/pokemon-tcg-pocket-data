@@ -331,7 +331,7 @@ export default function DecksListClient({
                     onClick={handleNextDeck}
                     disabled={cardLists.length <= 1}
                   >
-                    &lt;
+                    &gt;
                   </button>
 
                   <div className="md:hidden flex flex-col w-full gap-4">
