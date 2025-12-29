@@ -195,7 +195,13 @@ export default function DecksListClient({
     <div className="flex flex-col items-center justify-center p-3 md:p-5">
       <select
         className="dropdown"
-        onChange={(e) => setPackages(e.target.value)}
+        onChange={(e) => {
+          setPackages(e.target.value);
+          const selectedText = e.target.selectedOptions[0]?.text;
+          if (selectedText) {
+            document.title = `${selectedText} Deck Lists | Pokemon TCG Pocket Data`;
+          }
+        }}
       >
         <option value="A1_genetic-apex">
           {currentLanguageLookup.PACKAGES.A1}

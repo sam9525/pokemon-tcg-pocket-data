@@ -2,11 +2,11 @@
   "HEADER_TABS": {
     "cards": "Cards",
     "decksList": "Deck column",
-    "search": "search",
+    "search": "Search",
     "myDecks": "My deck",
     "deckCollection": "Deck Collection",
-    "deckBuilder": "deck building",
-    "users": "user",
+    "deckBuilder": "Deck building",
+    "users": "User",
     "s3Cards": "S3 Cards"
   },
   "PROFILES": {
@@ -52,11 +52,11 @@
     "weakness": "Weakness"
   },
   "USERS": {
-    "username": "username",
-    "email": "e-mail",
+    "username": "Username",
+    "email": "Email",
     "provider": "Provider",
     "createdAt": "Setup time",
-    "admin": "administrator"
+    "admin": "Administrator"
   },
   "S3_CARDS": {
     "selectPackage": "Select Series",

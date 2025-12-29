@@ -81,7 +81,7 @@ export default function Header() {
               className="text-primary text-2xl sm:text-3xl font-bold"
               href={"/"}
             >
-              POKEMON TCG POCKET
+              POKEMON TCG POCKET DATA
             </Link>
             <div className="flex items-center gap-2 absolute right-5 sm:right-13">
               {showHeaderTabs && (

@@ -1,11 +1,15 @@
 import Link from "next/link";
 
-import { Metadata } from "next";
+import type { Metadata } from "next";
 import CardImage from "@/components/CardImage";
 
 export const metadata: Metadata = {
-  title: "Card List",
-  description: "Browse all available Pokemon TCG Pocket card packages.",
+  title: "Package List",
+  description: "Browse all available Pokemon TCG Pocket packages.",
+  openGraph: {
+    title: "Package List | Pokemon TCG Pocket Data",
+    description: "Browse all available Pokemon TCG Pocket packages.",
+  },
 };
 
 export default async function Home() {

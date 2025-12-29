@@ -9,19 +9,22 @@ import { Analytics } from "@vercel/analytics/next";
 
 export const metadata: Metadata = {
   title: {
-    template: "%s | Pokemon TCG Pocket",
-    default: "Pokemon TCG Pocket",
+    template: "%s | Pokemon TCG Pocket Data",
+    default: "Pokemon TCG Pocket Data",
+  },
+  icons: {
+    icon: "/Pikachu.ico",
   },
   description: "Browse and filter Pokemon TCG Pocket cards and packages.",
   openGraph: {
-    title: "Pokemon TCG Pocket",
+    title: "%s | Pokemon TCG Pocket Data",
     description: "Browse and filter Pokemon TCG Pocket cards and packages.",
     type: "website",
-    siteName: "Pokemon TCG Pocket",
+    siteName: "Pokemon TCG Pocket Data",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Pokemon TCG Pocket",
+    title: "Pokemon TCG Pocket Data",
     description: "Browse and filter Pokemon TCG Pocket cards and packages.",
   },
 };

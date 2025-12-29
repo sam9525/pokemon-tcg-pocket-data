@@ -11,10 +11,10 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const packageName = id.replace(/_/g, " ");
 
   return {
-    title: `Package ${packageName}`,
+    title: `${packageName}`,
     description: `Browse cards from the ${packageName} package in Pokemon TCG Pocket.`,
     openGraph: {
-      title: `Package ${packageName} | Pokemon TCG Pocket`,
+      title: `${packageName} | Pokemon TCG Pocket Data`,
       description: `Browse cards from the ${packageName} package in Pokemon TCG Pocket.`,
     },
   };

@@ -1,4 +1,4 @@
-import { Metadata } from "next";
+import type { Metadata } from "next";
 import SearchPageClient from "./SearchPageClient";
 
 export const dynamic = "force-dynamic";
@@ -6,6 +6,10 @@ export const dynamic = "force-dynamic";
 export const metadata: Metadata = {
   title: "Search",
   description: "Search for Pokemon TCG Pocket cards.",
+  openGraph: {
+    title: "Search | Pokemon TCG Pocket Data",
+    description: "Search for Pokemon TCG Pocket cards.",
+  },
 };
 
 export default async function SearchPage() {
