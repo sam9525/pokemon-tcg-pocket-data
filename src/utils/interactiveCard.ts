@@ -29,10 +29,9 @@ export const handleClick = <T extends HTMLElement>(
         card.parentElement.style.width = "";
         card.parentElement.style.height = "";
       }
-      if (boosterPack != undefined) {
-        boosterPack.classList.remove("hidden");
-      }
-      cardCount.classList.remove("hidden");
+      boosterPack?.classList.remove("hidden");
+      cardCount?.classList.remove("hidden");
+
       // Remove mask when card is unfocused
       document.getElementById("background-mask")?.remove();
       window.history.back();
@@ -68,10 +67,8 @@ export const handleClick = <T extends HTMLElement>(
 
     // Add focus to the clicked card
     card.classList.add("focus");
-    if (boosterPack != undefined) {
-      boosterPack.classList.add("hidden");
-    }
-    cardCount.classList.add("hidden");
+    boosterPack?.classList.add("hidden");
+    cardCount?.classList.add("hidden");
 
     // Create and add background mask
     const mask = document.createElement("div");
@@ -86,10 +83,10 @@ export const handleClick = <T extends HTMLElement>(
           card.parentElement.style.width = "";
           card.parentElement.style.height = "";
         }
-        if (boosterPack != undefined) {
-          boosterPack.classList.remove("hidden");
-        }
-        cardCount.classList.remove("hidden");
+
+        boosterPack?.classList.remove("hidden");
+        cardCount?.classList.remove("hidden");
+
         mask.remove();
         window.history.back();
       }, 300);
