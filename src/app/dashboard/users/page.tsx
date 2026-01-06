@@ -6,7 +6,7 @@ import { useEffect, useRef, useState } from "react";
 import toast from "react-hot-toast";
 import { useLanguage } from "@/components/provider/LanguageProvider";
 import { List } from "react-window";
-import Image from "next/image";
+import GoogleIcon from "@/components/icons/google";
 
 export default function UsersPage() {
   const hasLoaded = useRef(false);
@@ -55,7 +55,9 @@ export default function UsersPage() {
         <div className="flex-2 border-r-1">{user.email}</div>
         <div className="flex-1 border-r-1 flex justify-center">
           {user.provider === "google" ? (
-            <Image src="/google-icon.svg" width={20} height={20} alt="Google" />
+            <div className="w-7 h-7">
+              <GoogleIcon />
+            </div>
           ) : (
             user.provider
           )}
