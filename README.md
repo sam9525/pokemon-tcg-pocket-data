@@ -25,7 +25,7 @@ This project was built to practice website development using Next.js, create-nex
 | **Profile page**       | It shows the user's name, email, and avatar. Users can also change their name, password and avatar.               | ✅          |
 | **Home page**          | First page that users see when they visit the website. It shows the all packages.                                 | ✅          |
 | **Cards page**         | Display all cards by packages. With the filtering options.                                                        | ✅          |
-| **Decks List page**    | Display all decks.                                                                                                |             |
+| **Decks List page**    | Display all decks.                                                                                                | ✅          |
 | **Search page**        | Allow to search cards by name, number, type, etc.                                                                 | ✅          |
 | **My Deck**            | Display the user's decks.                                                                                         |             |
 | **Deck Collection**    | Display the user's deck collection.                                                                               |             |
