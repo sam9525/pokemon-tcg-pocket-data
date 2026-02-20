@@ -196,11 +196,13 @@ async function crawlWebsite() {
         await page.goto(cardListUrls[j], { waitUntil: "domcontentloaded" });
 
         // Get player's name
-        const playerName = await page.$eval(
-          "div.heading",
-          (el) => el.textContent || "Unknown"
-        );
-
+        const playerName = await page.$("div.heading")
+          .then(el => el ? el.evaluate(el => el.textContent || "Unknown") : null);
+        if (!playerName) {
+          // couldn't find div.heading, skip this iteration
+          continue;
+        }
+        
         // Scrape cards
         const { pokemonList, foundHighlight } = await page.evaluate(
           (highlightName) => {
