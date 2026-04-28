@@ -9,7 +9,7 @@ export default function cloudflareLoader({
 }) {
   const params = [`width=${width}`, `quality=${quality || 80}`, "format=webp"];
 
-  const domain = "https://www.pokemon-tcg-pocket-data.com/";
+  const domain = "https://www.pokemon-tcg-pocket-data.com";
   let path = src;
 
   if (path.startsWith(domain)) {
