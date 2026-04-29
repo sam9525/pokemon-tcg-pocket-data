@@ -9,13 +9,13 @@ import CardImage from "@/components/CardImage";
 
 const useWebWorkerPreprocessing = () => {
   const [preprocessingWorker, setPreprocessingWorker] = useState<Worker | null>(
-    null
+    null,
   );
 
   useEffect(() => {
     // Create Web Worker for preprocessing
     const preprocessingWorkerInstance = new Worker(
-      new URL("../../../worker/card-preprocessor.tsx", import.meta.url)
+      new URL("../../../worker/card-preprocessor.tsx", import.meta.url),
     );
 
     setPreprocessingWorker(preprocessingWorkerInstance);
@@ -28,7 +28,7 @@ const useWebWorkerPreprocessing = () => {
   const preprocessWithWorker = (
     cards: { id: string; url: string }[],
     packageId: string,
-    language: string
+    language: string,
   ) => {
     return new Promise((resolve, reject) => {
       if (!preprocessingWorker) {
@@ -101,20 +101,39 @@ export default function S3CardsPage() {
   const [language, setLanguage] = useState<string>("");
   const [s3Cards, setS3Cards] = useState<{ id: string; url: string }[]>([]);
   const [packageInDB, setPackageInDB] = useState<boolean>(false);
+  const [packagesList, setPackagesList] = useState<
+    { id: string; name: string }[]
+  >([]);
   const { preprocessWithWorker } = useWebWorkerPreprocessing();
   const { currentLanguageLookup } = useLanguage();
+
+  // Fetch packages from API when language changes
+  useEffect(() => {
+    if (!language) return;
+
+    fetch(`/api/packages-metadata?language=${language}`)
+      .then((res) => res.json())
+      .then((data) => setPackagesList(data.packages || []))
+      .catch(console.error);
+  }, [language]);
+
+  // Set default language on mount
+  useEffect(() => {
+    const storedLanguage = localStorage.getItem("language") || "en_US";
+    setLanguage(storedLanguage);
+  }, []);
 
   const searchCards = () => {
     const toastPromise = new Promise(async (resolve, reject) => {
       const res = await fetch(
-        `/api/s3Cards?packageId=${packageId}&language=${language}`
+        `/api/s3Cards?packageId=${packageId}&language=${language}`,
       );
 
       const data = await res.json();
       setS3Cards(data.files || []);
 
       const resInDB = await fetch(
-        `/api/packageInDB?code=${packageId?.split("_")[0]}&language=${language}`
+        `/api/packageInDB?code=${packageId?.split("_")[0]}&language=${language}`,
       );
       const dataInDB = await resInDB.json();
       setPackageInDB(dataInDB.packageInDB);
@@ -145,7 +164,7 @@ export default function S3CardsPage() {
             const preprocessedCards = await preprocessWithWorker(
               s3Cards,
               packageId,
-              language
+              language,
             );
 
             const res = await fetch(`/api/s3Cards`, {
@@ -173,7 +192,7 @@ export default function S3CardsPage() {
                   headers: {
                     "Content-Type": "application/json",
                   },
-                }
+                },
               );
               if (resInDB.ok) {
                 resolve(resInDB);
@@ -215,47 +234,11 @@ export default function S3CardsPage() {
           <option value="">
             {currentLanguageLookup.S3_CARDS.selectPackage}
           </option>
-          <option value="A1_genetic-apex">
-            {currentLanguageLookup.PACKAGES.A1}
-          </option>
-          <option value="A1a_mythical-island">
-            {currentLanguageLookup.PACKAGES.A1a}
-          </option>
-          <option value="A2_space-time-smackdown">
-            {currentLanguageLookup.PACKAGES.A2}
-          </option>
-          <option value="A2a_triumphant-light">
-            {currentLanguageLookup.PACKAGES.A2a}
-          </option>
-          <option value="A2b_shining-rivalry">
-            {currentLanguageLookup.PACKAGES.A2b}
-          </option>
-          <option value="A3_celestial-guardians">
-            {currentLanguageLookup.PACKAGES.A3}
-          </option>
-          <option value="A3a_extradimensional-crisis">
-            {currentLanguageLookup.PACKAGES.A3a}
-          </option>
-          <option value="A3b_eevee-groove">
-            {currentLanguageLookup.PACKAGES.A3b}
-          </option>
-          <option value="A4_wisdom-of-sea-and-sky">
-            {currentLanguageLookup.PACKAGES.A4}
-          </option>
-          <option value="A4a_secluded-springs">
-            {currentLanguageLookup.PACKAGES.A4a}
-          </option>
-          <option value="A4b_deluxe-pack-ex">
-            {currentLanguageLookup.PACKAGES.A4b}
-          </option>
-          <option value="B1_mega-rising">
-            {currentLanguageLookup.PACKAGES.B1}
-          </option>
-          <option value="B1a_crimson-blaze">
-            {currentLanguageLookup.PACKAGES.B1a}
-          </option>
-          <option value="promo-a">PROMO-A</option>
-          <option value="promo-b">PROMO-B</option>
+          {packagesList.map((pkg) => (
+            <option key={pkg.id} value={pkg.id}>
+              {pkg.name}
+            </option>
+          ))}
         </select>
         <select
           value={language}

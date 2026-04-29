@@ -45,24 +45,24 @@ const Card = ({
       onMouseMove={(e) =>
         interactiveCard.handleMove(
           e,
-          e.currentTarget.querySelector(".card") as HTMLElement
+          e.currentTarget.querySelector(".card") as HTMLElement,
         )
       }
       onMouseOut={(e) =>
         interactiveCard.handleMouseOut(
-          e.currentTarget.querySelector(".card") as HTMLElement
+          e.currentTarget.querySelector(".card") as HTMLElement,
         )
       }
       onMouseUp={(e) =>
         interactiveCard.handleMouseUp(
-          e.currentTarget.querySelector(".card") as HTMLElement
+          e.currentTarget.querySelector(".card") as HTMLElement,
         )
       }
       onClick={(e) => {
         e.preventDefault();
         interactiveCard.handleClick(
           cardName,
-          e.currentTarget.querySelector(".card") as HTMLElement
+          e.currentTarget.querySelector(".card") as HTMLElement,
         );
       }}
     >
@@ -101,6 +101,9 @@ export default function DecksListClient({
   const { currentLanguageLookup, language } = useLanguage();
   const [deckList, setDeckList] = useState(defaultDeckList || []);
   const [packages, setPackages] = useState("A1_genetic-apex");
+  const [packagesList, setPackagesList] = useState<
+    { id: string; name: string }[]
+  >([]);
   const [visibleCount, setVisibleCount] = useState(5);
   const [currentCardListIndices, setCurrentCardListIndices] = useState<
     Record<string, number>
@@ -110,6 +113,22 @@ export default function DecksListClient({
   >({});
   const observerRef = useRef<HTMLDivElement>(null);
   const isMounted = useRef(false);
+
+  // Fetch packages when language changes
+  useEffect(() => {
+    if (!language) return;
+
+    fetch(`/api/packages-metadata?language=${language}`)
+      .then((res) => res.json())
+      .then((data) => {
+        setPackagesList(data.packages || []);
+        // Set default package
+        if (data.packages?.length > 0 && !packages) {
+          setPackages(data.packages[0].id);
+        }
+      })
+      .catch(console.error);
+  }, [language, packages]);
 
   const prevNextBtnClassNameDesktop =
     "hidden md:block self-center px-3 py-6 border-2 border-primary rounded-lg font-bold bg-foreground text-primary hover:bg-primary hover:text-background transition-colors duration-200";
@@ -131,7 +150,7 @@ export default function DecksListClient({
     try {
       const toastPromise = new Promise(async (resolve, reject) => {
         const response = await fetch(
-          `/api/decks-list?packages=${packages}&language=${language}`
+          `/api/decks-list?packages=${packages}&language=${language}`,
         );
         const data = await response.json();
         setDeckList(data.decklists || []);
@@ -174,7 +193,7 @@ export default function DecksListClient({
       {
         threshold: 0.1,
         rootMargin: "100px",
-      }
+      },
     );
 
     const currentObserverRef = observerRef.current;
@@ -203,36 +222,11 @@ export default function DecksListClient({
           }
         }}
       >
-        <option value="A1_genetic-apex">
-          {currentLanguageLookup.PACKAGES.A1}
-        </option>
-        <option value="A1a_mythical-island">
-          {currentLanguageLookup.PACKAGES.A1a}
-        </option>
-        <option value="A2_space-time-smackdown">
-          {currentLanguageLookup.PACKAGES.A2}
-        </option>
-        <option value="A2a_triumphant-light">
-          {currentLanguageLookup.PACKAGES.A2a}
-        </option>
-        <option value="A2b_shining-rivalry">
-          {currentLanguageLookup.PACKAGES.A2b}
-        </option>
-        <option value="A3_celestial-guardians">
-          {currentLanguageLookup.PACKAGES.A3}
-        </option>
-        <option value="A3a_extradimensional-crisis">
-          {currentLanguageLookup.PACKAGES.A3a}
-        </option>
-        <option value="A3b_eevee-groove">
-          {currentLanguageLookup.PACKAGES.A3b}
-        </option>
-        <option value="A4_wisdom-of-sea-and-sky">
-          {currentLanguageLookup.PACKAGES.A4}
-        </option>
-        <option value="A4a_secluded-springs ">
-          {currentLanguageLookup.PACKAGES.A4a}
-        </option>
+        {packagesList.map((pkg) => (
+          <option key={pkg.id} value={pkg.id}>
+            {pkg.name}
+          </option>
+        ))}
       </select>
       <div className="w-full max-w-5xl">
         {/* Main Content Area */}
