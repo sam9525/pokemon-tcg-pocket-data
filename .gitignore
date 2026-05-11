@@ -39,3 +39,15 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+.claude
+.serena
+claudedocs
+
+deckList.json
+
+package-metadata.json
+
+.vscode
+
+.worktrees
