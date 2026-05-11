@@ -70,16 +70,14 @@ export default function CardGrid({ onAddCard, currentDeckCards, onCardsLoaded }:
         if (!res.ok) throw new Error("Failed to fetch");
         const data = await res.json();
 
-        // Transform API response to internal names
-        setCards((data.cards || []).map((card: CardApiResponse) => ({
+        // Transform API response to internal names (reversed)
+        const mappedCards = (data.cards || []).map((card: CardApiResponse) => ({
           cardId: card.id,
           imageUrl: card.url,
-        })));
+        })).reverse();
+        setCards(mappedCards);
         if (onCardsLoadedRef.current) {
-          onCardsLoadedRef.current((data.cards || []).map((card: CardApiResponse) => ({
-            cardId: card.id,
-            imageUrl: card.url,
-          })));
+          onCardsLoadedRef.current(mappedCards);
         }
       } catch (error) {
         console.error("[CardGrid] Failed to load cards:", error);
