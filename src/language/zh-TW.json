@@ -102,5 +102,20 @@
     "loadingDeckLists": "載入牌組中",
     "failedToLoadDeckLists": "載入牌組失敗",
     "deckListsLoadedSuccessfully": "牌組載入成功"
+  },
+  "DECK_BUILDER": {
+    "deckName": "牌組名稱",
+    "save": "儲存",
+    "update": "更新",
+    "clear": "清除",
+    "clearConfirm": "確定要清除所有卡牌嗎？",
+    "loadConfirm": "載入牌組？未儲存的變更將會遺失。",
+    "deleteConfirm": "刪除此牌組？此動作無法復原。",
+    "savedSuccess": "牌組儲存成功",
+    "saveFailed": "儲存牌組失敗",
+    "deletedSuccess": "牌組已刪除",
+    "noCards": "將卡牌加入你的牌組",
+    "noSavedDecks": "尚無儲存的牌組",
+    "saving": "儲存中..."
   }
 }

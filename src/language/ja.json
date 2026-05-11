@@ -102,5 +102,20 @@
     "loadingDeckLists": "デッキを読み込んでいます",
     "failedToLoadDeckLists": "デッキの読み込みに失敗しました",
     "deckListsLoadedSuccessfully": "デッキの読み込みに成功しました"
+  },
+  "DECK_BUILDER": {
+    "deckName": "デッキ名",
+    "save": "保存",
+    "update": "更新",
+    "clear": "クリア",
+    "clearConfirm": "すべてのカードをクリアしますか？",
+    "loadConfirm": "デッキを読み込みますか？保存されていない変更は失われます。",
+    "deleteConfirm": "このデッキを削除しますか？この操作は取り消せません。",
+    "savedSuccess": "デッキを保存しました",
+    "saveFailed": "デッキの保存に失敗しました",
+    "deletedSuccess": "デッキを削除しました",
+    "noCards": "カードをデッキに追加",
+    "noSavedDecks": "保存されたデッキがありません",
+    "saving": "保存中..."
   }
 }

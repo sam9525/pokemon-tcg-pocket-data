@@ -102,5 +102,20 @@
     "loadingDeckLists": "Loading deck lists",
     "failedToLoadDeckLists": "Failed to load deck lists",
     "deckListsLoadedSuccessfully": "Deck lists loaded successfully"
+  },
+  "DECK_BUILDER": {
+    "deckName": "Deck Name",
+    "save": "Save",
+    "update": "Update",
+    "clear": "Clear",
+    "clearConfirm": "Clear all cards from deck?",
+    "loadConfirm": "Load deck? Current unsaved changes will be lost.",
+    "deleteConfirm": "Delete this deck? This cannot be undone.",
+    "savedSuccess": "Deck saved successfully",
+    "saveFailed": "Failed to save deck",
+    "deletedSuccess": "Deck deleted",
+    "noCards": "Add cards to your deck",
+    "noSavedDecks": "No saved decks yet",
+    "saving": "Saving..."
   }
 }
