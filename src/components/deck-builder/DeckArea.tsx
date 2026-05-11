@@ -35,7 +35,8 @@ export default function DeckArea({
 
   const totalCards = validation.totalCards;
   const progressPercent = Math.min((totalCards / DECK_MAX_CARDS) * 100, 100);
-  const isOverLimit = !validation.canSave && validation.saveErrors.length > 0;
+  // Red border only when hard limits exceeded (over 20 cards or over 2 copies)
+  const isOverLimit = totalCards > DECK_MAX_CARDS || cards.some(c => c.quantity > 2);
 
   const t = currentLanguageLookup?.DECK_BUILDER || {};
 

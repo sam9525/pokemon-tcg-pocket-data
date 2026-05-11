@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import CardImage from "@/components/CardImage";
 import FilteringTabs from "@/components/layouts/FilteringTabs";
 import toast from "react-hot-toast";
@@ -10,6 +10,7 @@ import { useLanguage } from "@/components/provider/LanguageProvider";
 interface CardGridProps {
   onAddCard: (cardId: string) => { success: boolean; reason?: string };
   currentDeckCards: DeckCard[];
+  onCardsLoaded?: (cards: CardItem[]) => void;
 }
 
 interface CardApiResponse {
@@ -22,13 +23,19 @@ interface CardItem {
   imageUrl: string;
 }
 
-export default function CardGrid({ onAddCard, currentDeckCards }: CardGridProps) {
+export default function CardGrid({ onAddCard, currentDeckCards, onCardsLoaded }: CardGridProps) {
   const [cards, setCards] = useState<CardItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [filter, setFilter] = useState<string[]>([]);
   const [packageId, setPackageId] = useState<string>("");
   const [packagesList, setPackagesList] = useState<{ id: string; name: string }[]>([]);
+  const onCardsLoadedRef = useRef(onCardsLoaded);
   const { language, currentLanguageLookup } = useLanguage();
+
+  // Keep ref updated
+  useEffect(() => {
+    onCardsLoadedRef.current = onCardsLoaded;
+  }, [onCardsLoaded]);
 
   // Fetch packages for dropdown
   useEffect(() => {
@@ -68,6 +75,12 @@ export default function CardGrid({ onAddCard, currentDeckCards }: CardGridProps)
           cardId: card.id,
           imageUrl: card.url,
         })));
+        if (onCardsLoadedRef.current) {
+          onCardsLoadedRef.current((data.cards || []).map((card: CardApiResponse) => ({
+            cardId: card.id,
+            imageUrl: card.url,
+          })));
+        }
       } catch (error) {
         console.error("[CardGrid] Failed to load cards:", error);
         toast.error("Failed to load cards");

@@ -1,21 +1,14 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import toast from "react-hot-toast";
 import { useLanguage } from "@/components/provider/LanguageProvider";
 import { useDeckBuilder } from "@/hooks/useDeckBuilder";
 import DeckArea from "@/components/deck-builder/DeckArea";
 import CardGrid from "@/components/deck-builder/CardGrid";
-import SavedDecksList from "@/components/deck-builder/SavedDecksList";
-
-interface SavedDeck {
-  _id: string;
-  name: string;
-  cards: { cardId: string; quantity: number }[];
-}
 
 export default function DeckBuilderClient() {
-  const { language, currentLanguageLookup } = useLanguage();
+  const { currentLanguageLookup } = useLanguage();
   const {
     deck,
     validation,
@@ -24,45 +17,18 @@ export default function DeckBuilderClient() {
     removeCard,
     removeAllCopies,
     clearDeck,
-    loadDeck,
   } = useDeckBuilder();
 
-  const [savedDecks, setSavedDecks] = useState<SavedDeck[]>([]);
   const [cardImages, setCardImages] = useState<Record<string, string>>({});
   const [isSaving, setIsSaving] = useState(false);
 
-  // Build cardId → imageUrl map from all saved decks' cards (for DeckArea display)
-  useEffect(() => {
+  const handleCardsLoaded = (cards: { cardId: string; imageUrl: string }[]) => {
     const images: Record<string, string> = {};
-    savedDecks.forEach(d => {
-      d.cards.forEach(c => {
-        if (!images[c.cardId]) {
-          // Placeholder — actual URL will be set when cards are fetched in CardGrid
-          images[c.cardId] = "";
-        }
-      });
+    cards.forEach(c => {
+      images[c.cardId] = c.imageUrl;
     });
-    setCardImages(images);
-  }, [savedDecks]);
-
-  // Fetch saved decks on mount
-  useEffect(() => {
-    if (!language) return;
-
-    fetch("/api/user-decks")
-      .then(res => {
-        if (res.status === 401) {
-          toast.error("Session expired, please login again");
-          window.location.href = "/login?callbackUrl=/deck-builder";
-          return null;
-        }
-        return res.json();
-      })
-      .then(data => {
-        if (data?.decks) setSavedDecks(data.decks);
-      })
-      .catch(err => console.error("[DeckBuilder] Failed to load decks:", err));
-  }, [language]);
+    setCardImages(prev => ({ ...prev, ...images }));
+  };
 
   const handleClear = () => {
     if (deck.cards.length === 0) return;
@@ -106,10 +72,6 @@ export default function DeckBuilderClient() {
       if (res.ok) {
         toast.success(t.savedSuccess || "Deck saved successfully", { id: toastId });
         clearDeck();
-        // Refresh saved decks list
-        const decksRes = await fetch("/api/user-decks");
-        const decksData = await decksRes.json();
-        if (decksData?.decks) setSavedDecks(decksData.decks);
       } else {
         toast.error(data.error || t.saveFailed || "Failed to save deck", { id: toastId });
       }
@@ -121,51 +83,8 @@ export default function DeckBuilderClient() {
     }
   };
 
-  const handleLoad = (savedDeck: SavedDeck) => {
-    if (deck.cards.length > 0) {
-      const t = currentLanguageLookup?.DECK_BUILDER as Record<string, string> || {};
-      const confirmed = window.confirm(t.loadConfirm || "Load deck? Current unsaved changes will be lost.");
-      if (!confirmed) return;
-    }
-    loadDeck({
-      id: savedDeck._id,
-      name: savedDeck.name,
-      cards: savedDeck.cards,
-    });
-  };
-
-  const handleDelete = (deckId: string) => {
-    const t = currentLanguageLookup?.DECK_BUILDER as Record<string, string> || {};
-    const confirmed = window.confirm(t.deleteConfirm || "Delete this deck? This cannot be undone.");
-    if (!confirmed) return;
-
-    fetch(`/api/user-decks/${deckId}`, { method: "DELETE" })
-      .then(res => {
-        if (res.status === 401) {
-          toast.error("Session expired, please login again");
-          window.location.href = "/login?callbackUrl=/deck-builder";
-          return;
-        }
-        if (res.ok) {
-          setSavedDecks(prev => prev.filter(d => d._id !== deckId));
-          toast.success(t.deletedSuccess || "Deck deleted");
-        } else {
-          toast.error("Failed to delete deck");
-        }
-      })
-      .catch(() => toast.error("Failed to delete deck"));
-  };
-
   return (
     <div className="flex flex-col items-center p-4 max-w-6xl mx-auto">
-      {/* Saved decks list */}
-      <SavedDecksList
-        decks={savedDecks}
-        currentDeckId={deck.id}
-        onLoad={handleLoad}
-        onDelete={handleDelete}
-      />
-
       {/* Deck Area */}
       <DeckArea
         name={deck.name}
@@ -185,6 +104,7 @@ export default function DeckBuilderClient() {
       <CardGrid
         onAddCard={addCard}
         currentDeckCards={deck.cards}
+        onCardsLoaded={handleCardsLoaded}
       />
     </div>
   );
