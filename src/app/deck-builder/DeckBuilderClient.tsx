@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import toast from "react-hot-toast";
 import { useLanguage } from "@/components/provider/LanguageProvider";
 import { useDeckBuilder } from "@/hooks/useDeckBuilder";

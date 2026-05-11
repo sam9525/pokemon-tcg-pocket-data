@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import CardImage from "@/components/CardImage";
 import FilteringTabs from "@/components/layouts/FilteringTabs";
 import toast from "react-hot-toast";
@@ -10,6 +10,11 @@ import { useLanguage } from "@/components/provider/LanguageProvider";
 interface CardGridProps {
   onAddCard: (cardId: string) => { success: boolean; reason?: string };
   currentDeckCards: DeckCard[];
+}
+
+interface CardApiResponse {
+  id: string;
+  url: string;
 }
 
 interface CardItem {
@@ -23,7 +28,6 @@ export default function CardGrid({ onAddCard, currentDeckCards }: CardGridProps)
   const [filter, setFilter] = useState<string[]>([]);
   const [packageId, setPackageId] = useState<string>("");
   const [packagesList, setPackagesList] = useState<{ id: string; name: string }[]>([]);
-  const hasLoaded = useRef(false);
   const { language, currentLanguageLookup } = useLanguage();
 
   // Fetch packages for dropdown
@@ -60,7 +64,7 @@ export default function CardGrid({ onAddCard, currentDeckCards }: CardGridProps)
         const data = await res.json();
 
         // Transform API response to internal names
-        setCards((data.cards || []).map((card: any) => ({
+        setCards((data.cards || []).map((card: CardApiResponse) => ({
           cardId: card.id,
           imageUrl: card.url,
         })));
@@ -76,8 +80,6 @@ export default function CardGrid({ onAddCard, currentDeckCards }: CardGridProps)
   }, [packageId, language, filter]);
 
   const handleCardClick = (card: CardItem) => {
-    const t = currentLanguageLookup?.DECK_BUILDER as Record<string, string> || {};
-
     const result = onAddCard(card.cardId);
     if (!result.success && result.reason) {
       toast.warning(result.reason);

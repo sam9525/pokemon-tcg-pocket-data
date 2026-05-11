@@ -11,7 +11,7 @@ describe("useDeckBuilder", () => {
 
   it("adds a new card", () => {
     const { result } = renderHook(() => useDeckBuilder());
-    const addResult = act(() => result.current.addCard("A1_001"));
+    act(() => result.current.addCard("A1_001"));
     expect(result.current.deck.cards).toHaveLength(1);
     expect(result.current.deck.cards[0]).toEqual({ cardId: "A1_001", quantity: 1 });
   });

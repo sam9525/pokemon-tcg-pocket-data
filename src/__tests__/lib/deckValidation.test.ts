@@ -1,4 +1,4 @@
-import { validateDeck, DECK_MAX_CARDS, MAX_COPIES_PER_CARD } from "@/lib/deckValidation";
+import { validateDeck } from "@/lib/deckValidation";
 
 describe("deckValidation", () => {
   describe("validateDeck", () => {
