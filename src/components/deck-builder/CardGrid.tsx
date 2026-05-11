@@ -1,0 +1,149 @@
+"use client";
+
+import { useEffect, useRef, useState } from "react";
+import CardImage from "@/components/CardImage";
+import FilteringTabs from "@/components/layouts/FilteringTabs";
+import toast from "react-hot-toast";
+import { DeckCard } from "@/lib/deckValidation";
+import { useLanguage } from "@/components/provider/LanguageProvider";
+
+interface CardGridProps {
+  onAddCard: (cardId: string) => { success: boolean; reason?: string };
+  currentDeckCards: DeckCard[];
+}
+
+interface CardItem {
+  cardId: string;
+  imageUrl: string;
+}
+
+export default function CardGrid({ onAddCard, currentDeckCards }: CardGridProps) {
+  const [cards, setCards] = useState<CardItem[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [filter, setFilter] = useState<string[]>([]);
+  const [packageId, setPackageId] = useState<string>("");
+  const [packagesList, setPackagesList] = useState<{ id: string; name: string }[]>([]);
+  const hasLoaded = useRef(false);
+  const { language, currentLanguageLookup } = useLanguage();
+
+  // Fetch packages for dropdown
+  useEffect(() => {
+    if (!language) return;
+
+    fetch(`/api/packages-metadata?language=${language}`)
+      .then(res => res.json())
+      .then(data => {
+        setPackagesList(data.packages || []);
+        if (data.packages?.length > 0) {
+          setPackageId(data.packages[0].id);
+        }
+      })
+      .catch(err => console.error("[CardGrid] Failed to load packages:", err));
+  }, [language]);
+
+  // Get current quantity for a card in deck
+  const getCardQuantity = (cardId: string): number => {
+    const deckCard = currentDeckCards.find(c => c.cardId === cardId);
+    return deckCard?.quantity || 0;
+  };
+
+  // Fetch cards when package or filter changes
+  useEffect(() => {
+    if (!packageId) return;
+
+    const fetchCards = async () => {
+      setIsLoading(true);
+      try {
+        const url = `/api/cards/${packageId}?language=${language}${filter.length > 0 ? `&filter=${filter.join(",")}` : ""}`;
+        const res = await fetch(url);
+        if (!res.ok) throw new Error("Failed to fetch");
+        const data = await res.json();
+
+        // Transform API response to internal names
+        setCards((data.cards || []).map((card: any) => ({
+          cardId: card.id,
+          imageUrl: card.url,
+        })));
+      } catch (error) {
+        console.error("[CardGrid] Failed to load cards:", error);
+        toast.error("Failed to load cards");
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchCards();
+  }, [packageId, language, filter]);
+
+  const handleCardClick = (card: CardItem) => {
+    const t = currentLanguageLookup?.DECK_BUILDER as Record<string, string> || {};
+
+    const result = onAddCard(card.cardId);
+    if (!result.success && result.reason) {
+      toast.warning(result.reason);
+    }
+  };
+
+  if (!packageId) {
+    return (
+      <div className="flex justify-center items-center py-10">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" />
+      </div>
+    );
+  }
+
+  return (
+    <>
+      {/* Package selector */}
+      <select
+        className="dropdown mb-4 w-full max-w-xs"
+        value={packageId}
+        onChange={(e) => setPackageId(e.target.value)}
+      >
+        {packagesList.map((pkg) => (
+          <option key={pkg.id} value={pkg.id}>
+            {pkg.name}
+          </option>
+        ))}
+      </select>
+
+      {/* Filter buttons — reuses existing FilteringTabs */}
+      <FilteringTabs filter={filter} setFilter={setFilter} currentLanguageLookup={currentLanguageLookup} />
+
+      {/* Card grid */}
+      {isLoading ? (
+        <div className="flex justify-center items-center py-10">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" />
+        </div>
+      ) : (
+        <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 xl:grid-cols-6 gap-4">
+          {cards.map((card) => {
+            const qty = getCardQuantity(card.cardId);
+            return (
+              <div
+                key={card.cardId}
+                className="relative cursor-pointer"
+                onClick={() => handleCardClick(card)}
+              >
+                <CardImage
+                  src={card.imageUrl}
+                  variant="card"
+                  alt={card.cardId}
+                  className={`w-full transition-transform hover:scale-105 ${
+                    qty > 0 ? "ring-2 ring-primary ring-offset-2" : ""
+                  }`}
+                />
+                {/* Quantity badge — only show when qty > 1 */}
+                {qty > 1 && (
+                  <div className="absolute -top-2 -right-2 bg-primary text-foreground text-xs font-bold w-6 h-6 flex items-center justify-center rounded-full z-10">
+                    {qty}
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      )}
+    </>
+  );
+}
