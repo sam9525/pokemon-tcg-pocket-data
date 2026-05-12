@@ -4,6 +4,41 @@ import connectDB from "@/lib/mongodb";
 import { UserDeck } from "@/models/UserDeck";
 import { User } from "@/models/User";
 
+// GET /api/user-decks/[id] - Get a single deck
+export async function GET(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> },
+) {
+  try {
+    const session = await auth();
+    if (!session?.user?.email) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const { id } = await params;
+    await connectDB();
+
+    const user = await User.findOne({ email: session.user.email }).lean();
+    if (!user) {
+      return NextResponse.json({ error: "User not found" }, { status: 404 });
+    }
+
+    const deck = await UserDeck.findOne({ _id: id, userId: user._id }).lean();
+
+    if (!deck) {
+      return NextResponse.json({ error: "Deck not found" }, { status: 404 });
+    }
+
+    return NextResponse.json({ deck });
+  } catch (error) {
+    console.error("[user-decks/[id]:GET]", error);
+    return NextResponse.json(
+      { error: "Failed to fetch deck" },
+      { status: 500 },
+    );
+  }
+}
+
 // PUT /api/user-decks/[id] - Update a deck
 export async function PUT(
   request: NextRequest,
