@@ -97,7 +97,7 @@ export default function DeckArea({
   <div className="flex items-center justify-center min-h-32 bg-gray-100 border-2 border-dashed border-gray-300 rounded-lg">
     <div className="flex flex-col items-center gap-2">
       <svg
-        className="w-10 h-10 text-gray-400"
+        className="w-2.5 h-2.5 text-gray-400"
         fill="none"
         stroke="currentColor"
         viewBox="0 0 24 24"
