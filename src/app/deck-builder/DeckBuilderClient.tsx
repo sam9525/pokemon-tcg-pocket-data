@@ -103,6 +103,8 @@ export default function DeckBuilderClient() {
       {/* Card Grid */}
       <CardGrid
         onAddCard={addCard}
+        onRemoveOne={removeCard}
+        onRemoveAll={removeAllCopies}
         currentDeckCards={deck.cards}
         onCardsLoaded={handleCardsLoaded}
       />

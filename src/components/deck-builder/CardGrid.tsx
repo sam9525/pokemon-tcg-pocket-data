@@ -11,6 +11,8 @@ interface CardGridProps {
   onAddCard: (cardId: string) => { success: boolean; reason?: string };
   currentDeckCards: DeckCard[];
   onCardsLoaded?: (cards: CardItem[]) => void;
+  onRemoveOne: (cardId: string) => void;
+  onRemoveAll: (cardId: string) => void;
 }
 
 interface CardApiResponse {
@@ -23,7 +25,7 @@ interface CardItem {
   imageUrl: string;
 }
 
-export default function CardGrid({ onAddCard, currentDeckCards, onCardsLoaded }: CardGridProps) {
+export default function CardGrid({ onAddCard, currentDeckCards, onCardsLoaded, onRemoveOne, onRemoveAll }: CardGridProps) {
   const [cards, setCards] = useState<CardItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [filter, setFilter] = useState<string[]>([]);
@@ -135,8 +137,9 @@ export default function CardGrid({ onAddCard, currentDeckCards, onCardsLoaded }:
             return (
               <div
                 key={card.cardId}
-                className="relative cursor-pointer"
-                onClick={() => handleCardClick(card)}
+                className="relative group cursor-pointer"
+                onClick={() => qty > 0 ? onRemoveOne(card.cardId) : handleCardClick(card)}
+                title={qty > 0 ? `${card.cardId} (tap to remove)` : `Add ${card.cardId}`}
               >
                 <CardImage
                   src={card.imageUrl}
@@ -151,6 +154,27 @@ export default function CardGrid({ onAddCard, currentDeckCards, onCardsLoaded }:
                   <div className="absolute -top-2 -right-2 bg-primary text-foreground text-xs font-bold w-6 h-6 flex items-center justify-center rounded-full z-10">
                     {qty}
                   </div>
+                )}
+
+                {/* Remove one overlay on hover - only show if card is in deck */}
+                {qty > 0 && (
+                  <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity rounded-lg flex items-center justify-center">
+                    <span className="text-white text-2xl font-bold">−</span>
+                  </div>
+                )}
+
+                {/* Remove all button - only show if card is in deck */}
+                {qty > 0 && (
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onRemoveAll(card.cardId);
+                    }}
+                    className="absolute top-1 right-1 w-5 h-5 bg-red-500 text-white rounded-full text-xs font-bold opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center"
+                    title="Remove all copies"
+                  >
+                    ×
+                  </button>
                 )}
               </div>
             );
