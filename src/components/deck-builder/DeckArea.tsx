@@ -93,7 +93,7 @@ export default function DeckArea({
       </div>
 
       {/* Card list */}
-      <div className="flex flex-row gap-3 overflow-x-auto pb-2 px-4 py-2">
+      <div className="flex flex-row gap-3 overflow-x-auto pb-2 py-2 -mr-3">
         {cards.length === 0 ? (
           // Placeholder card slots
           Array.from({ length: 10 }).map((_, i) => (
