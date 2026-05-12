@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import type { Metadata } from "next";
 import { auth } from "@/auth";
 import { redirect } from "next/navigation";
@@ -20,15 +21,17 @@ export default async function MyDecksPage() {
 
   await connectDB();
 
-  const user = await User.findOne({ email: session.user.email }).lean();
-  if (!user) {
+  const user = (await User.findOne({
+    email: session.user.email,
+  }).lean()) as any;
+  if (!user?._id) {
     redirect("/login?callbackUrl=/my-decks");
   }
 
-  const decks = await UserDeck.find({ userId: user._id })
+  const decks = (await UserDeck.find({ userId: user._id })
     .sort({ updatedAt: -1 })
     .select("name cards createdAt updatedAt")
-    .lean();
+    .lean()) as any;
 
   return <MyDecksClient initialDecks={decks} />;
 }

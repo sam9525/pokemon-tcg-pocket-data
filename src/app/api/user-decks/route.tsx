@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/auth";
 import connectDB from "@/lib/mongodb";
@@ -15,8 +16,10 @@ export async function GET() {
     await connectDB();
 
     // Look up userId from email
-    const user = await User.findOne({ email: session.user.email }).lean();
-    if (!user) {
+    const user = (await User.findOne({
+      email: session.user.email,
+    }).lean()) as any;
+    if (!user?._id) {
       return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
 
@@ -62,8 +65,10 @@ export async function POST(request: NextRequest) {
     await connectDB();
 
     // Look up userId from email
-    const user = await User.findOne({ email: session.user.email }).lean();
-    if (!user) {
+    const user = (await User.findOne({
+      email: session.user.email,
+    }).lean()) as any;
+    if (!user?._id) {
       return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
 

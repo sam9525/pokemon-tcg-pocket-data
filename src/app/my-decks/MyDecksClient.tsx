@@ -22,9 +22,7 @@ interface MyDecksClientProps {
   initialDecks: UserDeck[];
 }
 
-export default function MyDecksClient({
-  initialDecks,
-}: MyDecksClientProps) {
+export default function MyDecksClient({ initialDecks }: MyDecksClientProps) {
   const router = useRouter();
   const { currentLanguageLookup } = useLanguage();
   const [decks, setDecks] = useState<UserDeck[]>(initialDecks);

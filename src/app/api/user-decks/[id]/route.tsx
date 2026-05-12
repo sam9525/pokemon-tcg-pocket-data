@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/auth";
 import connectDB from "@/lib/mongodb";
@@ -18,12 +19,17 @@ export async function GET(
     const { id } = await params;
     await connectDB();
 
-    const user = await User.findOne({ email: session.user.email }).lean();
-    if (!user) {
+    const user = (await User.findOne({
+      email: session.user.email,
+    }).lean()) as any;
+    if (!user?._id) {
       return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
 
-    const deck = await UserDeck.findOne({ _id: id, userId: user._id }).lean();
+    const deck = (await UserDeck.findOne({
+      _id: id,
+      userId: user._id,
+    }).lean()) as any;
 
     if (!deck) {
       return NextResponse.json({ error: "Deck not found" }, { status: 404 });
@@ -57,8 +63,10 @@ export async function PUT(
     await connectDB();
 
     // Look up userId from email for ownership check
-    const user = await User.findOne({ email: session.user.email }).lean();
-    if (!user) {
+    const user = (await User.findOne({
+      email: session.user.email,
+    }).lean()) as any;
+    if (!user?._id) {
       return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
 
@@ -102,8 +110,10 @@ export async function DELETE(
     await connectDB();
 
     // Look up userId from email for ownership check
-    const user = await User.findOne({ email: session.user.email }).lean();
-    if (!user) {
+    const user = (await User.findOne({
+      email: session.user.email,
+    }).lean()) as any;
+    if (!user?._id) {
       return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
 

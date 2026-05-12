@@ -107,7 +107,7 @@ export default function CardGrid({
   const handleCardClick = (card: CardItem) => {
     const result = onAddCard(card.cardId);
     if (!result.success && result.reason) {
-      toast.warning(result.reason);
+      toast.error(result.reason);
     }
   };
 
