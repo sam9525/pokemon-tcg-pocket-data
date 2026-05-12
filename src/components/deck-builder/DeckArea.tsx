@@ -94,10 +94,27 @@ export default function DeckArea({
 
       {/* Card list */}
       {cards.length === 0 ? (
-        <div className="text-center text-gray-500 py-4">
-          {t.noCards as string || "Add cards to your deck"}
-        </div>
-      ) : (
+  <div className="flex items-center justify-center min-h-32 bg-gray-100 border-2 border-dashed border-gray-300 rounded-lg">
+    <div className="flex flex-col items-center gap-2">
+      <svg
+        className="w-10 h-10 text-gray-400"
+        fill="none"
+        stroke="currentColor"
+        viewBox="0 0 24 24"
+      >
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={1.5}
+          d="M12 6v6m0 0v6m0-6h6m-6 0H6"
+        />
+      </svg>
+      <span className="text-gray-500 text-sm">
+        {t.noCards as string || "Add cards to your deck"}
+      </span>
+    </div>
+  </div>
+) : (
         <div className="flex flex-row gap-3 overflow-x-auto pb-2">
           {cards.map((card) => (
             <DeckCard
