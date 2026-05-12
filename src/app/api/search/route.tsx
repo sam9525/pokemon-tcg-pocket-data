@@ -10,7 +10,7 @@ const ListObjects = async (
   s3Client: S3Client,
   bucket: string,
   prefix: string,
-  language: string
+  language: string,
 ) => {
   const command = new ListObjectsCommand({
     Bucket: bucket,
@@ -85,7 +85,7 @@ export async function GET(request: NextRequest) {
         error: "Failed to fetch types icon",
         details: error instanceof Error ? error.message : String(error),
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

@@ -32,8 +32,8 @@ export default function PackagePageClient({
       const toastPromise = new Promise(async (resolve, reject) => {
         const response = await fetch(
           `/api/cards/${packageId}?filter=${filter.join(
-            ","
-          )}&language=${language}`
+            ",",
+          )}&language=${language}`,
         );
         const data = await response.json();
         setFiles(data.cards || []);

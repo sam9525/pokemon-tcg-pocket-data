@@ -103,7 +103,7 @@ export async function DELETE(req: NextRequest) {
       new DeleteObjectCommand({
         Bucket: S3_BUCKET,
         Key: key,
-      })
+      }),
     );
 
     return Response.json({ message: "File deleted successfully" });

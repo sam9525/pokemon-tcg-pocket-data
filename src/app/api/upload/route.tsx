@@ -40,7 +40,7 @@ export async function POST(req: NextRequest) {
         ACL: "public-read",
         ContentType: file.type,
         Body: buffer,
-      })
+      }),
     );
 
     // Create a new link

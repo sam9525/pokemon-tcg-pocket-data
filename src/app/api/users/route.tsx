@@ -8,7 +8,7 @@ export async function GET(request: NextRequest) {
   // Rate limiting to users list endpoint
   const rateLimitResult = await rateLimit(
     request,
-    RESOURCE_INTENSIVE_RATE_LIMIT
+    RESOURCE_INTENSIVE_RATE_LIMIT,
   );
   if (!rateLimitResult.success) {
     return rateLimitResult.response;

@@ -63,7 +63,7 @@ const profileService = {
         } catch (error) {
           reject(error);
         }
-      }
+      },
     );
 
     return toast.promise(uploadPromise, {

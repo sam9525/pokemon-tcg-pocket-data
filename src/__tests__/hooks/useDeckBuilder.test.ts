@@ -13,7 +13,10 @@ describe("useDeckBuilder", () => {
     const { result } = renderHook(() => useDeckBuilder());
     act(() => result.current.addCard("A1_001"));
     expect(result.current.deck.cards).toHaveLength(1);
-    expect(result.current.deck.cards[0]).toEqual({ cardId: "A1_001", quantity: 1 });
+    expect(result.current.deck.cards[0]).toEqual({
+      cardId: "A1_001",
+      quantity: 1,
+    });
   });
 
   it("increments quantity when adding duplicate card", () => {

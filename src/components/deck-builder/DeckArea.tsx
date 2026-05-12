@@ -2,7 +2,11 @@
 
 import { useLanguage } from "@/components/provider/LanguageProvider";
 import DeckCard from "./DeckCard";
-import { DeckCard as DeckCardType, ValidationResult, DECK_MAX_CARDS } from "@/lib/deckValidation";
+import {
+  DeckCard as DeckCardType,
+  ValidationResult,
+  DECK_MAX_CARDS,
+} from "@/lib/deckValidation";
 
 interface DeckAreaProps {
   name: string;
@@ -36,21 +40,24 @@ export default function DeckArea({
   const totalCards = validation.totalCards;
   const progressPercent = Math.min((totalCards / DECK_MAX_CARDS) * 100, 100);
   // Red border only when hard limits exceeded (over 20 cards or over 2 copies)
-  const isOverLimit = totalCards > DECK_MAX_CARDS || cards.some(c => c.quantity > 2);
+  const isOverLimit =
+    totalCards > DECK_MAX_CARDS || cards.some((c) => c.quantity > 2);
 
   const t = currentLanguageLookup?.DECK_BUILDER || {};
 
   return (
-    <div className={`w-full bg-search-background border-2 rounded-xl p-4 mb-4 ${
-      isOverLimit ? "border-red-500" : "border-primary"
-    }`}>
+    <div
+      className={`w-full bg-search-background border-2 rounded-xl p-4 mb-4 ${
+        isOverLimit ? "border-red-500" : "border-primary"
+      }`}
+    >
       {/* Header: Name input and buttons */}
       <div className="flex flex-row flex-wrap justify-between items-center gap-2 mb-3">
         <input
           type="text"
           value={name}
           onChange={(e) => onNameChange(e.target.value)}
-          placeholder={t.deckName as string || "Deck Name"}
+          placeholder={(t.deckName as string) || "Deck Name"}
           className="flex-1 min-w-32 max-w-48 px-3 py-2 bg-foreground rounded-lg border border-primary focus:outline-none focus:ring-2 focus:ring-primary"
         />
         <div className="flex gap-2">
@@ -63,7 +70,11 @@ export default function DeckArea({
                 : "bg-gray-300 text-gray-500 cursor-not-allowed"
             }`}
           >
-            {isSaving ? "..." : (currentDeckId ? (t.update as string || "Update") : (t.save as string || "Save"))}
+            {isSaving
+              ? "..."
+              : currentDeckId
+                ? (t.update as string) || "Update"
+                : (t.save as string) || "Save"}
           </button>
           <button
             onClick={onClear}
@@ -74,7 +85,7 @@ export default function DeckArea({
                 : "bg-gray-300 text-gray-500 cursor-not-allowed"
             }`}
           >
-            {t.clear as string || "Clear"}
+            {(t.clear as string) || "Clear"}
           </button>
         </div>
       </div>
@@ -87,7 +98,9 @@ export default function DeckArea({
             style={{ width: `${progressPercent}%` }}
           />
         </div>
-        <span className={`text-sm font-bold whitespace-nowrap ${isOverLimit ? "text-red-500" : "text-primary"}`}>
+        <span
+          className={`text-sm font-bold whitespace-nowrap ${isOverLimit ? "text-red-500" : "text-primary"}`}
+        >
           {totalCards}/{DECK_MAX_CARDS}
         </span>
       </div>

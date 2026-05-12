@@ -66,7 +66,7 @@ const MessageItem = React.memo(({ msg }: { msg: ChatbotMessage }) =>
         ))}
       </div>
     </>
-  )
+  ),
 );
 MessageItem.displayName = "MessageItem";
 
@@ -127,7 +127,7 @@ export default function Chatbot() {
         closeChatbot();
       }
     },
-    [isOpen, closeChatbot]
+    [isOpen, closeChatbot],
   );
 
   useEffect(() => {
@@ -226,8 +226,8 @@ export default function Chatbot() {
                   prev.map((msg) =>
                     msg.id === currentMessageId
                       ? { ...msg, message: fullResponse }
-                      : msg
-                  )
+                      : msg,
+                  ),
                 );
               }
             } catch (parseError) {
@@ -247,7 +247,7 @@ export default function Chatbot() {
                 (link: { web: { title: string; uri: string } }) => ({
                   title: link.web.title,
                   uri: link.web.uri,
-                })
+                }),
               );
 
               setMessages((prev) =>
@@ -257,8 +257,8 @@ export default function Chatbot() {
                         ...msg,
                         links: [...(msg.links || []), ...newLinks],
                       }
-                    : msg
-                )
+                    : msg,
+                ),
               );
             } catch (parseError) {
               console.warn("Failed to parse links:", parseError);
@@ -320,7 +320,7 @@ export default function Chatbot() {
         setIsLoading(false);
       }
     },
-    [inputMessage, sendMessage, resetTextareaHeight, addMessage]
+    [inputMessage, sendMessage, resetTextareaHeight, addMessage],
   );
 
   const handleInputChange = useCallback(
@@ -328,7 +328,7 @@ export default function Chatbot() {
       setInputMessage(e.target.value);
       handleTextareaResize();
     },
-    [handleTextareaResize]
+    [handleTextareaResize],
   );
 
   return (

@@ -18,7 +18,7 @@ interface FilterSectionProps {
   renderItem: (
     filterName: string,
     item: FilterItem,
-    index: number
+    index: number,
   ) => React.ReactNode;
   className?: string;
 }
@@ -62,7 +62,7 @@ export default function SearchPageClient({
   const [Boosters_icon, setBoostersIcon] =
     useState<FilterItem[]>(initialBoostersIcon);
   const [specific_effect, setSpecificEffect] = useState<FilterItem[]>(
-    initialSpecificEffect
+    initialSpecificEffect,
   );
   const [filtering, setFiltering] = useState<[string, string][]>([]);
   const [searchResult, setSearchResult] = useState<FilterItem[]>([]);
@@ -122,7 +122,7 @@ export default function SearchPageClient({
 
     if (isLoading) {
       const loadingToast = toast.loading(
-        currentLanguageLookup.NOTIFICATIONS.loading
+        currentLanguageLookup.NOTIFICATIONS.loading,
       );
       return () => {
         toast.success(currentLanguageLookup.NOTIFICATIONS.loadingSuccessful, {
@@ -135,7 +135,7 @@ export default function SearchPageClient({
   useEffect(() => {
     const fetchSearchResult = async (
       page: number = 1,
-      append: boolean = false
+      append: boolean = false,
     ) => {
       try {
         if (page === 1) {
@@ -274,7 +274,7 @@ export default function SearchPageClient({
   const mouseClick = (filterName: string, id: string) => {
     setFiltering((prevFiltering) => {
       const existingIndex = prevFiltering.findIndex(
-        ([filter, itemId]) => filter === filterName && itemId === id
+        ([filter, itemId]) => filter === filterName && itemId === id,
       );
 
       if (existingIndex !== -1) {
@@ -300,7 +300,7 @@ export default function SearchPageClient({
           ))}
         </div>
       </div>
-    )
+    ),
   );
 
   FilterSection.displayName = "FilterSection";
@@ -309,7 +309,7 @@ export default function SearchPageClient({
   const FilterItemImage = React.memo<FilterItemImageProps>(
     ({ filterName, item, width, height }) => {
       const isActive = filtering.some(
-        ([filter, itemId]) => filter === filterName && itemId === item.id
+        ([filter, itemId]) => filter === filterName && itemId === item.id,
       );
 
       return (
@@ -332,7 +332,7 @@ export default function SearchPageClient({
           />
         </button>
       );
-    }
+    },
   );
 
   FilterItemImage.displayName = "FilterItemImage";
@@ -348,7 +348,7 @@ export default function SearchPageClient({
           {starCounts.map((starCount) => {
             const itemId = `${rarity.id}-${starCount}`;
             const isActive = filtering.some(
-              ([filter, id]) => filter === filterName && id === itemId
+              ([filter, id]) => filter === filterName && id === itemId,
             );
 
             return (
@@ -376,7 +376,7 @@ export default function SearchPageClient({
           <div className="w-0.5 h-9 rounded-lg bg-primary"></div>
         </div>
       );
-    }
+    },
   );
 
   const handleSearchByCardName = async (cardName: string) => {

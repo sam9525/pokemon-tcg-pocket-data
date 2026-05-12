@@ -2,7 +2,7 @@ import { MouseEvent } from "react";
 
 export const handleClick = <T extends HTMLElement>(
   cardId: string,
-  cardMapOrElement: Map<string, T> | T
+  cardMapOrElement: Map<string, T> | T,
 ) => {
   let card: T | undefined;
   let boosterPack: T | undefined;
@@ -103,7 +103,7 @@ export const handleClick = <T extends HTMLElement>(
 export const handleMove = <T extends HTMLElement>(
   e: MouseEvent<T>,
   cardIdOrElement: string | T,
-  cardMap?: Map<string, T>
+  cardMap?: Map<string, T>,
 ) => {
   let card: T | undefined;
   if (typeof cardIdOrElement === "string") {
@@ -137,7 +137,7 @@ export const handleMove = <T extends HTMLElement>(
 
 export const handleMouseOut = <T extends HTMLElement>(
   cardIdOrElement: string | T,
-  cardMap?: Map<string, T>
+  cardMap?: Map<string, T>,
 ) => {
   let card: T | undefined;
   if (typeof cardIdOrElement === "string") {
@@ -159,7 +159,7 @@ export const handleMouseOut = <T extends HTMLElement>(
 
 export const handleMouseUp = <T extends HTMLElement>(
   cardIdOrElement: string | T,
-  cardMap?: Map<string, T>
+  cardMap?: Map<string, T>,
 ) => {
   let card: T | undefined;
   if (typeof cardIdOrElement === "string") {

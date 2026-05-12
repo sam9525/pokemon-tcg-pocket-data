@@ -51,3 +51,7 @@ package-metadata.json
 .vscode
 
 .worktrees
+
+docs/
+
+.gitignore

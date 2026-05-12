@@ -25,12 +25,20 @@ interface CardItem {
   imageUrl: string;
 }
 
-export default function CardGrid({ onAddCard, currentDeckCards, onCardsLoaded, onRemoveOne, onRemoveAll }: CardGridProps) {
+export default function CardGrid({
+  onAddCard,
+  currentDeckCards,
+  onCardsLoaded,
+  onRemoveOne,
+  onRemoveAll,
+}: CardGridProps) {
   const [cards, setCards] = useState<CardItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [filter, setFilter] = useState<string[]>([]);
   const [packageId, setPackageId] = useState<string>("");
-  const [packagesList, setPackagesList] = useState<{ id: string; name: string }[]>([]);
+  const [packagesList, setPackagesList] = useState<
+    { id: string; name: string }[]
+  >([]);
   const onCardsLoadedRef = useRef(onCardsLoaded);
   const { language, currentLanguageLookup } = useLanguage();
 
@@ -44,19 +52,21 @@ export default function CardGrid({ onAddCard, currentDeckCards, onCardsLoaded, o
     if (!language) return;
 
     fetch(`/api/packages-metadata?language=${language}`)
-      .then(res => res.json())
-      .then(data => {
+      .then((res) => res.json())
+      .then((data) => {
         setPackagesList(data.packages || []);
         if (data.packages?.length > 0) {
           setPackageId(data.packages[0].id);
         }
       })
-      .catch(err => console.error("[CardGrid] Failed to load packages:", err));
+      .catch((err) =>
+        console.error("[CardGrid] Failed to load packages:", err),
+      );
   }, [language]);
 
   // Get current quantity for a card in deck
   const getCardQuantity = (cardId: string): number => {
-    const deckCard = currentDeckCards.find(c => c.cardId === cardId);
+    const deckCard = currentDeckCards.find((c) => c.cardId === cardId);
     return deckCard?.quantity || 0;
   };
 
@@ -73,10 +83,12 @@ export default function CardGrid({ onAddCard, currentDeckCards, onCardsLoaded, o
         const data = await res.json();
 
         // Transform API response to internal names (reversed)
-        const mappedCards = (data.cards || []).map((card: CardApiResponse) => ({
-          cardId: card.id,
-          imageUrl: card.url,
-        })).reverse();
+        const mappedCards = (data.cards || [])
+          .map((card: CardApiResponse) => ({
+            cardId: card.id,
+            imageUrl: card.url,
+          }))
+          .reverse();
         setCards(mappedCards);
         if (onCardsLoadedRef.current) {
           onCardsLoadedRef.current(mappedCards);
@@ -123,7 +135,11 @@ export default function CardGrid({ onAddCard, currentDeckCards, onCardsLoaded, o
       </select>
 
       {/* Filter buttons — reuses existing FilteringTabs */}
-      <FilteringTabs filter={filter} setFilter={setFilter} currentLanguageLookup={currentLanguageLookup} />
+      <FilteringTabs
+        filter={filter}
+        setFilter={setFilter}
+        currentLanguageLookup={currentLanguageLookup}
+      />
 
       {/* Card grid */}
       {isLoading ? (
@@ -139,14 +155,20 @@ export default function CardGrid({ onAddCard, currentDeckCards, onCardsLoaded, o
                 key={card.cardId}
                 className="relative group cursor-pointer"
                 onClick={() => handleCardClick(card)}
-                title={qty > 0 ? `${card.cardId} (tap grey area to remove)` : `Add ${card.cardId}`}
+                title={
+                  qty > 0
+                    ? `${card.cardId} (tap grey area to remove)`
+                    : `Add ${card.cardId}`
+                }
               >
                 <CardImage
                   src={card.imageUrl}
                   variant="card"
                   alt={card.cardId}
                   className={`w-full transition-transform hover:scale-105 ${
-                    qty > 0 ? "ring-4 ring-primary shadow-xl shadow-primary/50 rounded-lg scale-105" : "border-2 border-transparent"
+                    qty > 0
+                      ? "ring-4 ring-primary shadow-xl shadow-primary/50 rounded-lg scale-105"
+                      : "border-2 border-transparent"
                   }`}
                 />
                 {/* Quantity badge — only show when qty > 1 */}

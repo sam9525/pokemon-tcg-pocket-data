@@ -8,7 +8,7 @@ import { API_RATE_LIMIT } from "@/utils/rateLimitConfig";
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: Promise<{ id: string }> },
 ) {
   // Rate limiting to card queries
   const rateLimitResult = await rateLimit(request, API_RATE_LIMIT);
@@ -24,7 +24,7 @@ export async function GET(
     const language = url.searchParams.get("language");
 
     const cachePrefix = `cards_${(await params).id}_${filters.join(
-      "_"
+      "_",
     )}_${language}`;
 
     // Get the response from the cache
@@ -49,8 +49,8 @@ export async function GET(
     const rarityFilters = [
       ...new Set(
         filters.flatMap(
-          (filter) => rarityMap[filter as keyof typeof rarityMap] || []
-        )
+          (filter) => rarityMap[filter as keyof typeof rarityMap] || [],
+        ),
       ),
     ];
 
@@ -79,7 +79,7 @@ export async function GET(
         error: "Failed to fetch cards",
         details: error instanceof Error ? error.message : String(error),
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

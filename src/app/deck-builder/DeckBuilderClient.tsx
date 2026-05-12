@@ -24,16 +24,19 @@ export default function DeckBuilderClient() {
 
   const handleCardsLoaded = (cards: { cardId: string; imageUrl: string }[]) => {
     const images: Record<string, string> = {};
-    cards.forEach(c => {
+    cards.forEach((c) => {
       images[c.cardId] = c.imageUrl;
     });
-    setCardImages(prev => ({ ...prev, ...images }));
+    setCardImages((prev) => ({ ...prev, ...images }));
   };
 
   const handleClear = () => {
     if (deck.cards.length === 0) return;
-    const t = currentLanguageLookup?.DECK_BUILDER as Record<string, string> || {};
-    const confirmed = window.confirm(t.clearConfirm || "Clear all cards from deck?");
+    const t =
+      (currentLanguageLookup?.DECK_BUILDER as Record<string, string>) || {};
+    const confirmed = window.confirm(
+      t.clearConfirm || "Clear all cards from deck?",
+    );
     if (confirmed) {
       clearDeck();
     }
@@ -43,10 +46,11 @@ export default function DeckBuilderClient() {
     if (!validation.canSave) return;
 
     setIsSaving(true);
-    const t = currentLanguageLookup?.DECK_BUILDER as Record<string, string> || {};
+    const t =
+      (currentLanguageLookup?.DECK_BUILDER as Record<string, string>) || {};
 
     try {
-      const toastId = toast.loading(t.saving as string || "Saving...");
+      const toastId = toast.loading((t.saving as string) || "Saving...");
 
       const isUpdate = !!deck.id;
       const url = isUpdate ? `/api/user-decks/${deck.id}` : "/api/user-decks";
@@ -70,10 +74,14 @@ export default function DeckBuilderClient() {
       const data = await res.json();
 
       if (res.ok) {
-        toast.success(t.savedSuccess || "Deck saved successfully", { id: toastId });
+        toast.success(t.savedSuccess || "Deck saved successfully", {
+          id: toastId,
+        });
         clearDeck();
       } else {
-        toast.error(data.error || t.saveFailed || "Failed to save deck", { id: toastId });
+        toast.error(data.error || t.saveFailed || "Failed to save deck", {
+          id: toastId,
+        });
       }
     } catch (error) {
       console.error("[DeckBuilder] Save failed:", error);

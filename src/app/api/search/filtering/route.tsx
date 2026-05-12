@@ -65,7 +65,7 @@ export async function POST(request: Request) {
     function handleFilter(
       filterKey: string,
       queryKey: string,
-      mappings: Record<string, string>
+      mappings: Record<string, string>,
     ) {
       if (filters[filterKey] && filters[filterKey].length > 0) {
         const mappedFilter = filters[filterKey]
@@ -139,7 +139,7 @@ export async function POST(request: Request) {
         error: "Failed to fetch cards",
         details: error instanceof Error ? error.message : String(error),
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

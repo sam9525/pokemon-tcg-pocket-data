@@ -26,7 +26,8 @@ export default function SavedDecksList({
   if (decks.length === 0) {
     return (
       <div className="w-full mb-4 text-center text-gray-500 text-sm py-2">
-        {currentLanguageLookup?.DECK_BUILDER?.noSavedDecks as string || "No saved decks yet"}
+        {(currentLanguageLookup?.DECK_BUILDER?.noSavedDecks as string) ||
+          "No saved decks yet"}
       </div>
     );
   }
@@ -43,9 +44,7 @@ export default function SavedDecksList({
           }`}
           onClick={() => onLoad(deck)}
         >
-          <div className="text-sm font-bold truncate max-w-24">
-            {deck.name}
-          </div>
+          <div className="text-sm font-bold truncate max-w-24">{deck.name}</div>
           <div className="text-xs text-gray-500">
             {deck.cards.reduce((sum, c) => sum + c.quantity, 0)} cards
           </div>

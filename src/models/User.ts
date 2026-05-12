@@ -9,7 +9,7 @@ const UserSchema = new Schema(
     provider: { type: String, default: "credentials" },
     isAdmin: { type: Boolean, default: false },
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
 export const User = models?.User || model("User", UserSchema);

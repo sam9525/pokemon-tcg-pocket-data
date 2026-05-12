@@ -12,7 +12,7 @@ export async function POST(req: NextRequest) {
     if (!msg || typeof msg !== "string") {
       return Response.json(
         { error: "Invalid message format" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -102,7 +102,7 @@ export async function POST(req: NextRequest) {
         error: "Failed to get response from AI.",
         details: error instanceof Error ? error.message : String(error),
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

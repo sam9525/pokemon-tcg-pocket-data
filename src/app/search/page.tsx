@@ -17,7 +17,7 @@ export default async function SearchPage() {
     `${process.env.AUTH_URL}/api/search?language=en`,
     {
       cache: "no-cache",
-    }
+    },
   );
   const data = await response.json();
 

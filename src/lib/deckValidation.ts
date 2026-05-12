@@ -9,12 +9,15 @@ export interface DeckCard {
 
 export interface ValidationResult {
   totalCards: number;
-  warnings: string[];      // Soft warnings (non-blocking)
-  canSave: boolean;        // True if deck can be saved
-  saveErrors: string[];   // Errors that block saving
+  warnings: string[]; // Soft warnings (non-blocking)
+  canSave: boolean; // True if deck can be saved
+  saveErrors: string[]; // Errors that block saving
 }
 
-export function validateDeck(cards: DeckCard[], name: string): ValidationResult {
+export function validateDeck(
+  cards: DeckCard[],
+  name: string,
+): ValidationResult {
   const totalCards = cards.reduce((sum, card) => sum + card.quantity, 0);
   const warnings: string[] = [];
   const saveErrors: string[] = [];
@@ -24,7 +27,7 @@ export function validateDeck(cards: DeckCard[], name: string): ValidationResult 
     saveErrors.push(`Deck exceeds ${DECK_MAX_CARDS} cards`);
   }
 
-  cards.forEach(card => {
+  cards.forEach((card) => {
     if (card.quantity > MAX_COPIES_PER_CARD) {
       saveErrors.push(`"${card.cardId}" exceeds ${MAX_COPIES_PER_CARD} copies`);
     }

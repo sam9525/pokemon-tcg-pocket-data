@@ -21,7 +21,7 @@ const CardSchema = new Schema<ICard>(
     cardCount: { type: Number, required: true },
     boosterPack: { type: String },
   },
-  { _id: false }
+  { _id: false },
 );
 
 const DeckListSchema = new Schema<IDeckList>({

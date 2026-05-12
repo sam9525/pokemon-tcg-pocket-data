@@ -11,7 +11,7 @@ export function getS3Client(): S3Client {
 
   if (!AWS_ACCESS_KEY_ID || !AWS_SECRET_ACCESS_KEY) {
     throw new Error(
-      "Please define AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY environment variables"
+      "Please define AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY environment variables",
     );
   }
 

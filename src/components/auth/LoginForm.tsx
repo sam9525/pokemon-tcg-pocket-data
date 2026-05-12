@@ -60,19 +60,19 @@ export default function LoginForm() {
 
   const handleGoogleSignIn = async () => {
     const toastId = toast.loading(
-      currentLanguageLookup.NOTIFICATIONS.connectingToGoogle
+      currentLanguageLookup.NOTIFICATIONS.connectingToGoogle,
     );
     try {
       const result = await signIn("google", { callbackUrl: "/" });
       if (result?.error) {
         toast.error(
           currentLanguageLookup.NOTIFICATIONS.failedToLoginWithGoogle,
-          { id: toastId }
+          { id: toastId },
         );
       } else {
         toast.success(
           currentLanguageLookup.NOTIFICATIONS.googleLoginSuccessful,
-          { id: toastId }
+          { id: toastId },
         );
       }
     } catch (error) {

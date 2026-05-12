@@ -28,7 +28,10 @@ export async function GET() {
     return NextResponse.json({ decks });
   } catch (error) {
     console.error("[user-decks:GET]", error);
-    return NextResponse.json({ error: "Failed to fetch decks" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Failed to fetch decks" },
+      { status: 500 },
+    );
   }
 }
 
@@ -44,10 +47,16 @@ export async function POST(request: NextRequest) {
     const { name, cards } = body;
 
     if (!name?.trim()) {
-      return NextResponse.json({ error: "Deck name is required" }, { status: 400 });
+      return NextResponse.json(
+        { error: "Deck name is required" },
+        { status: 400 },
+      );
     }
     if (!cards?.length) {
-      return NextResponse.json({ error: "Deck must have at least one card" }, { status: 400 });
+      return NextResponse.json(
+        { error: "Deck must have at least one card" },
+        { status: 400 },
+      );
     }
 
     await connectDB();
@@ -70,6 +79,9 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ deck: newDeck }, { status: 201 });
   } catch (error) {
     console.error("[user-decks:POST]", error);
-    return NextResponse.json({ error: "Failed to create deck" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Failed to create deck" },
+      { status: 500 },
+    );
   }
 }

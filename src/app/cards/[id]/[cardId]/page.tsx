@@ -4,7 +4,7 @@ import { cache } from "react";
 
 const getCards = cache(async (id: string) => {
   const response = await fetch(
-    `${process.env.AUTH_URL}/api/cards/${id}?language=en`
+    `${process.env.AUTH_URL}/api/cards/${id}?language=en`,
   );
   if (!response.ok) return null;
   return response.json();

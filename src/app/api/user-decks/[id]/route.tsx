@@ -7,7 +7,7 @@ import { User } from "@/models/User";
 // PUT /api/user-decks/[id] - Update a deck
 export async function PUT(
   request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: Promise<{ id: string }> },
 ) {
   try {
     const session = await auth();
@@ -45,14 +45,17 @@ export async function PUT(
     return NextResponse.json({ deck });
   } catch (error) {
     console.error("[user-decks/[id]:PUT]", error);
-    return NextResponse.json({ error: "Failed to update deck" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Failed to update deck" },
+      { status: 500 },
+    );
   }
 }
 
 // DELETE /api/user-decks/[id] - Delete a deck
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: Promise<{ id: string }> },
 ) {
   try {
     const session = await auth();
@@ -78,6 +81,9 @@ export async function DELETE(
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error("[user-decks/[id]:DELETE]", error);
-    return NextResponse.json({ error: "Failed to delete deck" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Failed to delete deck" },
+      { status: 500 },
+    );
   }
 }

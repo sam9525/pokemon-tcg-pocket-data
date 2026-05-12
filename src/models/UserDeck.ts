@@ -1,7 +1,7 @@
 import { model, models, Schema } from "mongoose";
 
 export interface IDeckCard {
-  cardId: string;  // Includes language prefix, e.g. "A1_ja_001"
+  cardId: string; // Includes language prefix, e.g. "A1_ja_001"
   quantity: number; // 1 or 2 (enforced in validation)
 }
 
@@ -16,16 +16,21 @@ const DeckCardSchema = new Schema<IDeckCard>(
     cardId: { type: String, required: true },
     quantity: { type: Number, required: true, min: 1, max: 2 },
   },
-  { _id: false }
+  { _id: false },
 );
 
 const UserDeckSchema = new Schema<IUserDeck>(
   {
-    userId: { type: Schema.Types.ObjectId, required: true, ref: "User", index: true },
+    userId: {
+      type: Schema.Types.ObjectId,
+      required: true,
+      ref: "User",
+      index: true,
+    },
     name: { type: String, required: true },
     cards: { type: [DeckCardSchema], default: [] },
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
 // Index for user's decks lookup, sorted by creation date

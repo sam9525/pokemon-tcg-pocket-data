@@ -49,7 +49,7 @@ export default function FilteredItems({
       {
         threshold: 0.1,
         rootMargin: "100px",
-      }
+      },
     );
 
     const currentObserverRef = observerRef.current;

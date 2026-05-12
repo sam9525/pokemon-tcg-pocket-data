@@ -15,7 +15,7 @@ const CardSchema = new Schema(
     language: { type: String, required: true },
     imageUrl: { type: String, required: true },
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
 // Create a unique index for cardId and package

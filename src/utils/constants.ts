@@ -47,13 +47,19 @@ const LANGUAGES = ["zh_TW", "ja_JP", "en_US"];
 export const PACKAGE_MAPPINGS: Record<
   string,
   Record<string, string>
-> = LANGUAGES.reduce((acc, lang) => {
-  acc[lang] = PACKAGE_CODES.reduce((pkgAcc, [code, name]) => {
-    pkgAcc[`LOGO_expansion_${code}_${lang}`] = `${code}_${name}`;
-    return pkgAcc;
-  }, {} as Record<string, string>);
-  return acc;
-}, {} as Record<string, Record<string, string>>);
+> = LANGUAGES.reduce(
+  (acc, lang) => {
+    acc[lang] = PACKAGE_CODES.reduce(
+      (pkgAcc, [code, name]) => {
+        pkgAcc[`LOGO_expansion_${code}_${lang}`] = `${code}_${name}`;
+        return pkgAcc;
+      },
+      {} as Record<string, string>,
+    );
+    return acc;
+  },
+  {} as Record<string, Record<string, string>>,
+);
 
 const BOOSTER_CODES = [
   ["A1_100020_LIZARDON", "charizard"],
@@ -81,13 +87,19 @@ const BOOSTER_CODES = [
 export const BOOSTER_MAPPINGS: Record<
   string,
   Record<string, string>
-> = LANGUAGES.reduce((acc, lang) => {
-  acc[lang] = BOOSTER_CODES.reduce((pkgAcc, [code, name]) => {
-    pkgAcc[`EXPANSION_PACK_${code}_${lang}`] = `${name}`;
-    return pkgAcc;
-  }, {} as Record<string, string>);
-  return acc;
-}, {} as Record<string, Record<string, string>>);
+> = LANGUAGES.reduce(
+  (acc, lang) => {
+    acc[lang] = BOOSTER_CODES.reduce(
+      (pkgAcc, [code, name]) => {
+        pkgAcc[`EXPANSION_PACK_${code}_${lang}`] = `${name}`;
+        return pkgAcc;
+      },
+      {} as Record<string, string>,
+    );
+    return acc;
+  },
+  {} as Record<string, Record<string, string>>,
+);
 
 export const SPECIFIC_EFFECT_MAPPINGS: Record<string, string> = {
   ba_icn_01_sp_poisoned: "poisoned",

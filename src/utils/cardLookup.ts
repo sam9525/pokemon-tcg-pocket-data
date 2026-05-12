@@ -27,13 +27,13 @@ async function getCardList(packageCode: string, special: boolean = false) {
         cardData = await response.json();
       } else {
         console.warn(
-          `Failed to fetch ${fileName} from S3. Status: ${response.status}.`
+          `Failed to fetch ${fileName} from S3. Status: ${response.status}.`,
         );
       }
     } catch (error) {
       console.warn(
         `Error fetching from S3 for package: ${packageCode}.`,
-        error
+        error,
       );
     }
 
@@ -54,7 +54,7 @@ async function getCardList(packageCode: string, special: boolean = false) {
 
 // Create lookup map for regular cards
 function createCardLookupMap(
-  cardList: Record<string, Record<string, string[]>>
+  cardList: Record<string, Record<string, string[]>>,
 ) {
   const lookup = new Map<
     string,
@@ -63,7 +63,7 @@ function createCardLookupMap(
 
   for (const [boosterName, cardTypes] of Object.entries(cardList)) {
     for (const [type, cards] of Object.entries(
-      cardTypes as Record<string, string[]>
+      cardTypes as Record<string, string[]>,
     )) {
       if (Array.isArray(cards)) {
         cards.forEach((cardId) => {
@@ -82,7 +82,10 @@ function createCardLookupMap(
 
 // Create lookup map for special cards
 function createSpecialCardLookupMap(
-  specialCardList: Record<string, Record<string, Record<string, string>>> | null
+  specialCardList: Record<
+    string,
+    Record<string, Record<string, string>>
+  > | null,
 ) {
   const lookup = new Map();
 
@@ -153,7 +156,7 @@ export function clearCardLookupCache(packageCode?: string) {
 // Schedule cache clearing for a specific package
 export function scheduleCacheClear(
   packageCode: string,
-  delayMinutes: number = 10
+  delayMinutes: number = 10,
 ) {
   const delayMs = delayMinutes * 60 * 1000; // Convert minutes to milliseconds
 
@@ -165,7 +168,7 @@ export function scheduleCacheClear(
   // Set new timer
   const timer = setTimeout(() => {
     console.log(
-      `Clearing cache for package: ${packageCode} after ${delayMinutes} minutes`
+      `Clearing cache for package: ${packageCode} after ${delayMinutes} minutes`,
     );
     clearCardLookupCache(packageCode);
   }, delayMs);
@@ -173,7 +176,7 @@ export function scheduleCacheClear(
   cacheClearTimers.set(packageCode, timer);
 
   console.log(
-    `Scheduled cache clear for package: ${packageCode} in ${delayMinutes} minutes`
+    `Scheduled cache clear for package: ${packageCode} in ${delayMinutes} minutes`,
   );
 }
 
@@ -191,13 +194,13 @@ export async function getCardNamesList() {
         cardNamesData = await response.json();
       } else {
         console.warn(
-          `Failed to fetch ${fileName} from S3. Status: ${response.status}.`
+          `Failed to fetch ${fileName} from S3. Status: ${response.status}.`,
         );
       }
     } catch (error) {
       console.warn(
         `Error fetching from S3 for card names: ${fileName}.`,
-        error
+        error,
       );
     }
 

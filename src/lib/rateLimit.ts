@@ -37,18 +37,21 @@ class RateLimitStore {
   private startCleanup() {
     if (this.cleanupInterval) return;
 
-    this.cleanupInterval = setInterval(() => {
-      const now = Date.now();
-      const keysToDelete: string[] = [];
+    this.cleanupInterval = setInterval(
+      () => {
+        const now = Date.now();
+        const keysToDelete: string[] = [];
 
-      this.store.forEach((entry, key) => {
-        if (entry.resetTime < now) {
-          keysToDelete.push(key);
-        }
-      });
+        this.store.forEach((entry, key) => {
+          if (entry.resetTime < now) {
+            keysToDelete.push(key);
+          }
+        });
 
-      keysToDelete.forEach((key) => this.store.delete(key));
-    }, 5 * 60 * 1000); // 5 minutes
+        keysToDelete.forEach((key) => this.store.delete(key));
+      },
+      5 * 60 * 1000,
+    ); // 5 minutes
   }
 
   get(key: string): RateLimitEntry | undefined {
@@ -111,7 +114,7 @@ function getClientIdentifier(request: NextRequest): string {
  */
 export async function rateLimit(
   request: NextRequest,
-  config: RateLimitConfig
+  config: RateLimitConfig,
 ): Promise<{ success: boolean; response?: NextResponse }> {
   const {
     maxRequests,
@@ -166,7 +169,7 @@ export async function rateLimit(
               "X-RateLimit-Remaining": "0",
               "X-RateLimit-Reset": new Date(entry.resetTime).toISOString(),
             },
-          }
+          },
         ),
       };
     }

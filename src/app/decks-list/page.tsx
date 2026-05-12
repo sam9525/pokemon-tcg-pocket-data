@@ -17,7 +17,7 @@ export default async function DecksList() {
     `${process.env.AUTH_URL}/api/decks-list?packages=A1_Genetic-Apex&language=en_US`,
     {
       cache: "no-cache",
-    }
+    },
   );
   const data = await response.json();
 

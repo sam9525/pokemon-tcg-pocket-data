@@ -22,16 +22,15 @@ export async function POST(req: NextRequest) {
     await connectDB();
 
     // Parsing the body
-    const { name, email, password, image } = await registerSchema.parseAsync(
-      body
-    );
+    const { name, email, password, image } =
+      await registerSchema.parseAsync(body);
 
     // Check if user is exist
     const existingUser = await User.findOne({ email });
     if (existingUser) {
       return NextResponse.json(
         { error: "User with this email already exists" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -39,7 +38,7 @@ export async function POST(req: NextRequest) {
     if (password !== confirmPassword) {
       return NextResponse.json(
         { error: "Passwords do not match" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -65,7 +64,7 @@ export async function POST(req: NextRequest) {
           email: createdUser.email,
         },
       },
-      { status: 201 }
+      { status: 201 },
     );
   } catch (error) {
     console.error("Registration error:", error);
@@ -73,14 +72,14 @@ export async function POST(req: NextRequest) {
     if (error instanceof ZodError) {
       return NextResponse.json(
         { error: "Validation error", details: error.errors },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
     if (error instanceof SyntaxError) {
       return NextResponse.json(
         { error: "Invalid request data" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 

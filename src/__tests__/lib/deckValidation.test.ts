@@ -18,14 +18,14 @@ describe("deckValidation", () => {
       const cards = Array(21).fill({ cardId: "A1_001", quantity: 1 });
       const result = validateDeck(cards, "My Deck");
       expect(result.canSave).toBe(false);
-      expect(result.saveErrors.some(e => e.includes("20 cards"))).toBe(true);
+      expect(result.saveErrors.some((e) => e.includes("20 cards"))).toBe(true);
     });
 
     it("returns canSave=false when card has 3 copies", () => {
       const cards = [{ cardId: "A1_001", quantity: 3 }];
       const result = validateDeck(cards, "My Deck");
       expect(result.canSave).toBe(false);
-      expect(result.saveErrors.some(e => e.includes("2 copies"))).toBe(true);
+      expect(result.saveErrors.some((e) => e.includes("2 copies"))).toBe(true);
     });
 
     it("returns canSave=true when valid", () => {

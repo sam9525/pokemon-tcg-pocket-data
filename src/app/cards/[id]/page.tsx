@@ -24,7 +24,7 @@ export default async function PackagePage({ params }: Props) {
   const { id } = await params;
 
   const response = await fetch(
-    `${process.env.AUTH_URL}/api/cards/${id}?language=en_US`
+    `${process.env.AUTH_URL}/api/cards/${id}?language=en_US`,
   );
   const data = await response.json();
 

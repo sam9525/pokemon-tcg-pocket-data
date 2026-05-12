@@ -44,7 +44,7 @@ export async function GET(request: Request) {
           success: false,
           message: "No files found for the specified package",
         },
-        { status: 404 }
+        { status: 404 },
       );
     }
 

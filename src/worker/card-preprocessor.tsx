@@ -122,7 +122,7 @@ self.onmessage = async (event) => {
         language: language,
         imageUrl: url,
       };
-    })
+    }),
   );
 
   self.postMessage(preprocessedCards);
