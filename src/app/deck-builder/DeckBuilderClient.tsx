@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useSearchParams, useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 import { useLanguage } from "@/components/provider/LanguageProvider";
 import { useDeckBuilder } from "@/hooks/useDeckBuilder";
@@ -8,6 +9,8 @@ import DeckArea from "@/components/deck-builder/DeckArea";
 import CardGrid from "@/components/deck-builder/CardGrid";
 
 export default function DeckBuilderClient() {
+  const searchParams = useSearchParams();
+  const router = useRouter();
   const { currentLanguageLookup } = useLanguage();
   const {
     deck,
@@ -17,10 +20,51 @@ export default function DeckBuilderClient() {
     removeCard,
     removeAllCopies,
     clearDeck,
+    loadDeck,
   } = useDeckBuilder();
 
   const [cardImages, setCardImages] = useState<Record<string, string>>({});
   const [isSaving, setIsSaving] = useState(false);
+
+  // Load deck from URL param on mount
+  useEffect(() => {
+    const deckId = searchParams.get("deckId");
+    if (!deckId) return;
+
+    const fetchAndLoadDeck = async () => {
+      try {
+        const toastId = toast.loading("Loading deck...");
+
+        const res = await fetch(`/api/user-decks/${deckId}`);
+        const data = await res.json();
+
+        if (res.status === 401) {
+          toast.error("Session expired", { id: toastId });
+          router.push("/login?callbackUrl=/deck-builder");
+          return;
+        }
+
+        if (!res.ok || !data.deck) {
+          toast.error(data.error || "Deck not found", { id: toastId });
+          router.push("/my-decks");
+          return;
+        }
+
+        loadDeck({
+          id: data.deck._id,
+          name: data.deck.name,
+          cards: data.deck.cards,
+        });
+        toast.success("Deck loaded", { id: toastId });
+      } catch (error) {
+        console.error("[DeckBuilder] Failed to load deck:", error);
+        toast.error("Failed to load deck");
+        router.push("/my-decks");
+      }
+    };
+
+    fetchAndLoadDeck();
+  }, [searchParams, loadDeck, router]);
 
   const handleCardsLoaded = (cards: { cardId: string; imageUrl: string }[]) => {
     const images: Record<string, string> = {};
