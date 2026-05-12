@@ -93,30 +93,17 @@ export default function DeckArea({
       </div>
 
       {/* Card list */}
-      {cards.length === 0 ? (
-  <div className="flex items-center justify-center min-h-32 bg-gray-100 border-2 border-dashed border-gray-300 rounded-lg">
-    <div className="flex flex-col items-center gap-2">
-      <svg
-        className="w-2.5 h-2.5 text-gray-400"
-        fill="none"
-        stroke="currentColor"
-        viewBox="0 0 24 24"
-      >
-        <path
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          strokeWidth={1.5}
-          d="M12 6v6m0 0v6m0-6h6m-6 0H6"
-        />
-      </svg>
-      <span className="text-gray-500 text-sm">
-        {t.noCards as string || "Add cards to your deck"}
-      </span>
-    </div>
-  </div>
-) : (
-        <div className="flex flex-row gap-3 overflow-x-auto pb-2">
-          {cards.map((card) => (
+      <div className="flex flex-row gap-3 overflow-x-auto pb-2 px-4 py-2">
+        {cards.length === 0 ? (
+          // Placeholder card slots
+          Array.from({ length: 5 }).map((_, i) => (
+            <div
+              key={`placeholder-${i}`}
+              className="w-20 h-28 sm:w-24 sm:h-32 bg-gray-100 border-2 border-dashed border-gray-300 rounded-lg flex-shrink-0"
+            />
+          ))
+        ) : (
+          cards.map((card) => (
             <DeckCard
               key={card.cardId}
               cardId={card.cardId}
@@ -125,9 +112,9 @@ export default function DeckArea({
               onRemoveOne={onRemoveOne}
               onRemoveAll={onRemoveAll}
             />
-          ))}
-        </div>
-      )}
+          ))
+        )}
+      </div>
     </div>
   );
 }
