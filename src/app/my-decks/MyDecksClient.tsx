@@ -1,0 +1,171 @@
+"use client";
+
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import toast from "react-hot-toast";
+import { useLanguage } from "@/components/provider/LanguageProvider";
+
+interface DeckCard {
+  cardId: string;
+  quantity: number;
+}
+
+interface UserDeck {
+  _id: string;
+  name: string;
+  cards: DeckCard[];
+  createdAt: string;
+  updatedAt: string;
+}
+
+interface MyDecksClientProps {
+  initialDecks: UserDeck[];
+}
+
+export default function MyDecksClient({
+  initialDecks,
+}: MyDecksClientProps) {
+  const router = useRouter();
+  const { currentLanguageLookup } = useLanguage();
+  const [decks, setDecks] = useState<UserDeck[]>(initialDecks);
+
+  const handleEdit = (deckId: string) => {
+    router.push(`/deck-builder?deckId=${deckId}`);
+  };
+
+  const handleDelete = async (deckId: string) => {
+    const t =
+      (currentLanguageLookup?.DECK_BUILDER as Record<string, string>) || {};
+    const confirmed = window.confirm(
+      t.deleteConfirm || "Are you sure you want to delete this deck?",
+    );
+    if (!confirmed) return;
+
+    try {
+      const toastId = toast.loading((t.deleting as string) || "Deleting...");
+
+      const res = await fetch(`/api/user-decks/${deckId}`, {
+        method: "DELETE",
+      });
+
+      if (res.status === 401) {
+        toast.error("Session expired", { id: toastId });
+        router.push("/login?callbackUrl=/my-decks");
+        return;
+      }
+
+      if (res.ok) {
+        toast.success(t.deletedSuccess || "Deck deleted", { id: toastId });
+        setDecks((prev) => prev.filter((d) => d._id !== deckId));
+      } else {
+        const data = await res.json();
+        toast.error(data.error || t.deleteFailed || "Failed to delete", {
+          id: toastId,
+        });
+      }
+    } catch (error) {
+      console.error("[MyDecks] Delete failed:", error);
+      toast.error(t.deleteFailed || "Failed to delete deck");
+    }
+  };
+
+  if (decks.length === 0) {
+    return (
+      <div className="flex flex-col items-center justify-center p-8">
+        <div className="text-center mb-6">
+          <h2 className="text-2xl font-bold mb-2">
+            {currentLanguageLookup?.DECK_BUILDER?.noSavedDecks ||
+              "No decks yet"}
+          </h2>
+          <p className="text-gray-500">
+            {currentLanguageLookup?.DECK_BUILDER?.createFirstDeck ||
+              "Create your first deck to get started"}
+          </p>
+        </div>
+        <button
+          onClick={() => router.push("/deck-builder")}
+          className="px-6 py-3 bg-primary text-foreground font-bold rounded-lg hover:opacity-90 transition-opacity"
+        >
+          {currentLanguageLookup?.DECK_BUILDER?.createDeck || "Create Deck"}
+        </button>
+      </div>
+    );
+  }
+
+  return (
+    <div className="flex flex-col items-center p-4 md:p-6">
+      <h1 className="text-2xl font-bold mb-6">
+        {currentLanguageLookup?.MY_DECKS?.title || "My Decks"}
+      </h1>
+      <div className="w-full max-w-5xl">
+        {decks.map((deck) => (
+          <DeckCardComponent
+            key={deck._id}
+            deck={deck}
+            onEdit={handleEdit}
+            onDelete={handleDelete}
+          />
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function DeckCardComponent({
+  deck,
+  onEdit,
+  onDelete,
+}: {
+  deck: UserDeck;
+  onEdit: (id: string) => void;
+  onDelete: (id: string) => void;
+}) {
+  const totalCards = deck.cards.reduce((sum, c) => sum + c.quantity, 0);
+
+  return (
+    <div className="flex flex-col gap-4 items-end m-4">
+      <div className="w-full flex flex-col gap-4 p-4 md:p-6 sm:p-5 border-2 border-primary rounded-2xl bg-search-background shadow-lg">
+        <div className="flex flex-row justify-between items-center">
+          <div className="text-xl font-bold">{deck.name}</div>
+          <div className="text-sm text-gray-500">{totalCards} cards</div>
+        </div>
+        <div className="flex flex-row gap-4 items-center">
+          <div className="w-24 h-32 bg-gray-200 rounded-lg flex items-center justify-center text-gray-400">
+            Cards
+          </div>
+          <div className="flex-1">
+            <div className="grid grid-cols-5 gap-2">
+              {deck.cards.slice(0, 10).map((card, idx) => (
+                <div
+                  key={`${card.cardId}-${idx}`}
+                  className="w-12 h-16 bg-gray-200 rounded flex items-center justify-center text-xs text-gray-500 relative"
+                >
+                  {card.quantity > 1 && (
+                    <span className="absolute top-0 right-0 bg-primary text-xs px-1 rounded-full">
+                      x{card.quantity}
+                    </span>
+                  )}
+                  {card.cardId.split("_").pop()}
+                </div>
+              ))}
+            </div>
+          </div>
+          <div className="flex flex-col gap-2">
+            <button
+              onClick={() => onEdit(deck._id)}
+              className="px-4 py-2 bg-primary text-foreground font-bold rounded-lg hover:opacity-90 transition-opacity"
+            >
+              Edit
+            </button>
+            <button
+              onClick={() => onDelete(deck._id)}
+              className="px-4 py-2 bg-red-500 text-white font-bold rounded-lg hover:opacity-90 transition-opacity"
+            >
+              Delete
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
