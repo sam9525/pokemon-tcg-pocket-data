@@ -143,7 +143,7 @@ export default function CardGrid({ onAddCard, currentDeckCards, onCardsLoaded }:
                   variant="card"
                   alt={card.cardId}
                   className={`w-full transition-transform hover:scale-105 ${
-                    qty > 0 ? "ring-2 ring-offset-2 ring-yellow-400 border-2 border-yellow-400 rounded-lg" : "border-2 border-transparent"
+                    qty > 0 ? "ring-4 ring-primary shadow-xl shadow-primary/50 rounded-lg scale-105" : "border-2 border-transparent"
                   }`}
                 />
                 {/* Quantity badge — only show when qty > 1 */}
