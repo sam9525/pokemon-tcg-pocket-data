@@ -158,8 +158,8 @@ export default function CardGrid({ onAddCard, currentDeckCards, onCardsLoaded, o
 
                 {/* Remove one overlay on hover - only show if card is in deck */}
                 {qty > 0 && (
-                  <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity rounded-lg flex items-center justify-center">
-                    <span className="text-white text-2xl font-bold">−</span>
+                  <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity rounded-lg flex items-end justify-center pb-2">
+                    <span className="text-white text-sm font-bold">− 1</span>
                   </div>
                 )}
 
