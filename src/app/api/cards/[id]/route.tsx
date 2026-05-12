@@ -67,12 +67,18 @@ export async function GET(
       ? parts[1]
       : parts[1].replace(/-/g, " ");
 
-    const cards = await Card.find({
-      package: pkg,
-      boosterPack,
-      language,
-      ...(rarityFilters.length > 0 && { rarity: { $in: rarityFilters } }),
-    });
+    const query: Record<string, unknown> = { package: pkg };
+    if (isExtended && boosterPack) {
+      query.boosterPack = boosterPack;
+    }
+    if (language) {
+      query.language = language;
+    }
+    if (rarityFilters.length > 0) {
+      query.rarity = { $in: rarityFilters };
+    }
+
+    const cards = await Card.find(query);
 
     const cardsMap = {
       cards: cards.map((card) => ({ id: card.cardId, url: card.imageUrl })),
