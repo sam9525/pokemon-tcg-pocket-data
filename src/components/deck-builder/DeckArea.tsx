@@ -92,18 +92,11 @@ export default function DeckArea({
         </span>
       </div>
 
-      {/* Card list */}
+      {/* Card list - always show 10 slots */}
       <div className="flex flex-row gap-3 overflow-x-auto pb-2 py-2 -mr-3">
-        {cards.length === 0 ? (
-          // Placeholder card slots
-          Array.from({ length: 10 }).map((_, i) => (
-            <div
-              key={`placeholder-${i}`}
-              className="w-20 h-28 sm:w-24 sm:h-32 bg-gray-600/40 border-2 border-dashed border-gray-300 rounded-lg flex-shrink-0"
-            />
-          ))
-        ) : (
-          cards.map((card) => (
+        {Array.from({ length: 10 }).map((_, i) => {
+          const card = cards[i];
+          return card ? (
             <DeckCard
               key={card.cardId}
               cardId={card.cardId}
@@ -112,8 +105,13 @@ export default function DeckArea({
               onRemoveOne={onRemoveOne}
               onRemoveAll={onRemoveAll}
             />
-          ))
-        )}
+          ) : (
+            <div
+              key={`placeholder-${i}`}
+              className="w-20 h-28 sm:w-24 sm:h-32 bg-gray-600/40 border-2 border-dashed border-gray-300 rounded-lg flex-shrink-0"
+            />
+          );
+        })}
       </div>
     </div>
   );
