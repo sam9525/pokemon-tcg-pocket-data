@@ -138,8 +138,8 @@ export default function CardGrid({ onAddCard, currentDeckCards, onCardsLoaded, o
               <div
                 key={card.cardId}
                 className="relative group cursor-pointer"
-                onClick={() => qty > 0 ? onRemoveOne(card.cardId) : handleCardClick(card)}
-                title={qty > 0 ? `${card.cardId} (tap to remove)` : `Add ${card.cardId}`}
+                onClick={() => handleCardClick(card)}
+                title={qty > 0 ? `${card.cardId} (tap grey area to remove)` : `Add ${card.cardId}`}
               >
                 <CardImage
                   src={card.imageUrl}
@@ -158,7 +158,13 @@ export default function CardGrid({ onAddCard, currentDeckCards, onCardsLoaded, o
 
                 {/* Remove one overlay on hover - only show if card is in deck */}
                 {qty > 0 && (
-                  <div className="absolute inset-x-0 bottom-0 h-8 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity rounded-b-lg flex items-end justify-center pb-1">
+                  <div
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onRemoveOne(card.cardId);
+                    }}
+                    className="absolute inset-x-0 bottom-0 h-8 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity rounded-b-lg flex items-end justify-center pb-1 cursor-pointer"
+                  >
                     <span className="text-white text-sm font-bold">− 1</span>
                   </div>
                 )}
