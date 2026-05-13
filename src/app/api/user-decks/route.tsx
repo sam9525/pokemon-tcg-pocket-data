@@ -23,12 +23,20 @@ export async function GET() {
       return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
 
-    const decks = await UserDeck.find({ userId: user._id })
+    const decks = (await UserDeck.find({ userId: user._id })
       .sort({ updatedAt: -1 })
       .select("name cards updatedAt createdAt")
-      .lean();
+      .lean()) as any;
 
-    return NextResponse.json({ decks });
+    const plainDecks = decks.map((deck: any) => ({
+      _id: deck._id.toString(),
+      name: deck.name,
+      cards: deck.cards,
+      createdAt: deck.createdAt?.toISOString() || new Date().toISOString(),
+      updatedAt: deck.updatedAt?.toISOString() || new Date().toISOString(),
+    }));
+
+    return NextResponse.json({ decks: plainDecks });
   } catch (error) {
     console.error("[user-decks:GET]", error);
     return NextResponse.json(

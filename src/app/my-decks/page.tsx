@@ -24,6 +24,7 @@ export default async function MyDecksPage() {
   const user = (await User.findOne({
     email: session.user.email,
   }).lean()) as any;
+
   if (!user?._id) {
     redirect("/login?callbackUrl=/my-decks");
   }
@@ -33,5 +34,13 @@ export default async function MyDecksPage() {
     .select("name cards createdAt updatedAt")
     .lean()) as any;
 
-  return <MyDecksClient initialDecks={decks} />;
+  const plainDecks = decks.map((deck: any) => ({
+    _id: deck._id.toString(),
+    name: deck.name,
+    cards: deck.cards,
+    createdAt: deck.createdAt?.toISOString() || new Date().toISOString(),
+    updatedAt: deck.updatedAt?.toISOString() || new Date().toISOString(),
+  }));
+
+  return <MyDecksClient initialDecks={plainDecks} />;
 }
