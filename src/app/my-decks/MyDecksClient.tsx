@@ -1,9 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 import { useLanguage } from "@/components/provider/LanguageProvider";
+import CardImage from "@/components/CardImage";
 
 interface DeckCard {
   cardId: string;
@@ -22,10 +23,39 @@ interface MyDecksClientProps {
   initialDecks: UserDeck[];
 }
 
+interface CardImageMap {
+  [cardId: string]: string;
+}
+
 export default function MyDecksClient({ initialDecks }: MyDecksClientProps) {
   const router = useRouter();
-  const { currentLanguageLookup } = useLanguage();
+  const { currentLanguageLookup, language } = useLanguage();
   const [decks, setDecks] = useState<UserDeck[]>(initialDecks);
+  const [cardImages, setCardImages] = useState<CardImageMap>({});
+
+  // Fetch card images when language changes
+  useEffect(() => {
+    if (!language) return;
+
+    const allCardIds = new Set<string>();
+    decks.forEach((deck) => {
+      deck.cards.forEach((card) => {
+        allCardIds.add(card.cardId);
+      });
+    });
+
+    if (allCardIds.size === 0) return;
+
+    const cardIds = Array.from(allCardIds).join(",");
+    fetch(
+      `/api/cards/images?cardIds=${encodeURIComponent(cardIds)}&language=${language}`,
+    )
+      .then((res) => res.json())
+      .then((data) => {
+        setCardImages(data.images || {});
+      })
+      .catch(console.error);
+  }, [decks, language]);
 
   const handleEdit = (deckId: string) => {
     router.push(`/deck-builder?deckId=${deckId}`);
@@ -100,6 +130,7 @@ export default function MyDecksClient({ initialDecks }: MyDecksClientProps) {
           <DeckCardComponent
             key={deck._id}
             deck={deck}
+            cardImages={cardImages}
             onEdit={handleEdit}
             onDelete={handleDelete}
           />
@@ -111,10 +142,12 @@ export default function MyDecksClient({ initialDecks }: MyDecksClientProps) {
 
 function DeckCardComponent({
   deck,
+  cardImages,
   onEdit,
   onDelete,
 }: {
   deck: UserDeck;
+  cardImages: CardImageMap;
   onEdit: (id: string) => void;
   onDelete: (id: string) => void;
 }) {
@@ -129,21 +162,38 @@ function DeckCardComponent({
         </div>
         <div className="flex flex-row gap-4 items-center">
           <div className="w-24 h-32 bg-gray-200 rounded-lg flex items-center justify-center text-gray-400">
-            Cards
+            {deck.cards[0] && cardImages[deck.cards[0].cardId] ? (
+              <CardImage
+                src={cardImages[deck.cards[0].cardId]}
+                variant="thumbnail"
+                alt="Deck card"
+                className="w-full h-full object-contain"
+              />
+            ) : (
+              "Cards"
+            )}
           </div>
           <div className="flex-1">
             <div className="grid grid-cols-5 gap-2">
               {deck.cards.slice(0, 10).map((card, idx) => (
                 <div
                   key={`${card.cardId}-${idx}`}
-                  className="w-12 h-16 bg-gray-200 rounded flex items-center justify-center text-xs text-gray-500 relative"
+                  className="w-12 h-16 bg-gray-200 rounded flex items-center justify-center text-xs text-gray-500 relative overflow-hidden"
                 >
+                  {cardImages[card.cardId] ? (
+                    <img
+                      src={cardImages[card.cardId]}
+                      alt={card.cardId}
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    card.cardId.split("_").pop()
+                  )}
                   {card.quantity > 1 && (
                     <span className="absolute top-0 right-0 bg-primary text-xs px-1 rounded-full">
                       x{card.quantity}
                     </span>
                   )}
-                  {card.cardId.split("_").pop()}
                 </div>
               ))}
             </div>
