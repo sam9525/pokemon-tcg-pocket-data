@@ -45,6 +45,7 @@ next-env.d.ts
 .serena
 claudedocs
 CLAUDE.md
+AGENTS.md
 
 deckList.json
 
