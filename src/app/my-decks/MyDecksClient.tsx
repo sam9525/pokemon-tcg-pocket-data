@@ -4,7 +4,6 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 import { useLanguage } from "@/components/provider/LanguageProvider";
-import CardImage from "@/components/CardImage";
 
 interface DeckCard {
   cardId: string;
@@ -23,38 +22,29 @@ interface MyDecksClientProps {
   initialDecks: UserDeck[];
 }
 
-interface CardImageMap {
-  [cardId: string]: string;
-}
-
 export default function MyDecksClient({ initialDecks }: MyDecksClientProps) {
   const router = useRouter();
   const { currentLanguageLookup, language } = useLanguage();
   const [decks, setDecks] = useState<UserDeck[]>(initialDecks);
-  const [cardImages, setCardImages] = useState<CardImageMap>({});
+  const [cardImages, setCardImages] = useState<Record<string, string>>({});
 
-  // Fetch card images when language changes
   useEffect(() => {
-    if (!language) return;
+    if (decks.length === 0) return;
 
-    const allCardIds = new Set<string>();
-    decks.forEach((deck) => {
-      deck.cards.forEach((card) => {
-        allCardIds.add(card.cardId);
-      });
-    });
+    const allCardIds = [
+      ...new Set(decks.flatMap((d) => d.cards.map((c) => c.cardId))),
+    ];
+    if (allCardIds.length === 0) return;
 
-    if (allCardIds.size === 0) return;
-
-    const cardIds = Array.from(allCardIds).join(",");
     fetch(
-      `/api/cards/images?cardIds=${encodeURIComponent(cardIds)}&language=${language}`,
+      `/api/cards/images?cardIds=${allCardIds.join(",")}&language=${language}`,
     )
       .then((res) => res.json())
-      .then((data) => {
-        setCardImages(data.images || {});
-      })
-      .catch(console.error);
+      .then((data) => setCardImages(data.images || {}))
+      .catch((err) => {
+        console.error("[MyDecks] Failed to load card images:", err);
+        setCardImages({});
+      });
   }, [decks, language]);
 
   const handleEdit = (deckId: string) => {
@@ -147,7 +137,7 @@ function DeckCardComponent({
   onDelete,
 }: {
   deck: UserDeck;
-  cardImages: CardImageMap;
+  cardImages: Record<string, string>;
   onEdit: (id: string) => void;
   onDelete: (id: string) => void;
 }) {
@@ -161,14 +151,19 @@ function DeckCardComponent({
           <div className="text-sm text-gray-500">{totalCards} cards</div>
         </div>
         <div className="flex flex-row gap-4 items-center">
-          <div className="w-24 h-32 bg-gray-200 rounded-lg flex items-center justify-center text-gray-400">
-            {deck.cards[0] && cardImages[deck.cards[0].cardId] ? (
-              <CardImage
-                src={cardImages[deck.cards[0].cardId]}
-                variant="thumbnail"
-                alt="Deck card"
-                className="w-full h-full object-contain"
-              />
+          <div className="w-24 h-32 bg-gray-200 rounded-lg flex items-center justify-center text-gray-400 overflow-hidden">
+            {deck.cards[0] ? (
+              cardImages[deck.cards[0].cardId] ? (
+                <img
+                  src={cardImages[deck.cards[0].cardId]}
+                  alt={deck.cards[0].cardId}
+                  className="w-full h-full object-cover"
+                />
+              ) : (
+                <span className="text-sm">
+                  {deck.cards[0].cardId.split("_").pop()}
+                </span>
+              )
             ) : (
               "Cards"
             )}
@@ -187,7 +182,7 @@ function DeckCardComponent({
                       className="w-full h-full object-cover"
                     />
                   ) : (
-                    card.cardId.split("_").pop()
+                    <span>{card.cardId.split("_").pop()}</span>
                   )}
                   {card.quantity > 1 && (
                     <span className="absolute top-0 right-0 bg-primary text-xs px-1 rounded-full">
