@@ -30,9 +30,8 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       },
       authorize: async (credentials) => {
         try {
-          const { email, password } = await signInSchema.parseAsync(
-            credentials
-          );
+          const { email, password } =
+            await signInSchema.parseAsync(credentials);
 
           // connect to mongodb
           await connectDB();

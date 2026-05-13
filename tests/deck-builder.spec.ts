@@ -65,11 +65,13 @@ test.describe("Deck Builder", () => {
     await savedDeck.click();
 
     // Confirm load
-    page.on("dialog", dialog => dialog.accept());
+    page.on("dialog", (dialog) => dialog.accept());
     await savedDeck.click();
 
     // Deck area populated
-    await expect(page.locator('input[type="text"]')).toHaveValue("My Fire Deck");
+    await expect(page.locator('input[type="text"]')).toHaveValue(
+      "My Fire Deck",
+    );
   });
 
   test("blocks save when over limits", async ({ page }) => {

@@ -94,7 +94,7 @@ async function crawlWebsite() {
   // Get the length of the select option
   const selectOptionLength = await page.$eval(
     "select#set",
-    (el) => el.options.length
+    (el) => el.options.length,
   );
 
   // Connect to db
@@ -117,7 +117,7 @@ async function crawlWebsite() {
         };
       },
       setIndex,
-      "data-set"
+      "data-set",
     );
 
     const currentSetValue = await page.$eval("select#set", (el) => el.value);
@@ -184,25 +184,28 @@ async function crawlWebsite() {
             .slice(1, 6)
             .map((row) => {
               const link = row.querySelector(
-                "td:nth-child(6) > a"
+                "td:nth-child(6) > a",
               ) as HTMLAnchorElement;
               return link ? link.href : null;
             })
             .filter((u) => u !== null) as string[];
-        }
+        },
       );
 
       for (let j = 0; j < cardListUrls.length; j++) {
         await page.goto(cardListUrls[j], { waitUntil: "domcontentloaded" });
 
         // Get player's name
-        const playerName = await page.$("div.heading")
-          .then(el => el ? el.evaluate(el => el.textContent || "Unknown") : null);
+        const playerName = await page
+          .$("div.heading")
+          .then((el) =>
+            el ? el.evaluate((el) => el.textContent || "Unknown") : null,
+          );
         if (!playerName) {
           // couldn't find div.heading, skip this iteration
           continue;
         }
-        
+
         // Scrape cards
         const { pokemonList, foundHighlight } = await page.evaluate(
           (highlightName) => {
@@ -218,7 +221,7 @@ async function crawlWebsite() {
 
                 if (colIndex === 0) {
                   const match = text.match(
-                    /^(\d+)\s+(.*?)\s+\((.*?)(?:-\d+)?\)$/
+                    /^(\d+)\s+(.*?)\s+\((.*?)(?:-\d+)?\)$/,
                   );
                   if (match) {
                     const cardCount = match[1];
@@ -253,7 +256,7 @@ async function crawlWebsite() {
             });
             return { pokemonList, foundHighlight };
           },
-          highlightName
+          highlightName,
         );
 
         if (foundHighlight.length > 0) {
