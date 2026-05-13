@@ -5,6 +5,7 @@ import { useSearchParams, useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 import { useLanguage } from "@/components/provider/LanguageProvider";
 import { useDeckBuilder } from "@/hooks/useDeckBuilder";
+import { useAnimation } from "@/hooks/useAnimation";
 import DeckArea from "@/components/deck-builder/DeckArea";
 import CardGrid from "@/components/deck-builder/CardGrid";
 
@@ -22,6 +23,8 @@ export default function DeckBuilderClient() {
     clearDeck,
     loadDeck,
   } = useDeckBuilder();
+
+  const { animatingCards, triggerCardAnimation } = useAnimation();
 
   const [cardImages, setCardImages] = useState<Record<string, string>>({});
   const [isSaving, setIsSaving] = useState(false);
@@ -72,6 +75,26 @@ export default function DeckBuilderClient() {
       images[c.cardId] = c.imageUrl;
     });
     setCardImages((prev) => ({ ...prev, ...images }));
+  };
+
+  const handleCardClickWithPosition = (
+    card: { cardId: string; imageUrl: string },
+    startX: number,
+    startY: number
+  ) => {
+    // Calculate end position (deck area - first card slot)
+    // Using fixed position based on deck area's approximate location
+    const deckAreaEndX = window.innerWidth / 2; // Center of deck area
+    const deckAreaEndY = 200; // Approximate Y position of deck area
+
+    triggerCardAnimation(
+      card.cardId,
+      card.imageUrl,
+      startX,
+      startY,
+      deckAreaEndX,
+      deckAreaEndY
+    );
   };
 
   const handleClear = () => {
@@ -159,7 +182,33 @@ export default function DeckBuilderClient() {
         onRemoveAll={removeAllCopies}
         currentDeckCards={deck.cards}
         onCardsLoaded={handleCardsLoaded}
+        onCardClickWithPosition={handleCardClickWithPosition}
       />
+
+      {/* Flying card clones */}
+      {animatingCards.map((card) => (
+        <div
+          key={card.id}
+          className="card-fly-animation"
+          style={{
+            left: card.startX,
+            top: card.startY,
+            "--fly-x": `${card.endX - card.startX}px`,
+            "--fly-y": `${card.endY - card.startY}px`,
+          } as React.CSSProperties}
+        >
+          <img
+            src={card.imageUrl}
+            alt=""
+            style={{
+              width: 80,
+              height: 112,
+              borderRadius: 8,
+              boxShadow: "0 4px 20px rgba(0,0,0,0.3)",
+            }}
+          />
+        </div>
+      ))}
     </div>
   );
 }
