@@ -13,6 +13,11 @@ interface CardGridProps {
   onCardsLoaded?: (cards: CardItem[]) => void;
   onRemoveOne: (cardId: string) => void;
   onRemoveAll: (cardId: string) => void;
+  onCardClickWithPosition?: (
+    card: CardItem,
+    startX: number,
+    startY: number
+  ) => void;
 }
 
 interface CardApiResponse {
@@ -31,6 +36,7 @@ export default function CardGrid({
   onCardsLoaded,
   onRemoveOne,
   onRemoveAll,
+  onCardClickWithPosition,
 }: CardGridProps) {
   const [cards, setCards] = useState<CardItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -104,7 +110,17 @@ export default function CardGrid({
     fetchCards();
   }, [packageId, language, filter]);
 
-  const handleCardClick = (card: CardItem) => {
+  const handleCardClick = (card: CardItem, event: React.MouseEvent) => {
+    // Capture position before any state changes
+    const rect = event.currentTarget.getBoundingClientRect();
+    const startX = rect.left + rect.width / 2;
+    const startY = rect.top + rect.height / 2;
+
+    // Trigger animation if callback provided
+    if (onCardClickWithPosition) {
+      onCardClickWithPosition(card, startX, startY);
+    }
+
     const result = onAddCard(card.cardId);
     if (!result.success && result.reason) {
       toast.error(result.reason);
@@ -154,7 +170,7 @@ export default function CardGrid({
               <div
                 key={card.cardId}
                 className="relative group cursor-pointer"
-                onClick={() => handleCardClick(card)}
+                onClick={(e) => handleCardClick(card, e)}
                 title={
                   qty > 0
                     ? `${card.cardId} (tap grey area to remove)`
