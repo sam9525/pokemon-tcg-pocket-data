@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback, useRef } from "react";
+import { useState, useCallback, useRef, useEffect } from "react";
 
 export interface AnimationCard {
   id: string;
@@ -15,6 +15,14 @@ export interface AnimationCard {
 export function useAnimation() {
   const [animatingCards, setAnimatingCards] = useState<AnimationCard[]>([]);
   const idCounterRef = useRef(0);
+  const mountedRef = useRef(true);
+
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      mountedRef.current = false;
+    };
+  }, []);
 
   const triggerCardAnimation = useCallback(
     (
@@ -40,7 +48,9 @@ export function useAnimation() {
 
       // Remove the card after animation completes (500ms)
       setTimeout(() => {
-        setAnimatingCards((prev) => prev.filter((c) => c.id !== id));
+        if (mountedRef.current) {
+          setAnimatingCards((prev) => prev.filter((c) => c.id !== id));
+        }
       }, 500);
 
       return id;
