@@ -118,13 +118,14 @@ export default function MyDecksClient({ initialDecks }: MyDecksClientProps) {
       </h1>
       <div className="w-full max-w-5xl">
         {decks.map((deck) => (
-          <DeckCardComponent
-            key={deck._id}
-            deck={deck}
-            cardImages={cardImages}
-            onEdit={handleEdit}
-            onDelete={handleDelete}
-          />
+          <div key={deck._id} className="flex flex-col gap-6 items-end m-4">
+            <DeckCardComponent
+              deck={deck}
+              cardImages={cardImages}
+              onEdit={handleEdit}
+              onDelete={handleDelete}
+            />
+          </div>
         ))}
       </div>
     </div>
@@ -145,71 +146,69 @@ function DeckCardComponent({
   const totalCards = deck.cards.reduce((sum, c) => sum + c.quantity, 0);
 
   return (
-    <div className="flex flex-col gap-4 items-end m-4">
-      <div className="w-full flex flex-col gap-4 p-4 md:p-6 sm:p-5 border-2 border-primary rounded-2xl bg-search-background shadow-lg">
-        <div className="flex flex-row justify-between items-center">
-          <div className="text-xl font-bold">{deck.name}</div>
-          <div className="text-sm text-gray-500">{totalCards} cards</div>
-        </div>
-        <div className="flex flex-row gap-4 items-center">
-          <div className="w-24 h-32 bg-gray-200 rounded-lg flex items-center justify-center text-gray-400 overflow-hidden">
-            {deck.cards[0] ? (
-              cardImages[deck.cards[0].cardId] ? (
-                <CardImage
-                  src={cardImages[deck.cards[0].cardId]}
-                  variant="card"
-                  alt={deck.cards[0].cardId}
-                  className="w-full h-full object-cover"
-                />
-              ) : (
-                <span className="text-sm">
-                  {deck.cards[0].cardId.split("_").pop()}
-                </span>
-              )
+    <div className="w-full flex flex-col gap-4 p-4 md:p-6 sm:p-5 border-2 border-primary rounded-2xl bg-search-background shadow-lg">
+      <div className="flex flex-row justify-between items-center">
+        <div className="text-xl font-bold">{deck.name}</div>
+        <div className="text-sm text-gray-500">{totalCards} cards</div>
+      </div>
+      <div className="flex flex-row gap-4 items-center">
+        <div className="w-32 sm:w-40 md:w-48 bg-gray-200 rounded-lg flex items-center justify-center text-gray-400 overflow-hidden aspect-[5/7]">
+          {deck.cards[0] ? (
+            cardImages[deck.cards[0].cardId] ? (
+              <CardImage
+                src={cardImages[deck.cards[0].cardId]}
+                variant="card"
+                alt={deck.cards[0].cardId}
+                className="w-full h-full object-cover"
+              />
             ) : (
-              "Cards"
-            )}
+              <span className="text-sm">
+                {deck.cards[0].cardId.split("_").pop()}
+              </span>
+            )
+          ) : (
+            "Cards"
+          )}
+        </div>
+        <div className="flex-1">
+          <div className="grid grid-cols-3 sm:grid-cols-4 lg:grid-cols-5 gap-2">
+            {deck.cards.slice(0, 10).map((card, idx) => (
+              <div
+                key={`${card.cardId}-${idx}`}
+                className="w-full aspect-[5/7] bg-gray-200 rounded flex items-center justify-center text-xs text-gray-500 relative overflow-hidden"
+              >
+                {cardImages[card.cardId] ? (
+                  <CardImage
+                    src={cardImages[card.cardId]}
+                    variant="thumbnailCard"
+                    alt={card.cardId}
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <span>{card.cardId.split("_").pop()}</span>
+                )}
+                {card.quantity > 1 && (
+                  <span className="absolute top-0 right-0 bg-primary text-xs px-1 rounded-full">
+                    x{card.quantity}
+                  </span>
+                )}
+              </div>
+            ))}
           </div>
-          <div className="flex-1">
-            <div className="grid grid-cols-5 gap-2">
-              {deck.cards.slice(0, 10).map((card, idx) => (
-                <div
-                  key={`${card.cardId}-${idx}`}
-                  className="w-12 h-16 bg-gray-200 rounded flex items-center justify-center text-xs text-gray-500 relative overflow-hidden"
-                >
-                  {cardImages[card.cardId] ? (
-                    <CardImage
-                      src={cardImages[card.cardId]}
-                      variant="thumbnailCard"
-                      alt={card.cardId}
-                      className="w-full h-full object-cover"
-                    />
-                  ) : (
-                    <span>{card.cardId.split("_").pop()}</span>
-                  )}
-                  {card.quantity > 1 && (
-                    <span className="absolute top-0 right-0 bg-primary text-xs px-1 rounded-full">
-                      x{card.quantity}
-                    </span>
-                  )}
-                </div>
-              ))}
-            </div>
-          </div>
-          <div className="flex flex-col gap-2">
-            <button
-              onClick={() => onEdit(deck._id)}
-              className="px-4 py-2 bg-primary text-foreground font-bold rounded-lg hover:opacity-90 transition-opacity"
-            >
-              Edit
-            </button>
-            <button
-              onClick={() => onDelete(deck._id)}
-              className="px-4 py-2 bg-red-500 text-white font-bold rounded-lg hover:opacity-90 transition-opacity"
-            >
-              Delete
-            </button>
-          </div>
+        </div>
+        <div className="flex flex-col gap-2">
+          <button
+            onClick={() => onEdit(deck._id)}
+            className="px-4 py-2 bg-primary text-foreground font-bold rounded-lg hover:opacity-90 transition-opacity"
+          >
+            Edit
+          </button>
+          <button
+            onClick={() => onDelete(deck._id)}
+            className="px-4 py-2 bg-red-500 text-white font-bold rounded-lg hover:opacity-90 transition-opacity"
+          >
+            Delete
+          </button>
         </div>
       </div>
     </div>
