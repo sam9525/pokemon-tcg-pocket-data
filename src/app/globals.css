@@ -269,6 +269,29 @@ button.profile-button {
   animation: slideInRight 0.3s ease-out;
 }
 
+/* Card fly animation from grid to deck area */
+@keyframes cardFlyToDeck {
+  0% {
+    transform: translate(0, 0) scale(1);
+    opacity: 1;
+  }
+  70% {
+    transform: translate(var(--fly-x, 0px), var(--fly-y, -100px)) scale(0.8);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(var(--fly-x, 0px), var(--fly-y, -200px)) scale(0.5);
+    opacity: 0;
+  }
+}
+
+.card-fly-animation {
+  animation: cardFlyToDeck 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+  pointer-events: none;
+  z-index: 1000;
+  position: fixed;
+}
+
 .decklist-button {
   @apply w-full md:w-auto px-6 py-2 border-2 border-primary rounded-full font-bold bg-foreground text-primary;
   transition: all 0.2s ease-in-out;
