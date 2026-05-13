@@ -29,6 +29,36 @@ export default function DeckBuilderClient() {
   const [cardImages, setCardImages] = useState<Record<string, string>>({});
   const [isSaving, setIsSaving] = useState(false);
 
+  // Track dynamic deck area position for card animation destination
+  const [deckAreaPosition, setDeckAreaPosition] = useState({
+    x: typeof window !== "undefined" ? window.innerWidth / 2 : 300,
+    y: 200,
+  });
+
+  useEffect(() => {
+    const updatePosition = () => {
+      // Get the deck area element (first .flex-col container with bg-search-background)
+      const deckArea = document.querySelector(".bg-search-background");
+      if (deckArea) {
+        const rect = deckArea.getBoundingClientRect();
+        setDeckAreaPosition({
+          x: rect.left + rect.width / 2,
+          y: rect.top + rect.height / 2,
+        });
+      }
+    };
+
+    updatePosition();
+    window.addEventListener("resize", updatePosition);
+    // Also update on scroll since deck area position may change
+    window.addEventListener("scroll", updatePosition, { passive: true });
+
+    return () => {
+      window.removeEventListener("resize", updatePosition);
+      window.removeEventListener("scroll", updatePosition);
+    };
+  }, []);
+
   // Load deck from URL param on mount
   useEffect(() => {
     const deckId = searchParams.get("deckId");
@@ -82,18 +112,13 @@ export default function DeckBuilderClient() {
     startX: number,
     startY: number
   ) => {
-    // Calculate end position (deck area - first card slot)
-    // Using fixed position based on deck area's approximate location
-    const deckAreaEndX = window.innerWidth / 2; // Center of deck area
-    const deckAreaEndY = 200; // Approximate Y position of deck area
-
     triggerCardAnimation(
       card.cardId,
       card.imageUrl,
       startX,
       startY,
-      deckAreaEndX,
-      deckAreaEndY
+      deckAreaPosition.x,
+      deckAreaPosition.y
     );
   };
 
