@@ -1,9 +1,8 @@
 "use client";
 import { useLanguage } from "@/components/provider/LanguageProvider";
-import CardImage from "@/components/CardImage";
+import AnimatedCard from "@/components/AnimatedCard";
 import { useEffect, useState, useRef } from "react";
 import toast from "react-hot-toast";
-import * as interactiveCard from "@/utils/interactiveCard";
 
 interface Card {
   cardId: string;
@@ -25,73 +24,6 @@ interface IDeckList {
   cardList: CardList;
   deckListHash: string;
 }
-
-const Card = ({
-  cardName,
-  imageUrl,
-  boosterPack,
-  cardCount,
-  cardClass,
-}: {
-  cardName: string;
-  imageUrl: string;
-  boosterPack?: string;
-  cardCount?: number;
-  cardClass?: string;
-}) => {
-  return (
-    <div
-      className="card-container"
-      onMouseMove={(e) =>
-        interactiveCard.handleMove(
-          e,
-          e.currentTarget.querySelector(".card") as HTMLElement,
-        )
-      }
-      onMouseOut={(e) =>
-        interactiveCard.handleMouseOut(
-          e.currentTarget.querySelector(".card") as HTMLElement,
-        )
-      }
-      onMouseUp={(e) =>
-        interactiveCard.handleMouseUp(
-          e.currentTarget.querySelector(".card") as HTMLElement,
-        )
-      }
-      onClick={(e) => {
-        e.preventDefault();
-        interactiveCard.handleClick(
-          cardName,
-          e.currentTarget.querySelector(".card") as HTMLElement,
-        );
-      }}
-    >
-      <div className="card relative">
-        <CardImage
-          src={imageUrl}
-          variant="card"
-          alt="Featured Card"
-          className={`${cardClass} transition-transform duration-300`}
-        />
-        <CardImage
-          src="https://pokemon-tcg-pocket-data.s3.ap-southeast-2.amazonaws.com/pokemon_card_backside.png"
-          variant="card"
-          alt="card-backside"
-          className="card-backside"
-        />
-        {boosterPack && (
-          <div className="booster-pack w-1/3 h-4 bg-primary text-sm font-bold text-foreground text-center absolute left-0 bottom-0 rounded-bl-md rounded-tr-md">
-            {boosterPack}
-          </div>
-        )}
-
-        <div className="card-count w-1/3 h-4 bg-primary text-sm font-bold text-foreground text-center absolute right-0 bottom-0 rounded-tl-md rounded-br-md">
-          {cardCount}
-        </div>
-      </div>
-    </div>
-  );
-};
 
 export default function DecksListClient({
   defaultDeckList,
@@ -271,8 +203,8 @@ export default function DecksListClient({
                 <div className="flex flex-col md:flex-row gap-2 md:gap-4 items-center md:items-stretch">
                   {/* Featured Image section */}
                   <div className="hidden md:flex md:flex-col justify-center md:justify-start">
-                    <Card
-                      cardName={deck.highlight[0].cardName}
+                    <AnimatedCard
+                      cardId={deck.highlight[0].cardName}
                       imageUrl={deck.highlight[0].imageUrl}
                       boosterPack={deck.highlight[0].boosterPack}
                       cardCount={deck.highlight[0].cardCount}
@@ -306,8 +238,8 @@ export default function DecksListClient({
                   >
                     {/* Featured Image (Mobile) */}
                     <div className="relative group md:hidden">
-                      <Card
-                        cardName={deck.highlight[0].cardName}
+                      <AnimatedCard
+                        cardId={deck.highlight[0].cardName}
                         imageUrl={deck.highlight[0].imageUrl}
                         boosterPack={deck.highlight[0].boosterPack}
                         cardCount={deck.highlight[0].cardCount}
@@ -315,8 +247,8 @@ export default function DecksListClient({
                     </div>
                     {currentCardList.map((card, cardIndex) => (
                       <div key={cardIndex} className="relative group">
-                        <Card
-                          cardName={card.cardName}
+                        <AnimatedCard
+                          cardId={card.cardName}
                           imageUrl={card.imageUrl}
                           boosterPack={card.boosterPack}
                           cardCount={card.cardCount}

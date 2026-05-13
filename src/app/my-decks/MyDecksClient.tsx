@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 import { useLanguage } from "@/components/provider/LanguageProvider";
-import CardImage from "@/components/CardImage";
+import AnimatedCard from "@/components/AnimatedCard";
 
 interface DeckCard {
   cardId: string;
@@ -152,45 +152,40 @@ function DeckCardComponent({
         <div className="text-sm text-gray-500">{totalCards} cards</div>
       </div>
       <div className="flex flex-row gap-4 items-center">
-        <div className="w-32 sm:w-40 md:w-48 bg-gray-200 rounded-lg flex items-center justify-center text-gray-400 overflow-hidden aspect-[5/7]">
+        <div className="w-32 sm:w-40 md:w-48 aspect-[5/7]">
           {deck.cards[0] ? (
             cardImages[deck.cards[0].cardId] ? (
-              <CardImage
-                src={cardImages[deck.cards[0].cardId]}
-                variant="card"
-                alt={deck.cards[0].cardId}
-                className="w-full h-full object-cover"
+              <AnimatedCard
+                cardId={deck.cards[0].cardId}
+                imageUrl={cardImages[deck.cards[0].cardId]}
               />
             ) : (
-              <span className="text-sm">
-                {deck.cards[0].cardId.split("_").pop()}
-              </span>
+              <div className="w-full h-full bg-gray-200 rounded-lg flex items-center justify-center text-gray-400">
+                <span className="text-sm">
+                  {deck.cards[0].cardId.split("_").pop()}
+                </span>
+              </div>
             )
           ) : (
-            "Cards"
+            <div className="w-full h-full bg-gray-200 rounded-lg flex items-center justify-center text-gray-400">
+              Cards
+            </div>
           )}
         </div>
         <div className="flex-1">
           <div className="grid grid-cols-3 sm:grid-cols-4 lg:grid-cols-5 gap-2">
             {deck.cards.slice(0, 10).map((card, idx) => (
-              <div
-                key={`${card.cardId}-${idx}`}
-                className="w-full aspect-[5/7] bg-gray-200 rounded flex items-center justify-center text-xs text-gray-500 relative overflow-hidden"
-              >
+              <div key={`${card.cardId}-${idx}`} className="relative group">
                 {cardImages[card.cardId] ? (
-                  <CardImage
-                    src={cardImages[card.cardId]}
-                    variant="thumbnailCard"
-                    alt={card.cardId}
-                    className="w-full h-full object-cover"
+                  <AnimatedCard
+                    cardId={card.cardId}
+                    imageUrl={cardImages[card.cardId]}
+                    cardCount={card.quantity}
                   />
                 ) : (
-                  <span>{card.cardId.split("_").pop()}</span>
-                )}
-                {card.quantity > 1 && (
-                  <span className="absolute top-0 right-0 bg-primary text-xs px-1 rounded-full">
-                    x{card.quantity}
-                  </span>
+                  <div className="w-full aspect-[5/7] bg-gray-200 rounded flex items-center justify-center text-xs text-gray-500">
+                    {card.cardId.split("_").pop()}
+                  </div>
                 )}
               </div>
             ))}
