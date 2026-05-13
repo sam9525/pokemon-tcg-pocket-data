@@ -31,7 +31,7 @@ export function useAnimation() {
       startX: number,
       startY: number,
       endX: number,
-      endY: number
+      endY: number,
     ): string => {
       const id = `anim-${idCounterRef.current++}`;
       const newCard: AnimationCard = {
@@ -55,7 +55,7 @@ export function useAnimation() {
 
       return id;
     },
-    []
+    [],
   );
 
   return {

@@ -16,7 +16,7 @@ interface CardGridProps {
   onCardClickWithPosition?: (
     card: CardItem,
     startX: number,
-    startY: number
+    startY: number,
   ) => void;
 }
 

@@ -110,7 +110,7 @@ export default function DeckBuilderClient() {
   const handleCardClickWithPosition = (
     card: { cardId: string; imageUrl: string },
     startX: number,
-    startY: number
+    startY: number,
   ) => {
     triggerCardAnimation(
       card.cardId,
@@ -118,7 +118,7 @@ export default function DeckBuilderClient() {
       startX,
       startY,
       deckAreaPosition.x,
-      deckAreaPosition.y
+      deckAreaPosition.y,
     );
   };
 
@@ -215,12 +215,14 @@ export default function DeckBuilderClient() {
         <div
           key={card.id}
           className="card-fly-animation"
-          style={{
-            left: card.startX,
-            top: card.startY,
-            "--fly-x": `${card.endX - card.startX}px`,
-            "--fly-y": `${card.endY - card.startY}px`,
-          } as React.CSSProperties}
+          style={
+            {
+              left: card.startX,
+              top: card.startY,
+              "--fly-x": `${card.endX - card.startX}px`,
+              "--fly-y": `${card.endY - card.startY}px`,
+            } as React.CSSProperties
+          }
         >
           <img
             src={card.imageUrl}
