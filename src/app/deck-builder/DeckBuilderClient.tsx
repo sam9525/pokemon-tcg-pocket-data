@@ -8,6 +8,7 @@ import { useDeckBuilder } from "@/hooks/useDeckBuilder";
 import { useAnimation } from "@/hooks/useAnimation";
 import DeckArea from "@/components/deck-builder/DeckArea";
 import CardGrid from "@/components/deck-builder/CardGrid";
+import CardImage from "@/components/CardImage";
 
 export default function DeckBuilderClient() {
   const searchParams = useSearchParams();
@@ -224,12 +225,13 @@ export default function DeckBuilderClient() {
             } as React.CSSProperties
           }
         >
-          <img
+          <CardImage
             src={card.imageUrl}
+            variant="card"
             alt=""
+            width={80}
+            height={112}
             style={{
-              width: 80,
-              height: 112,
               borderRadius: 8,
               boxShadow: "0 4px 20px rgba(0,0,0,0.3)",
             }}

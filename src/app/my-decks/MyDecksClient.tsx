@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 import { useLanguage } from "@/components/provider/LanguageProvider";
+import CardImage from "@/components/CardImage";
 
 interface DeckCard {
   cardId: string;
@@ -154,8 +155,9 @@ function DeckCardComponent({
           <div className="w-24 h-32 bg-gray-200 rounded-lg flex items-center justify-center text-gray-400 overflow-hidden">
             {deck.cards[0] ? (
               cardImages[deck.cards[0].cardId] ? (
-                <img
+                <CardImage
                   src={cardImages[deck.cards[0].cardId]}
+                  variant="card"
                   alt={deck.cards[0].cardId}
                   className="w-full h-full object-cover"
                 />
@@ -176,8 +178,9 @@ function DeckCardComponent({
                   className="w-12 h-16 bg-gray-200 rounded flex items-center justify-center text-xs text-gray-500 relative overflow-hidden"
                 >
                   {cardImages[card.cardId] ? (
-                    <img
+                    <CardImage
                       src={cardImages[card.cardId]}
+                      variant="thumbnailCard"
                       alt={card.cardId}
                       className="w-full h-full object-cover"
                     />
