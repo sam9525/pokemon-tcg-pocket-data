@@ -247,16 +247,16 @@ function DeckCardComponent({
       )}
 
       {/* Edit/Delete Buttons */}
-      <div className="flex flex-row gap-2 justify-end">
+      <div className="flex flex-row gap-2">
         <button
           onClick={() => onEdit(deck._id)}
-          className="px-4 py-2 bg-primary text-foreground font-bold rounded-lg hover:opacity-90 transition-opacity"
+          className="flex-1 py-2 bg-primary text-foreground font-bold rounded-lg hover:opacity-90 transition-opacity"
         >
           Edit
         </button>
         <button
           onClick={() => onDelete(deck._id)}
-          className="px-4 py-2 bg-red-500 text-white font-bold rounded-lg hover:opacity-90 transition-opacity"
+          className="flex-1 py-2 bg-red-500 text-white font-bold rounded-lg hover:opacity-90 transition-opacity"
         >
           Delete
         </button>
