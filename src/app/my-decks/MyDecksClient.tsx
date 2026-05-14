@@ -152,26 +152,6 @@ function DeckCardComponent({
         <div className="text-sm text-gray-500">{totalCards} cards</div>
       </div>
       <div className="flex flex-row gap-4 items-center">
-        <div className="w-32 sm:w-40 md:w-48 aspect-[5/7]">
-          {deck.cards[0] ? (
-            cardImages[deck.cards[0].cardId] ? (
-              <AnimatedCard
-                cardId={deck.cards[0].cardId}
-                imageUrl={cardImages[deck.cards[0].cardId]}
-              />
-            ) : (
-              <div className="w-full h-full bg-gray-200 rounded-lg flex items-center justify-center text-gray-400">
-                <span className="text-sm">
-                  {deck.cards[0].cardId.split("_").pop()}
-                </span>
-              </div>
-            )
-          ) : (
-            <div className="w-full h-full bg-gray-200 rounded-lg flex items-center justify-center text-gray-400">
-              Cards
-            </div>
-          )}
-        </div>
         <div className="flex-1">
           <div className="grid grid-cols-3 sm:grid-cols-4 lg:grid-cols-5 gap-2">
             {deck.cards.slice(0, 10).map((card, idx) => (
