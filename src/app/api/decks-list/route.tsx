@@ -5,6 +5,16 @@ import { API_RATE_LIMIT } from "@/utils/rateLimitConfig";
 import connectDB from "@/lib/mongodb";
 import { DeckList } from "@/models/DeckList";
 import { Card } from "@/models/Card";
+import { getBoosterToPackageMapping } from "@/lib/boosterToPackage";
+
+function getPackageFromBoosterPack(
+  boosterPack: string,
+  boosterToPackage: Record<string, string>,
+): string {
+  if (!boosterPack) return "";
+  const prefix = boosterPack.split("_")[0];
+  return boosterToPackage[prefix] || prefix;
+}
 
 export async function GET(request: NextRequest) {
   const searchParams = request.nextUrl.searchParams;
@@ -17,6 +27,9 @@ export async function GET(request: NextRequest) {
     return rateLimitResult.response;
   }
 
+  // Fetch booster-to-package mapping from S3 (cached)
+  const boosterToPackage = await getBoosterToPackageMapping();
+
   // Connect to MongoDB
   await connectDB();
 
@@ -28,14 +41,11 @@ export async function GET(request: NextRequest) {
   // Extract all unique card names from the deck lists
   const cardNamesSet = new Set<string>();
   decklists.forEach((deck: any) => {
-    // Collect from highlight
     if (deck.highlight) {
       deck.highlight.forEach((card: any) => {
         if (card.cardName) cardNamesSet.add(card.cardName);
       });
     }
-
-    // Collect from cardList
     if (deck.cardList) {
       Object.values(deck.cardList).forEach((playerCards: any) => {
         if (Array.isArray(playerCards)) {
@@ -49,9 +59,43 @@ export async function GET(request: NextRequest) {
 
   const uniqueCardNames = Array.from(cardNamesSet);
 
-  // Fetch only the relevant cards using case-insensitive matching
+  // Derive fallback packages from booster packs for cards not in selected packages
+  const fallbackPackagesSet = new Set<string>();
+  decklists.forEach((deck: any) => {
+    if (deck.highlight) {
+      deck.highlight.forEach((card: any) => {
+        if (card.boosterPack) {
+          const pkg = getPackageFromBoosterPack(
+            card.boosterPack,
+            boosterToPackage,
+          );
+          if (pkg) fallbackPackagesSet.add(pkg);
+        }
+      });
+    }
+    if (deck.cardList) {
+      Object.values(deck.cardList).forEach((playerCards: any) => {
+        if (Array.isArray(playerCards)) {
+          playerCards.forEach((card: any) => {
+            if (card.boosterPack) {
+              const pkg = getPackageFromBoosterPack(
+                card.boosterPack,
+                boosterToPackage,
+              );
+              if (pkg) fallbackPackagesSet.add(pkg);
+            }
+          });
+        }
+      });
+    }
+  });
+
+  // Fetch cards from selected packages AND fallback packages
+  const allPackages = [
+    ...new Set([...[packages], ...Array.from(fallbackPackagesSet)]),
+  ];
   const cards = (await Card.find({
-    package: { $regex: packages, $options: "i" },
+    package: { $in: allPackages },
     name: { $in: uniqueCardNames },
     language: "en_US",
     rarity: {
@@ -59,62 +103,81 @@ export async function GET(request: NextRequest) {
       $options: "i",
     },
   })
-    .collation({ locale: "en", strength: 2 }) // Case-insensitive match
-    .select("name cardId imageUrl language")
+    .collation({ locale: "en", strength: 2 })
+    .select("name cardId imageUrl language package")
     .lean()) as any[];
 
-  // Create a lookup map for cards by name
+  // Create lookup map by card name (case-insensitive)
   const cardMap = new Map<
     string,
-    { cardId: string; imageUrl: string | undefined }
+    { cardId: string; imageUrl: string | undefined; package: string }
   >();
-  cards.forEach((card: any) => {
-    if (card.cardId && language !== "en_US") {
-      card.cardId = card.cardId.replace(/en_US/gi, language);
-    }
-    if (card.imageUrl && language !== "en_US") {
-      card.imageUrl = card.imageUrl.replace(/en_US/gi, language);
-    }
+  const cardMapLower = new Map<
+    string,
+    { cardId: string; imageUrl: string | undefined; package: string }
+  >();
 
-    cardMap.set(card.name, {
-      cardId: card.cardId,
-      imageUrl: card.imageUrl,
-    });
-    if (card.name) {
-      cardMap.set(card.name.toLowerCase().trim(), {
+  cards.forEach((card: any) => {
+    if (!cardMap.has(card.name)) {
+      cardMap.set(card.name, {
         cardId: card.cardId,
         imageUrl: card.imageUrl,
+        package: card.package,
+      });
+    }
+    const lower = card.name.toLowerCase().trim();
+    if (!cardMapLower.has(lower)) {
+      cardMapLower.set(lower, {
+        cardId: card.cardId,
+        imageUrl: card.imageUrl,
+        package: card.package,
       });
     }
   });
 
-  // Helper to get card data
+  // Helper to get card data (case-insensitive lookup)
   const getCardData = (name: string) => {
     if (!name) return undefined;
-    return cardMap.get(name) || cardMap.get(name.toLowerCase().trim());
+    return cardMap.get(name) || cardMapLower.get(name.toLowerCase().trim());
   };
 
   // Enrich decklists with cardId and imageUrl
   const enrichedDecklists = decklists.map((deck: any) => {
-    // Enrich highlight cards
     const enrichedHighlight = deck.highlight.map((card: any) => {
       const cardData = getCardData(card.cardName);
       if (!cardData) {
-        console.log(`Failed to find card for highlight: "${card.cardName}"`);
+        console.log(
+          `Failed to find card: "${card.cardName}" boosterPack: "${card.boosterPack}"`,
+        );
       }
-      return {
-        ...card,
-        ...cardData,
-      };
+      const result = { ...card, ...cardData };
+      if (result?.cardId && language !== "en_US") {
+        result.cardId = result.cardId.replace(/en_US/gi, language);
+      }
+      if (result?.imageUrl && language !== "en_US") {
+        result.imageUrl = result.imageUrl.replace(/en_US/gi, language);
+      }
+      return result;
     });
 
-    // Enrich cardList
     const enrichedCardList: Record<string, any[]> = {};
     Object.entries(deck.cardList).forEach(([player, playerCards]) => {
-      enrichedCardList[player] = (playerCards as any[]).map((card: any) => ({
-        ...card,
-        ...getCardData(card.cardName),
-      }));
+      enrichedCardList[player] = (playerCards as any[]).map((card: any) => {
+        const cardData = getCardData(card.cardName);
+        if (!cardData) {
+          console.log(
+            `Failed to find card: "${card.cardName}" boosterPack: "${card.boosterPack}"`,
+          );
+        }
+        const result = { ...card, ...cardData };
+        if (result?.cardId && language !== "en_US") {
+          result.cardId = result.cardId.replace(/en_US/gi, language);
+        }
+        if (result?.imageUrl && language !== "en_US") {
+          result.imageUrl = result.imageUrl.replace(/en_US/gi, language);
+        }
+        return result;
+      });
     });
 
     return {
