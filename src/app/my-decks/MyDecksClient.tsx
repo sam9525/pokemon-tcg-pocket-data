@@ -4,7 +4,9 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 import { useLanguage } from "@/components/provider/LanguageProvider";
-import AnimatedCard from "@/components/AnimatedCard";
+import CardImage from "@/components/CardImage";
+import * as interactiveCard from "@/utils/interactiveCard";
+import { getRarityPriority } from "@/lib/rarity";
 
 interface DeckCard {
   cardId: string;
@@ -28,6 +30,9 @@ export default function MyDecksClient({ initialDecks }: MyDecksClientProps) {
   const { currentLanguageLookup, language } = useLanguage();
   const [decks, setDecks] = useState<UserDeck[]>(initialDecks);
   const [cardImages, setCardImages] = useState<Record<string, string>>({});
+  const [cardData, setCardData] = useState<
+    Record<string, { boosterPack?: string; rarity?: string }>
+  >({});
 
   useEffect(() => {
     if (decks.length === 0) return;
@@ -41,10 +46,14 @@ export default function MyDecksClient({ initialDecks }: MyDecksClientProps) {
       `/api/cards/images?cardIds=${allCardIds.join(",")}&language=${language}`,
     )
       .then((res) => res.json())
-      .then((data) => setCardImages(data.images || {}))
+      .then((data) => {
+        setCardImages(data.images || {});
+        setCardData(data.cardData || {});
+      })
       .catch((err) => {
-        console.error("[MyDecks] Failed to load card images:", err);
+        console.error("[MyDecks] Failed to load card data:", err);
         setCardImages({});
+        setCardData({});
       });
   }, [decks, language]);
 
@@ -122,6 +131,7 @@ export default function MyDecksClient({ initialDecks }: MyDecksClientProps) {
             <DeckCardComponent
               deck={deck}
               cardImages={cardImages}
+              cardData={cardData}
               onEdit={handleEdit}
               onDelete={handleDelete}
             />
@@ -135,15 +145,24 @@ export default function MyDecksClient({ initialDecks }: MyDecksClientProps) {
 function DeckCardComponent({
   deck,
   cardImages,
+  cardData,
   onEdit,
   onDelete,
 }: {
   deck: UserDeck;
   cardImages: Record<string, string>;
+  cardData: Record<string, { boosterPack?: string; rarity?: string }>;
   onEdit: (id: string) => void;
   onDelete: (id: string) => void;
 }) {
   const totalCards = deck.cards.reduce((sum, c) => sum + c.quantity, 0);
+
+  // Sort cards by rarity: Crown first, then Ultra Rare, etc.
+  const sortedCards = [...deck.cards].sort((a, b) => {
+    const rarityA = cardData[a.cardId]?.rarity || "Common";
+    const rarityB = cardData[b.cardId]?.rarity || "Common";
+    return getRarityPriority(rarityA) - getRarityPriority(rarityB);
+  });
 
   return (
     <div className="w-full flex flex-col gap-4 p-4 md:p-6 sm:p-5 border-2 border-primary rounded-2xl bg-search-background shadow-lg">
@@ -154,12 +173,13 @@ function DeckCardComponent({
       <div className="flex flex-row gap-4 items-center">
         <div className="flex-1">
           <div className="grid grid-cols-3 sm:grid-cols-4 lg:grid-cols-5 gap-2">
-            {deck.cards.slice(0, 10).map((card, idx) => (
+            {sortedCards.slice(0, 10).map((card, idx) => (
               <div key={`${card.cardId}-${idx}`} className="relative group">
                 {cardImages[card.cardId] ? (
-                  <AnimatedCard
+                  <DeckCardWithBoosterPack
                     cardId={card.cardId}
                     imageUrl={cardImages[card.cardId]}
+                    boosterPack={cardData[card.cardId]?.boosterPack}
                     cardCount={card.quantity}
                   />
                 ) : (
@@ -185,6 +205,74 @@ function DeckCardComponent({
             Delete
           </button>
         </div>
+      </div>
+    </div>
+  );
+}
+
+// Inline component that shows card with boosterPack badge
+// Mirrors AnimatedCard but with proper boosterPack positioning
+function DeckCardWithBoosterPack({
+  cardId,
+  imageUrl,
+  boosterPack,
+  cardCount,
+}: {
+  cardId: string;
+  imageUrl: string;
+  boosterPack?: string;
+  cardCount?: number;
+}) {
+  return (
+    <div
+      className="card-container"
+      onMouseMove={(e) =>
+        interactiveCard.handleMove(
+          e,
+          e.currentTarget.querySelector(".card") as HTMLElement,
+        )
+      }
+      onMouseOut={(e) =>
+        interactiveCard.handleMouseOut(
+          e.currentTarget.querySelector(".card") as HTMLElement,
+        )
+      }
+      onMouseUp={(e) =>
+        interactiveCard.handleMouseUp(
+          e.currentTarget.querySelector(".card") as HTMLElement,
+        )
+      }
+      onClick={(e) => {
+        e.preventDefault();
+        interactiveCard.handleClick(
+          cardId,
+          e.currentTarget.querySelector(".card") as HTMLElement,
+        );
+      }}
+    >
+      <div className="card relative">
+        <CardImage
+          src={imageUrl}
+          variant="card"
+          alt={cardId}
+          className="transition-transform duration-300"
+        />
+        <CardImage
+          src="https://pokemon-tcg-pocket-data.s3.ap-southeast-2.amazonaws.com/pokemon_card_backside.png"
+          variant="card"
+          alt="card-backside"
+          className="card-backside"
+        />
+        {boosterPack && (
+          <div className="booster-pack w-1/2 h-4 bg-primary text-[10px] font-bold text-foreground text-center absolute left-0 bottom-0 rounded-bl-md rounded-tr-md">
+            {boosterPack}
+          </div>
+        )}
+        {cardCount !== undefined && cardCount > 1 && (
+          <div className="card-count w-1/2 h-4 bg-primary text-[10px] font-bold text-foreground text-center absolute right-0 bottom-0 rounded-tl-md rounded-br-md">
+            x{cardCount}
+          </div>
+        )}
       </div>
     </div>
   );
