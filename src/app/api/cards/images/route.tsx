@@ -35,10 +35,10 @@ export async function GET(request: NextRequest) {
 
     cards.forEach((card) => {
       images[card.cardId] = card.imageUrl || "";
-      // Get the first boosterPack entry (e.g., "A1" from ["A1", "A1a"])
-      const boosterPackValue = card.boosterPack?.[0] || "";
+      // Extract booster pack code from package (e.g., "A1_genetic-apex" -> "A1")
+      const boosterPackCode = card.package?.split("_")[0] || "";
       cardData[card.cardId] = {
-        boosterPack: boosterPackValue,
+        boosterPack: boosterPackCode,
         rarity: card.rarity || "Common",
       };
     });
