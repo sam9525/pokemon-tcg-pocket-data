@@ -28,6 +28,9 @@ export default function DeckBuilderClient() {
   const { animatingCards, triggerCardAnimation } = useAnimation();
 
   const [cardImages, setCardImages] = useState<Record<string, string>>({});
+  const [cardData, setCardData] = useState<
+    Record<string, { boosterPack?: string; rarity?: string }>
+  >({});
   const [isSaving, setIsSaving] = useState(false);
 
   // Track dynamic deck area position for card animation destination
@@ -106,6 +109,20 @@ export default function DeckBuilderClient() {
       images[c.cardId] = c.imageUrl;
     });
     setCardImages((prev) => ({ ...prev, ...images }));
+
+    // Fetch card metadata (boosterPack, rarity) for these cards
+    if (cards.length > 0) {
+      const cardIds = cards.map((c) => c.cardId);
+      const lang = currentLanguageLookup?.LANGUAGE || "en_US";
+      fetch(`/api/cards/images?cardIds=${cardIds.join(",")}&language=${lang}`)
+        .then((res) => res.json())
+        .then((data) => {
+          setCardData((prev) => ({ ...prev, ...data.cardData || {} }));
+        })
+        .catch((err) => {
+          console.error("[DeckBuilder] Failed to load card metadata:", err);
+        });
+    }
   };
 
   const handleCardClickWithPosition = (
@@ -192,6 +209,7 @@ export default function DeckBuilderClient() {
         cards={deck.cards}
         validation={validation}
         cardImages={cardImages}
+        cardData={cardData}
         onNameChange={setDeckName}
         onRemoveOne={removeCard}
         onRemoveAll={removeAllCopies}
