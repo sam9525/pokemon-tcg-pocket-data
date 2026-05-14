@@ -155,6 +155,14 @@ function DeckCardComponent({
   onDelete: (id: string) => void;
 }) {
   const totalCards = deck.cards.reduce((sum, c) => sum + c.quantity, 0);
+  const [currentPage, setCurrentPage] = useState(0);
+  const cardsPerPage = 10;
+  const totalPages = Math.ceil(totalCards / cardsPerPage);
+
+  // Reset page when deck changes
+  useEffect(() => {
+    setCurrentPage(0);
+  }, [deck._id]);
 
   // Sort cards by rarity: Crown first, then Ultra Rare, etc.
   const sortedCards = [...deck.cards].sort((a, b) => {
@@ -163,16 +171,39 @@ function DeckCardComponent({
     return getRarityPriority(rarityA) - getRarityPriority(rarityB);
   });
 
+  const visibleCards = sortedCards.slice(
+    currentPage * cardsPerPage,
+    (currentPage + 1) * cardsPerPage,
+  );
+
+  const handlePrev = () => {
+    setCurrentPage((prev) => (prev - 1 + totalPages) % totalPages);
+  };
+
+  const handleNext = () => {
+    setCurrentPage((prev) => (prev + 1) % totalPages);
+  };
+
   return (
     <div className="w-full flex flex-col gap-4 p-4 md:p-6 sm:p-5 border-2 border-primary rounded-2xl bg-search-background shadow-lg">
       <div className="flex flex-row justify-between items-center">
         <div className="text-xl font-bold">{deck.name}</div>
         <div className="text-sm text-gray-500">{totalCards} cards</div>
       </div>
-      <div className="flex flex-row gap-4 items-center">
+      <div className="flex flex-row gap-2 md:gap-4 items-center">
+        {/* Previous Button */}
+        <button
+          onClick={handlePrev}
+          disabled={totalPages <= 1}
+          className="px-2 py-2 border-2 border-primary rounded-lg font-bold bg-foreground text-primary hover:bg-primary hover:text-background transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          &lt;
+        </button>
+
+        {/* Cards Grid */}
         <div className="flex-1">
           <div className="grid grid-cols-3 sm:grid-cols-4 lg:grid-cols-5 gap-2">
-            {sortedCards.slice(0, 10).map((card, idx) => (
+            {visibleCards.map((card, idx) => (
               <div key={`${card.cardId}-${idx}`} className="relative group">
                 {cardImages[card.cardId] ? (
                   <AnimatedCard
@@ -190,20 +221,45 @@ function DeckCardComponent({
             ))}
           </div>
         </div>
-        <div className="flex flex-col gap-2">
-          <button
-            onClick={() => onEdit(deck._id)}
-            className="px-4 py-2 bg-primary text-foreground font-bold rounded-lg hover:opacity-90 transition-opacity"
-          >
-            Edit
-          </button>
-          <button
-            onClick={() => onDelete(deck._id)}
-            className="px-4 py-2 bg-red-500 text-white font-bold rounded-lg hover:opacity-90 transition-opacity"
-          >
-            Delete
-          </button>
+
+        {/* Next Button */}
+        <button
+          onClick={handleNext}
+          disabled={totalPages <= 1}
+          className="px-2 py-2 border-2 border-primary rounded-lg font-bold bg-foreground text-primary hover:bg-primary hover:text-background transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          &gt;
+        </button>
+      </div>
+
+      {/* Page Indicator */}
+      {totalPages > 1 && (
+        <div className="flex justify-center gap-2 text-sm text-gray-500">
+          {Array.from({ length: totalPages }).map((_, idx) => (
+            <div
+              key={idx}
+              className={`w-2 h-2 rounded-full ${
+                idx === currentPage ? "bg-primary" : "bg-gray-300"
+              }`}
+            />
+          ))}
         </div>
+      )}
+
+      {/* Edit/Delete Buttons */}
+      <div className="flex flex-row gap-2 justify-end">
+        <button
+          onClick={() => onEdit(deck._id)}
+          className="px-4 py-2 bg-primary text-foreground font-bold rounded-lg hover:opacity-90 transition-opacity"
+        >
+          Edit
+        </button>
+        <button
+          onClick={() => onDelete(deck._id)}
+          className="px-4 py-2 bg-red-500 text-white font-bold rounded-lg hover:opacity-90 transition-opacity"
+        >
+          Delete
+        </button>
       </div>
     </div>
   );
