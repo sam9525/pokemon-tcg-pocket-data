@@ -13,7 +13,7 @@ interface DeckAreaProps {
   cards: DeckCardType[];
   validation: ValidationResult;
   cardImages: Record<string, string>; // cardId → imageUrl
-  cardData?: Record<string, { boosterPack?: string; rarity?: string }>; // NEW
+  cardData?: Record<string, { boosterPack?: string; rarity?: string }>;
   onNameChange: (name: string) => void;
   onRemoveOne: (cardId: string) => void;
   onRemoveAll: (cardId: string) => void;
