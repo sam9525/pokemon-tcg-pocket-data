@@ -11,7 +11,7 @@ export async function GET(request: NextRequest) {
     const language = url.searchParams.get("language") || "en_US";
 
     if (!cardIdsParam) {
-      return Response.json({ images: {} });
+      return Response.json({ images: {}, cardData: {} });
     }
 
     const cardIds = cardIdsParam.split(",").filter(Boolean);
@@ -30,23 +30,35 @@ export async function GET(request: NextRequest) {
     });
 
     const images: Record<string, string> = {};
+    const cardData: Record<
+      string,
+      { boosterPack?: string; rarity?: string }
+    > = {};
+
     cards.forEach((card) => {
       images[card.cardId] = card.imageUrl || "";
+      // Get the first boosterPack entry (e.g., "A1" from ["A1", "A1a"])
+      const boosterPackValue = card.boosterPack?.[0] || "";
+      cardData[card.cardId] = {
+        boosterPack: boosterPackValue,
+        rarity: card.rarity || "Common",
+      };
     });
 
     // Fill in missing cardIds with empty strings
     cardIds.forEach((cardId) => {
       if (!images[cardId]) {
         images[cardId] = "";
+        cardData[cardId] = { boosterPack: "", rarity: "Common" };
       }
     });
 
-    const result = { images };
+    const result = { images, cardData };
     cacheManager.set(cachePrefix, result, CACHE_CONFIG.CACHE_20_TTL.TTL);
 
     return Response.json(result);
   } catch (error) {
     console.error("[cards/images] Error:", error);
-    return Response.json({ images: {} }, { status: 500 });
+    return Response.json({ images: {}, cardData: {} }, { status: 500 });
   }
 }
