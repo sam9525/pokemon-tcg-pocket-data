@@ -3,12 +3,12 @@
  * Used for sorting cards in My Decks.
  */
 export const RARITY_ORDER = [
-  "Crown",         // ultra rare cards (cardinal, ditto, mewtwo, etc.)
-  "Ultra Rare",    // ex cards (charizard ex, pikachu ex, etc.)
-  "Super Rare",    // special art / ACE cards
-  "Rare",          // regular rare
-  "Common",        // common / uncommon
-  "Pokemon",       // basic pokemon (lowest)
+  "Crown", // ultra rare cards (cardinal, ditto, mewtwo, etc.)
+  "Ultra Rare", // ex cards (charizard ex, pikachu ex, etc.)
+  "Super Rare", // special art / ACE cards
+  "Rare", // regular rare
+  "Common", // common / uncommon
+  "Pokemon", // basic pokemon (lowest)
 ] as const;
 
 export type RarityLevel = (typeof RARITY_ORDER)[number];
@@ -32,8 +32,8 @@ export const FILTER_TO_RARITY: Record<string, RarityLevel> = {
  */
 export function getRarityPriority(rarity: string): number {
   const normalizedRarity = rarity.trim();
-  const index = RARITY_ORDER.findIndex(
-    (r) => normalizedRarity.toLowerCase().includes(r.toLowerCase()),
+  const index = RARITY_ORDER.findIndex((r) =>
+    normalizedRarity.toLowerCase().includes(r.toLowerCase()),
   );
   return index === -1 ? RARITY_ORDER.length : index;
 }

@@ -117,7 +117,7 @@ export default function DeckBuilderClient() {
       fetch(`/api/cards/images?cardIds=${cardIds.join(",")}&language=${lang}`)
         .then((res) => res.json())
         .then((data) => {
-          setCardData((prev) => ({ ...prev, ...data.cardData || {} }));
+          setCardData((prev) => ({ ...prev, ...(data.cardData || {}) }));
         })
         .catch((err) => {
           console.error("[DeckBuilder] Failed to load card metadata:", err);

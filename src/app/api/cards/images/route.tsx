@@ -30,10 +30,8 @@ export async function GET(request: NextRequest) {
     });
 
     const images: Record<string, string> = {};
-    const cardData: Record<
-      string,
-      { boosterPack?: string; rarity?: string }
-    > = {};
+    const cardData: Record<string, { boosterPack?: string; rarity?: string }> =
+      {};
 
     cards.forEach((card) => {
       images[card.cardId] = card.imageUrl || "";
