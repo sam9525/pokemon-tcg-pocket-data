@@ -25,6 +25,9 @@ interface IDeckList {
   deckListHash: string;
 }
 
+const CARD_BACKSIDE =
+  "https://pokemon-tcg-pocket-data.s3.ap-southeast-2.amazonaws.com/pokemon_card_backside.png";
+
 export default function DecksListClient({
   defaultDeckList,
 }: {
@@ -204,10 +207,10 @@ export default function DecksListClient({
                   {/* Featured Image section */}
                   <div className="hidden md:flex md:flex-col justify-center md:justify-start">
                     <AnimatedCard
-                      cardId={deck.highlight[0].cardName}
-                      imageUrl={deck.highlight[0].imageUrl}
-                      boosterPack={deck.highlight[0].boosterPack}
-                      cardCount={deck.highlight[0].cardCount}
+                      cardId={deck.highlight[0]?.cardName ?? ""}
+                      imageUrl={deck.highlight[0]?.imageUrl ?? CARD_BACKSIDE}
+                      boosterPack={deck.highlight[0]?.boosterPack}
+                      cardCount={deck.highlight[0]?.cardCount}
                     />
                     <div className="flex-grow h-4" />
                     <div className="flex flex-col gap-2">
@@ -239,10 +242,10 @@ export default function DecksListClient({
                     {/* Featured Image (Mobile) */}
                     <div className="relative group md:hidden">
                       <AnimatedCard
-                        cardId={deck.highlight[0].cardName}
-                        imageUrl={deck.highlight[0].imageUrl}
-                        boosterPack={deck.highlight[0].boosterPack}
-                        cardCount={deck.highlight[0].cardCount}
+                        cardId={deck.highlight[0]?.cardName ?? ""}
+                        imageUrl={deck.highlight[0]?.imageUrl ?? CARD_BACKSIDE}
+                        boosterPack={deck.highlight[0]?.boosterPack}
+                        cardCount={deck.highlight[0]?.cardCount}
                       />
                     </div>
                     {currentCardList.map((card, cardIndex) => (
