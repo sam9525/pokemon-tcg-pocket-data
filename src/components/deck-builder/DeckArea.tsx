@@ -13,6 +13,7 @@ interface DeckAreaProps {
   cards: DeckCardType[];
   validation: ValidationResult;
   cardImages: Record<string, string>; // cardId → imageUrl
+  cardData?: Record<string, { boosterPack?: string; rarity?: string }>; // NEW
   onNameChange: (name: string) => void;
   onRemoveOne: (cardId: string) => void;
   onRemoveAll: (cardId: string) => void;
@@ -27,6 +28,7 @@ export default function DeckArea({
   cards,
   validation,
   cardImages,
+  cardData = {},
   onNameChange,
   onRemoveOne,
   onRemoveAll,
@@ -113,6 +115,7 @@ export default function DeckArea({
             cardId={card.cardId}
             imageUrl={cardImages[card.cardId] || ""}
             quantity={card.quantity}
+            boosterPack={cardData[card.cardId]?.boosterPack}
             onRemoveOne={onRemoveOne}
             onRemoveAll={onRemoveAll}
           />

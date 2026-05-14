@@ -6,6 +6,7 @@ interface DeckCardProps {
   cardId: string;
   imageUrl: string;
   quantity: number;
+  boosterPack?: string;
   onRemoveOne: (cardId: string) => void;
   onRemoveAll: (cardId: string) => void;
 }
@@ -14,6 +15,7 @@ export default function DeckCard({
   cardId,
   imageUrl,
   quantity,
+  boosterPack,
   onRemoveOne,
   onRemoveAll,
 }: DeckCardProps) {
@@ -35,6 +37,12 @@ export default function DeckCard({
       {quantity > 1 && (
         <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 bg-primary text-foreground text-xs font-bold px-2 py-0.5 rounded-full z-10">
           x{quantity}
+        </div>
+      )}
+      {/* Booster pack badge */}
+      {boosterPack && (
+        <div className="absolute left-0 bottom-0 bg-primary text-foreground text-[10px] font-bold px-1 py-0.5 rounded-tr-md z-10">
+          {boosterPack}
         </div>
       )}
       {/* Remove one overlay on hover */}
