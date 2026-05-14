@@ -10,6 +10,9 @@ interface CardImageProps extends Omit<ImageProps, "width" | "height" | "src"> {
   height?: number;
 }
 
+const CARD_BACKSIDE =
+  "https://pokemon-tcg-pocket-data.s3.ap-southeast-2.amazonaws.com/pokemon_card_backside.png";
+
 export default function CardImage({
   src,
   variant,
@@ -19,6 +22,7 @@ export default function CardImage({
   height,
   ...props
 }: CardImageProps) {
+  const imageSrc = !src ? CARD_BACKSIDE : src;
   let sizes = "100vw";
   let defaultWidth = 360;
   let defaultHeight = 500;
@@ -46,7 +50,7 @@ export default function CardImage({
 
   return (
     <Image
-      src={src}
+      src={imageSrc}
       alt={alt}
       width={width || defaultWidth}
       height={height || defaultHeight}
