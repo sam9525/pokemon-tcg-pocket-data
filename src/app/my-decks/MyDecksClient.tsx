@@ -195,7 +195,7 @@ function DeckCardComponent({
         <button
           onClick={handlePrev}
           disabled={totalPages <= 1}
-          className="px-2 py-2 border-2 border-primary rounded-lg font-bold bg-foreground text-primary hover:bg-primary hover:text-background transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          className="px-3 py-6 border-2 border-primary rounded-lg font-bold bg-foreground text-primary hover:bg-primary hover:text-background transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
         >
           &lt;
         </button>
@@ -226,7 +226,7 @@ function DeckCardComponent({
         <button
           onClick={handleNext}
           disabled={totalPages <= 1}
-          className="px-2 py-2 border-2 border-primary rounded-lg font-bold bg-foreground text-primary hover:bg-primary hover:text-background transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          className="px-3 py-6 border-2 border-primary rounded-lg font-bold bg-foreground text-primary hover:bg-primary hover:text-background transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
         >
           &gt;
         </button>
