@@ -4,8 +4,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 import { useLanguage } from "@/components/provider/LanguageProvider";
-import CardImage from "@/components/CardImage";
-import * as interactiveCard from "@/utils/interactiveCard";
+import AnimatedCard from "@/components/AnimatedCard";
 import { getRarityPriority } from "@/lib/rarity";
 
 interface DeckCard {
@@ -176,7 +175,7 @@ function DeckCardComponent({
             {sortedCards.slice(0, 10).map((card, idx) => (
               <div key={`${card.cardId}-${idx}`} className="relative group">
                 {cardImages[card.cardId] ? (
-                  <DeckCardWithBoosterPack
+                  <AnimatedCard
                     cardId={card.cardId}
                     imageUrl={cardImages[card.cardId]}
                     boosterPack={cardData[card.cardId]?.boosterPack}
@@ -205,74 +204,6 @@ function DeckCardComponent({
             Delete
           </button>
         </div>
-      </div>
-    </div>
-  );
-}
-
-// Inline component that shows card with boosterPack badge
-// Mirrors AnimatedCard but with proper boosterPack positioning
-function DeckCardWithBoosterPack({
-  cardId,
-  imageUrl,
-  boosterPack,
-  cardCount,
-}: {
-  cardId: string;
-  imageUrl: string;
-  boosterPack?: string;
-  cardCount?: number;
-}) {
-  return (
-    <div
-      className="card-container"
-      onMouseMove={(e) =>
-        interactiveCard.handleMove(
-          e,
-          e.currentTarget.querySelector(".card") as HTMLElement,
-        )
-      }
-      onMouseOut={(e) =>
-        interactiveCard.handleMouseOut(
-          e.currentTarget.querySelector(".card") as HTMLElement,
-        )
-      }
-      onMouseUp={(e) =>
-        interactiveCard.handleMouseUp(
-          e.currentTarget.querySelector(".card") as HTMLElement,
-        )
-      }
-      onClick={(e) => {
-        e.preventDefault();
-        interactiveCard.handleClick(
-          cardId,
-          e.currentTarget.querySelector(".card") as HTMLElement,
-        );
-      }}
-    >
-      <div className="card relative">
-        <CardImage
-          src={imageUrl}
-          variant="card"
-          alt={cardId}
-          className="transition-transform duration-300"
-        />
-        <CardImage
-          src="https://pokemon-tcg-pocket-data.s3.ap-southeast-2.amazonaws.com/pokemon_card_backside.png"
-          variant="card"
-          alt="card-backside"
-          className="card-backside"
-        />
-        {boosterPack && (
-          <div className="booster-pack w-1/2 h-4 bg-primary text-[10px] font-bold text-foreground text-center absolute left-0 bottom-0 rounded-bl-md rounded-tr-md">
-            {boosterPack}
-          </div>
-        )}
-        {cardCount !== undefined && cardCount > 1 && (
-          <div className="card-count w-1/2 h-4 bg-primary text-[10px] font-bold text-foreground text-center absolute right-0 bottom-0 rounded-tl-md rounded-br-md">
-            x{cardCount}
-          </div>
-        )}
       </div>
     </div>
   );
