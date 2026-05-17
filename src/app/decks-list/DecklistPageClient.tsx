@@ -213,7 +213,9 @@ export default function DecksListClient({
                     <div className="flex-grow h-4" />
                     <div className="flex flex-col gap-2">
                       {/* Tag */}
-                      <div className={setTagClassName}>B1</div>
+                      <div className={setTagClassName}>
+                        {deck.package.split("_")[0]}
+                      </div>
                       {/* Save Button */}
                       <button className="decklist-button">SAVE</button>
                     </div>
@@ -286,7 +288,9 @@ export default function DecksListClient({
                     </div>
                     <div className="flex flex-row gap-4">
                       {/* Tag */}
-                      <div className={setTagClassName}>B1</div>
+                      <div className={setTagClassName}>
+                        {deck.package.split("_")[0]}
+                      </div>
                       {/* Save Button */}
                       <button className="decklist-button">SAVE</button>
                     </div>
