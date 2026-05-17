@@ -116,6 +116,7 @@
     "deletedSuccess": "Deck deleted",
     "noCards": "Add cards to your deck",
     "noSavedDecks": "No saved decks yet",
-    "saving": "Saving..."
+    "saving": "Saving...",
+    "loginRequired": "Please login to save decks"
   }
 }

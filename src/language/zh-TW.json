@@ -116,6 +116,7 @@
     "deletedSuccess": "牌組已刪除",
     "noCards": "將卡牌加入你的牌組",
     "noSavedDecks": "尚無儲存的牌組",
-    "saving": "儲存中..."
+    "saving": "儲存中...",
+    "loginRequired": "請登入以儲存牌組"
   }
 }
