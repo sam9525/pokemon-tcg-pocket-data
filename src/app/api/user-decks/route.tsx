@@ -25,13 +25,14 @@ export async function GET() {
 
     const decks = (await UserDeck.find({ userId: user._id })
       .sort({ updatedAt: -1 })
-      .select("name cards updatedAt createdAt")
+      .select("name cards updatedAt createdAt source")
       .lean()) as any;
 
     const plainDecks = decks.map((deck: any) => ({
       _id: deck._id.toString(),
       name: deck.name,
       cards: deck.cards,
+      source: deck.source,
       createdAt: deck.createdAt?.toISOString() || new Date().toISOString(),
       updatedAt: deck.updatedAt?.toISOString() || new Date().toISOString(),
     }));
@@ -55,7 +56,7 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { name, cards } = body;
+    const { name, cards, source } = body;
 
     if (!name?.trim()) {
       return NextResponse.json(
@@ -87,6 +88,7 @@ export async function POST(request: NextRequest) {
         cardId: c.cardId,
         quantity: Math.min(c.quantity, 2), // Cap at 2 copies
       })),
+      source: source || "builder",
     });
 
     return NextResponse.json({ deck: newDeck }, { status: 201 });
