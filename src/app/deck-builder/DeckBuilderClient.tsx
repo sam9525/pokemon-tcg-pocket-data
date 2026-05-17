@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 import { useLanguage } from "@/components/provider/LanguageProvider";
@@ -63,6 +63,29 @@ export default function DeckBuilderClient() {
     };
   }, []);
 
+  // Pre-fetch images for card IDs
+  const fetchImagesForCardIds = useCallback(
+    async (cardIds: string[]) => {
+      if (cardIds.length === 0) return;
+      const lang = currentLanguageLookup?.LANGUAGE || "en_US";
+      try {
+        const res = await fetch(
+          `/api/cards/images?cardIds=${cardIds.join(",")}&language=${lang}`,
+        );
+        const data = await res.json();
+        if (data.images) {
+          setCardImages((prev) => ({ ...prev, ...data.images }));
+        }
+        if (data.cardData) {
+          setCardData((prev) => ({ ...prev, ...data.cardData }));
+        }
+      } catch (err) {
+        console.error("[DeckBuilder] Failed to fetch deck card images:", err);
+      }
+    },
+    [currentLanguageLookup],
+  );
+
   // Load deck from URL param on mount
   useEffect(() => {
     const deckId = searchParams.get("deckId");
@@ -92,6 +115,11 @@ export default function DeckBuilderClient() {
           name: data.deck.name,
           cards: data.deck.cards,
         });
+        // Pre-fetch images for all deck cards so they render immediately
+        const deckCardIds = data.deck.cards.map(
+          (c: { cardId: string }) => c.cardId,
+        );
+        await fetchImagesForCardIds(deckCardIds);
         toast.success("Deck loaded", { id: toastId });
       } catch (error) {
         console.error("[DeckBuilder] Failed to load deck:", error);
@@ -101,7 +129,7 @@ export default function DeckBuilderClient() {
     };
 
     fetchAndLoadDeck();
-  }, [searchParams, loadDeck, router]);
+  }, [searchParams, loadDeck, router, fetchImagesForCardIds]);
 
   const handleCardsLoaded = (cards: { cardId: string; imageUrl: string }[]) => {
     const images: Record<string, string> = {};
