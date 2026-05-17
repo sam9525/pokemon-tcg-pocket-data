@@ -46,10 +46,10 @@ export default function DecksListClient({
   const [animationDirections, setAnimationDirections] = useState<
     Record<string, "left" | "right">
   >({});
+  const [hasLoadedFromSSR, setHasLoadedFromSSR] = useState(false);
   const observerRef = useRef<HTMLDivElement>(null);
-  const isMounted = useRef(false);
 
-  // Fetch packages when language changes
+  // Fetch packages only when language changes
   useEffect(() => {
     if (!language) return;
 
@@ -57,13 +57,14 @@ export default function DecksListClient({
       .then((res) => res.json())
       .then((data) => {
         setPackagesList(data.packages || []);
-        // Set default package
+        // Set default package if not already set
         if (data.packages?.length > 0 && !packages) {
           setPackages(data.packages[0].id);
         }
       })
       .catch(console.error);
-  }, [language, packages]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [language]);
 
   const prevNextBtnClassNameDesktop =
     "hidden md:block self-center px-3 py-6 border-2 border-primary rounded-lg font-bold bg-foreground text-primary hover:bg-primary hover:text-background transition-colors duration-200";
@@ -74,39 +75,36 @@ export default function DecksListClient({
   const setTagClassName =
     "w-full md:w-auto px-6 py-2 border-2 border-primary rounded-full font-bold bg-foreground text-center text-primary hover:bg-primary hover:text-background transition-colors duration-200";
 
+  // Fetch deck list when package changes, skip on initial mount if SSR provided data
   useEffect(() => {
-    if (!isMounted.current) {
-      isMounted.current = true;
-      if (language === "en_US" && !packages) {
-        return;
+    // Skip initial render if we have SSR data and packages is empty
+    if (!hasLoadedFromSSR && !packages) {
+      setHasLoadedFromSSR(true);
+      return;
+    }
+
+    if (!packages) return;
+
+    const toastPromise = new Promise(async (resolve, reject) => {
+      const response = await fetch(
+        `/api/decks-list?packages=${packages}&language=${language}`,
+      );
+      const data = await response.json();
+      setDeckList(data.decklists || []);
+
+      if (response.ok) {
+        resolve(response);
+      } else {
+        reject(response);
       }
-    }
+    });
 
-    try {
-      const toastPromise = new Promise(async (resolve, reject) => {
-        const response = await fetch(
-          `/api/decks-list?packages=${packages}&language=${language}`,
-        );
-        const data = await response.json();
-        setDeckList(data.decklists || []);
-
-        if (response.ok) {
-          resolve(response);
-        } else {
-          reject(response);
-        }
-      });
-
-      toast.promise(toastPromise, {
-        loading: currentLanguageLookup.NOTIFICATIONS.loadingDeckLists,
-        error: currentLanguageLookup.NOTIFICATIONS.failedToLoadDeckLists,
-        success:
-          currentLanguageLookup.NOTIFICATIONS.deckListsLoadedSuccessfully,
-      });
-    } catch (error) {
-      console.error(error);
-    }
-  }, [packages, language, currentLanguageLookup]);
+    toast.promise(toastPromise, {
+      loading: currentLanguageLookup.NOTIFICATIONS.loadingDeckLists,
+      error: currentLanguageLookup.NOTIFICATIONS.failedToLoadDeckLists,
+      success: currentLanguageLookup.NOTIFICATIONS.deckListsLoadedSuccessfully,
+    });
+  }, [packages, language, currentLanguageLookup, hasLoadedFromSSR]);
 
   useEffect(() => {
     setVisibleCount(5);
