@@ -14,8 +14,9 @@ async function getFirstPackageId(): Promise<string> {
     if (!response.Body) return "A1_Genetic-Apex";
 
     const bodyContents = await response.Body.transformToString();
-    const allMetadata: Record<string, Record<string, string>> =
-      JSON.parse(bodyContents);
+    const allMetadata: Record<string, Record<string, string>> = JSON.parse(
+      bodyContents,
+    );
     const packages = Object.keys(allMetadata);
     return packages[0] || "A1_Genetic-Apex";
   } catch {

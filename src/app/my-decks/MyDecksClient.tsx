@@ -213,9 +213,7 @@ function DeckCardComponent({
                     cardCount={card.quantity}
                   />
                 ) : (
-                  <div className="w-full aspect-[5/7] bg-gray-200 rounded flex items-center justify-center text-xs text-gray-500">
-                    {card.cardId.split("_").pop()}
-                  </div>
+                  <div className="w-full aspect-[5/7] bg-gray-600/40 border-2 border-dashed border-gray-300 rounded-lg" />
                 )}
               </div>
             ))}
