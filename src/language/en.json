@@ -127,6 +127,11 @@
     "deleteConfirm": "Delete this deck? This cannot be undone.",
     "deleting": "Deleting...",
     "deletedSuccess": "Deck deleted",
-    "deleteFailed": "Failed to delete deck"
+    "deleteFailed": "Failed to delete deck",
+    "editInBuilder": "Edit in Builder",
+    "editInBuilderPrompt": "Enter a name for the new deck:",
+    "copying": "Copying...",
+    "copiedSuccess": "Deck copied!",
+    "copyFailed": "Failed to copy"
   }
 }

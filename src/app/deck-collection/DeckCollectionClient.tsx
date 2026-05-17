@@ -34,6 +34,7 @@ export default function DeckCollectionClient({
   const [cardData, setCardData] = useState<
     Record<string, { boosterPack?: string; rarity?: string }>
   >({});
+  const [editingDeckId, setEditingDeckId] = useState<string | null>(null);
 
   useEffect(() => {
     if (decks.length === 0) return;
@@ -55,6 +56,59 @@ export default function DeckCollectionClient({
         console.error("[DeckCollection] Failed to load card data:", err);
       });
   }, [decks, language]);
+
+  const handleEditInBuilder = async (deck: UserDeck) => {
+    const t =
+      (currentLanguageLookup?.DECK_COLLECTION as Record<string, string>) || {};
+
+    // Prompt for new deck name
+    const newName = window.prompt(
+      t.editInBuilderPrompt || "Enter a name for the new deck:",
+      deck.name + " (Copy)",
+    );
+
+    if (!newName?.trim()) return;
+
+    setEditingDeckId(deck._id);
+
+    try {
+      const toastId = toast.loading(t.copying || "Copying...");
+
+      // Create new deck via POST
+      const res = await fetch("/api/user-decks", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: newName.trim(),
+          cards: deck.cards,
+          source: "builder",
+        }),
+      });
+
+      if (res.status === 401) {
+        toast.error("Session expired", { id: toastId });
+        router.push("/login?callbackUrl=/deck-collection");
+        return;
+      }
+
+      if (res.ok) {
+        const data = await res.json();
+        toast.success(t.copiedSuccess || "Deck copied!", { id: toastId });
+        // Navigate to builder with the new deck ID
+        router.push(`/deck-builder?deckId=${data.deck._id}`);
+      } else {
+        const data = await res.json();
+        toast.error(data.error || t.copyFailed || "Failed to copy", {
+          id: toastId,
+        });
+      }
+    } catch (error) {
+      console.error("[DeckCollection] Copy failed:", error);
+      toast.error(t.copyFailed || "Failed to copy deck");
+    } finally {
+      setEditingDeckId(null);
+    }
+  };
 
   const handleDelete = async (deckId: string) => {
     const t =
@@ -117,20 +171,19 @@ export default function DeckCollectionClient({
   }
 
   return (
-    <div className="flex flex-col items-center p-4 md:p-6">
-      <h1 className="text-2xl font-bold mb-6">
-        {currentLanguageLookup?.DECK_COLLECTION?.title || "Deck Collection"}
-      </h1>
+    <div className="flex flex-col items-center justify-center p-3 md:p-5">
       <div className="w-full max-w-5xl">
         {decks.map((deck) => (
-          <div key={deck._id} className="flex flex-col gap-6 items-end m-4">
-            <DeckCardComponent
-              deck={deck}
-              cardImages={cardImages}
-              cardData={cardData}
-              onDelete={handleDelete}
-            />
-          </div>
+          <DeckCardComponent
+            key={deck._id}
+            deck={deck}
+            cardImages={cardImages}
+            cardData={cardData}
+            onEditInBuilder={handleEditInBuilder}
+            onDelete={handleDelete}
+            isEditing={editingDeckId === deck._id}
+            currentLanguageLookup={currentLanguageLookup}
+          />
         ))}
       </div>
     </div>
@@ -141,60 +194,92 @@ function DeckCardComponent({
   deck,
   cardImages,
   cardData,
+  onEditInBuilder,
   onDelete,
+  isEditing,
+  currentLanguageLookup,
 }: {
   deck: UserDeck;
   cardImages: Record<string, string>;
   cardData: Record<string, { boosterPack?: string; rarity?: string }>;
+  onEditInBuilder: (deck: UserDeck) => void;
   onDelete: (id: string) => void;
+  isEditing: boolean;
+  currentLanguageLookup: Record<string, unknown> | null;
 }) {
-  const totalCards = deck.cards.reduce((sum, c) => sum + c.quantity, 0);
-  const [currentPage, setCurrentPage] = useState(0);
-  const cardsPerPage = 10;
-  const totalPages = Math.ceil(totalCards / cardsPerPage);
-
-  useEffect(() => {
-    setCurrentPage(0);
-  }, [deck._id]);
-
+  // Sort cards by rarity: Crown first, then Ultra Rare, etc.
   const sortedCards = [...deck.cards].sort((a, b) => {
     const rarityA = cardData[a.cardId]?.rarity || "Common";
     const rarityB = cardData[b.cardId]?.rarity || "Common";
     return getRarityPriority(rarityA) - getRarityPriority(rarityB);
   });
 
-  const visibleCards = sortedCards.slice(
-    currentPage * cardsPerPage,
-    (currentPage + 1) * cardsPerPage,
-  );
-
-  const handlePrev = () => {
-    setCurrentPage((prev) => (prev - 1 + totalPages) % totalPages);
-  };
-
-  const handleNext = () => {
-    setCurrentPage((prev) => (prev + 1) % totalPages);
-  };
+  // Featured card is the first one (highest rarity)
+  const featuredCard = sortedCards[0];
+  const gridCards = sortedCards.slice(1);
 
   return (
-    <div className="w-full flex flex-col gap-4 p-4 md:p-6 sm:p-5 border-2 border-primary rounded-2xl bg-search-background shadow-lg">
-      <div className="flex flex-row justify-between items-center">
-        <div className="text-xl font-bold">{deck.name}</div>
-        <div className="text-sm text-gray-500">{totalCards} cards</div>
-      </div>
-      <div className="flex flex-row gap-2 md:gap-4 items-center">
-        <button
-          onClick={handlePrev}
-          disabled={totalPages <= 1}
-          className="px-3 py-6 border-2 border-primary rounded-lg font-bold bg-foreground text-primary hover:bg-primary hover:text-background transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
-        >
-          &lt;
-        </button>
+    <div className="flex flex-col gap-6 items-end m-4">
+      <div className="w-full flex flex-col gap-4 p-4 md:p-6 sm:p-5 border-2 border-primary rounded-2xl bg-search-background shadow-lg">
+        <div className="flex flex-row justify-between items-center">
+          <div className="text-xl font-bold">{deck.name}</div>
+        </div>
+        <div className="flex flex-col md:flex-row gap-2 md:gap-4 items-center md:items-stretch">
+          {/* Featured Image section */}
+          <div className="hidden md:flex md:flex-col justify-center md:justify-start">
+            {featuredCard && (
+              <AnimatedCard
+                cardId={featuredCard.cardId}
+                imageUrl={cardImages[featuredCard.cardId]}
+                boosterPack={cardData[featuredCard.cardId]?.boosterPack}
+                cardCount={featuredCard.quantity}
+              />
+            )}
+            <div className="flex-grow h-4" />
+            <div className="flex flex-col gap-2">
+              {/* Edit in Builder Button */}
+              <button
+                className="px-6 py-2 bg-primary text-foreground font-bold rounded-lg hover:opacity-90 transition-opacity disabled:opacity-50"
+                onClick={() => onEditInBuilder(deck)}
+                disabled={isEditing}
+              >
+                {isEditing
+                  ? "..."
+                  : (
+                      currentLanguageLookup?.DECK_COLLECTION as Record<
+                        string,
+                        string
+                      >
+                    )?.editInBuilder || "Edit in Builder"}
+              </button>
+              {/* Delete Button */}
+              <button
+                className="px-6 py-2 bg-red-500 text-white font-bold rounded-lg hover:opacity-90 transition-opacity"
+                onClick={() => onDelete(deck._id)}
+              >
+                Delete
+              </button>
+            </div>
+          </div>
 
-        <div className="flex-1">
-          <div className="grid grid-cols-3 sm:grid-cols-4 lg:grid-cols-5 gap-2">
-            {visibleCards.map((card, idx) => (
-              <div key={`${card.cardId}-${idx}`} className="relative group">
+          {/* Grid of Cards */}
+          <div className="flex-1 grid grid-cols-3 sm:grid-cols-4 lg:grid-cols-5 gap-2 pb-4 sm:pb-0">
+            {/* Featured Card (Mobile) */}
+            <div className="relative group md:hidden">
+              {featuredCard && (
+                <AnimatedCard
+                  cardId={featuredCard.cardId}
+                  imageUrl={cardImages[featuredCard.cardId]}
+                  boosterPack={cardData[featuredCard.cardId]?.boosterPack}
+                  cardCount={featuredCard.quantity}
+                />
+              )}
+            </div>
+            {gridCards.map((card, cardIndex) => (
+              <div
+                key={`${card.cardId}-${cardIndex}`}
+                className="relative group"
+              >
                 {cardImages[card.cardId] ? (
                   <AnimatedCard
                     cardId={card.cardId}
@@ -208,38 +293,34 @@ function DeckCardComponent({
               </div>
             ))}
           </div>
+
+          <div className="md:hidden flex flex-col w-full gap-4">
+            <div className="flex flex-row gap-4">
+              {/* Edit in Builder Button (Mobile) */}
+              <button
+                className="flex-1 py-2 bg-primary text-foreground font-bold rounded-lg hover:opacity-90 transition-opacity disabled:opacity-50"
+                onClick={() => onEditInBuilder(deck)}
+                disabled={isEditing}
+              >
+                {isEditing
+                  ? "..."
+                  : (
+                      currentLanguageLookup?.DECK_COLLECTION as Record<
+                        string,
+                        string
+                      >
+                    )?.editInBuilder || "Edit in Builder"}
+              </button>
+              {/* Delete Button (Mobile) */}
+              <button
+                className="flex-1 py-2 bg-red-500 text-white font-bold rounded-lg hover:opacity-90 transition-opacity"
+                onClick={() => onDelete(deck._id)}
+              >
+                Delete
+              </button>
+            </div>
+          </div>
         </div>
-
-        <button
-          onClick={handleNext}
-          disabled={totalPages <= 1}
-          className="px-3 py-6 border-2 border-primary rounded-lg font-bold bg-foreground text-primary hover:bg-primary hover:text-background transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
-        >
-          &gt;
-        </button>
-      </div>
-
-      {totalPages > 1 && (
-        <div className="flex justify-center gap-2 text-sm text-gray-500">
-          {Array.from({ length: totalPages }).map((_, idx) => (
-            <div
-              key={idx}
-              className={`w-2 h-2 rounded-full ${
-                idx === currentPage ? "bg-primary" : "bg-gray-300"
-              }`}
-            />
-          ))}
-        </div>
-      )}
-
-      {/* Delete Button Only */}
-      <div className="flex flex-row gap-2">
-        <button
-          onClick={() => onDelete(deck._id)}
-          className="flex-1 py-2 bg-red-500 text-white font-bold rounded-lg hover:opacity-90 transition-opacity"
-        >
-          Delete
-        </button>
       </div>
     </div>
   );

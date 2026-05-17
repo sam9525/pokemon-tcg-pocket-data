@@ -127,6 +127,11 @@
     "deleteConfirm": "刪除此牌組？此動作無法復原。",
     "deleting": "刪除中...",
     "deletedSuccess": "牌組已刪除",
-    "deleteFailed": "刪除牌組失敗"
+    "deleteFailed": "刪除牌組失敗",
+    "editInBuilder": "在構築器中編輯",
+    "editInBuilderPrompt": "輸入新牌組名稱:",
+    "copying": "複製中...",
+    "copiedSuccess": "牌組已複製！",
+    "copyFailed": "複製失敗"
   }
 }

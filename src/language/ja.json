@@ -127,6 +127,11 @@
     "deleteConfirm": "このデッキを削除しますか？この操作は取り消せません。",
     "deleting": "削除中...",
     "deletedSuccess": "デッキを削除しました",
-    "deleteFailed": "デッキの削除に失敗しました"
+    "deleteFailed": "デッキの削除に失敗しました",
+    "editInBuilder": "ビルダーで編集",
+    "editInBuilderPrompt": "新しいデッキ名を入力:",
+    "copying": "コピー中...",
+    "copiedSuccess": "デッキをコピーしました！",
+    "copyFailed": "コピーに失敗しました"
   }
 }
