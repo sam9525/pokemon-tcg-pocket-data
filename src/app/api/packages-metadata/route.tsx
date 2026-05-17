@@ -48,9 +48,6 @@ export async function GET(request: Request) {
       name: names[language] || names["en_US"] || id,
     }));
 
-    // Sort by id
-    packages.sort((a, b) => a.id.localeCompare(b.id));
-
     // Store the response in the cache
     cacheManager.set(cachePrefix, packages, CACHE_CONFIG.CACHE_20_TTL.TTL);
 

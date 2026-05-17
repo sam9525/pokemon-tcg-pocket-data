@@ -35,7 +35,7 @@ export default function DecksListClient({
 }) {
   const { currentLanguageLookup, language } = useLanguage();
   const [deckList, setDeckList] = useState(defaultDeckList || []);
-  const [packages, setPackages] = useState("A1_genetic-apex");
+  const [packages, setPackages] = useState("");
   const [packagesList, setPackagesList] = useState<
     { id: string; name: string }[]
   >([]);
@@ -77,7 +77,7 @@ export default function DecksListClient({
   useEffect(() => {
     if (!isMounted.current) {
       isMounted.current = true;
-      if (language === "en_US" && packages === "A1_genetic-apex") {
+      if (language === "en_US" && !packages) {
         return;
       }
     }
