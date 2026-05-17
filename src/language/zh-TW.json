@@ -125,6 +125,7 @@
     "visitDeckList": "前往牌組列表儲存牌組",
     "browseDecks": "瀏覽牌組",
     "deleteConfirm": "刪除此牌組？此動作無法復原。",
+    "delete": "刪除",
     "deleting": "刪除中...",
     "deletedSuccess": "牌組已刪除",
     "deleteFailed": "刪除牌組失敗",
@@ -133,5 +134,10 @@
     "copying": "複製中...",
     "copiedSuccess": "牌組已複製！",
     "copyFailed": "複製失敗"
+  },
+  "MY_DECKS": {
+    "title": "我的牌組",
+    "edit": "編輯",
+    "delete": "刪除"
   }
 }

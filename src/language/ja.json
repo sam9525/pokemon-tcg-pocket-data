@@ -125,6 +125,7 @@
     "visitDeckList": "デッキリストからデッキを保存してください",
     "browseDecks": "デッキ一覧を見る",
     "deleteConfirm": "このデッキを削除しますか？この操作は取り消せません。",
+    "delete": "削除",
     "deleting": "削除中...",
     "deletedSuccess": "デッキを削除しました",
     "deleteFailed": "デッキの削除に失敗しました",
@@ -133,5 +134,10 @@
     "copying": "コピー中...",
     "copiedSuccess": "デッキをコピーしました！",
     "copyFailed": "コピーに失敗しました"
+  },
+  "MY_DECKS": {
+    "title": "マイデッキ",
+    "edit": "編集",
+    "delete": "削除"
   }
 }

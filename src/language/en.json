@@ -125,6 +125,7 @@
     "visitDeckList": "Visit the deck list to save decks",
     "browseDecks": "Browse Decks",
     "deleteConfirm": "Delete this deck? This cannot be undone.",
+    "delete": "Delete",
     "deleting": "Deleting...",
     "deletedSuccess": "Deck deleted",
     "deleteFailed": "Failed to delete deck",
@@ -133,5 +134,10 @@
     "copying": "Copying...",
     "copiedSuccess": "Deck copied!",
     "copyFailed": "Failed to copy"
+  },
+  "MY_DECKS": {
+    "title": "My Decks",
+    "edit": "Edit",
+    "delete": "Delete"
   }
 }

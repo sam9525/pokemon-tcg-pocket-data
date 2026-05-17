@@ -121,9 +121,6 @@ export default function MyDecksClient({ initialDecks }: MyDecksClientProps) {
 
   return (
     <div className="flex flex-col items-center p-4 md:p-6">
-      <h1 className="text-2xl font-bold mb-6">
-        {currentLanguageLookup?.MY_DECKS?.title || "My Decks"}
-      </h1>
       <div className="w-full max-w-5xl">
         {decks.map((deck) => (
           <div key={deck._id} className="flex flex-col gap-6 items-end m-4">
@@ -133,6 +130,7 @@ export default function MyDecksClient({ initialDecks }: MyDecksClientProps) {
               cardData={cardData}
               onEdit={handleEdit}
               onDelete={handleDelete}
+              currentLanguageLookup={currentLanguageLookup}
             />
           </div>
         ))}
@@ -147,13 +145,17 @@ function DeckCardComponent({
   cardData,
   onEdit,
   onDelete,
+  currentLanguageLookup,
 }: {
   deck: UserDeck;
   cardImages: Record<string, string>;
   cardData: Record<string, { boosterPack?: string; rarity?: string }>;
   onEdit: (id: string) => void;
   onDelete: (id: string) => void;
+  currentLanguageLookup: Record<string, unknown> | null;
 }) {
+  const t =
+    (currentLanguageLookup?.MY_DECKS as Record<string, string>) || {};
   const totalCards = deck.cards.reduce((sum, c) => sum + c.quantity, 0);
   const [currentPage, setCurrentPage] = useState(0);
   const cardsPerPage = 10;
@@ -250,13 +252,13 @@ function DeckCardComponent({
           onClick={() => onEdit(deck._id)}
           className="flex-1 py-2 bg-primary text-foreground font-bold rounded-lg hover:opacity-90 transition-opacity"
         >
-          Edit
+          {t.edit || "Edit"}
         </button>
         <button
           onClick={() => onDelete(deck._id)}
           className="flex-1 py-2 bg-red-500 text-white font-bold rounded-lg hover:opacity-90 transition-opacity"
         >
-          Delete
+          {t.delete || "Delete"}
         </button>
       </div>
     </div>
