@@ -307,7 +307,9 @@ export default function DecksListClient({
                         onClick={() => handleSaveDeck(deck)}
                         disabled={savingDeckName === deck.deckName}
                       >
-                        {savingDeckName === deck.deckName ? "..." : "SAVE"}
+                        {savingDeckName === deck.deckName
+                          ? currentLanguageLookup?.DECK_BUILDER?.saving
+                          : currentLanguageLookup?.DECK_BUILDER?.save}
                       </button>
                     </div>
                   </div>
@@ -388,7 +390,9 @@ export default function DecksListClient({
                         onClick={() => handleSaveDeck(deck)}
                         disabled={savingDeckName === deck.deckName}
                       >
-                        {savingDeckName === deck.deckName ? "..." : "SAVE"}
+                        {savingDeckName === deck.deckName
+                          ? currentLanguageLookup?.DECK_BUILDER?.saving
+                          : currentLanguageLookup?.DECK_BUILDER?.save}
                       </button>
                     </div>
                   </div>
