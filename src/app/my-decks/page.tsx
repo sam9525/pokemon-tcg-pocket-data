@@ -29,9 +29,9 @@ export default async function MyDecksPage() {
     redirect("/login?callbackUrl=/my-decks");
   }
 
-  const decks = (await UserDeck.find({ userId: user._id })
+  const decks = (await UserDeck.find({ userId: user._id, source: "builder" })
     .sort({ updatedAt: -1 })
-    .select("name cards createdAt updatedAt")
+    .select("name cards createdAt updatedAt source")
     .lean()) as any;
 
   const plainDecks = decks.map((deck: any) => ({
@@ -40,6 +40,7 @@ export default async function MyDecksPage() {
     cards: deck.cards,
     createdAt: deck.createdAt?.toISOString() || new Date().toISOString(),
     updatedAt: deck.updatedAt?.toISOString() || new Date().toISOString(),
+    source: deck.source,
   }));
 
   return <MyDecksClient initialDecks={plainDecks} />;
