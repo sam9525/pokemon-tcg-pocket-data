@@ -118,5 +118,15 @@
     "noSavedDecks": "保存されたデッキがありません",
     "saving": "保存中...",
     "loginRequired": "デッキを保存するにはログインしてください"
+  },
+  "DECK_COLLECTION": {
+    "title": "デッキコレクション",
+    "noDecks": "保存されたデッキがありません",
+    "visitDeckList": "デッキリストからデッキを保存してください",
+    "browseDecks": "デッキ一覧を見る",
+    "deleteConfirm": "このデッキを削除しますか？この操作は取り消せません。",
+    "deleting": "削除中...",
+    "deletedSuccess": "デッキを削除しました",
+    "deleteFailed": "デッキの削除に失敗しました"
   }
 }

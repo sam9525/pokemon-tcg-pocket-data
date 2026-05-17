@@ -118,5 +118,15 @@
     "noSavedDecks": "No saved decks yet",
     "saving": "Saving...",
     "loginRequired": "Please login to save decks"
+  },
+  "DECK_COLLECTION": {
+    "title": "Deck Collection",
+    "noDecks": "No saved decks",
+    "visitDeckList": "Visit the deck list to save decks",
+    "browseDecks": "Browse Decks",
+    "deleteConfirm": "Delete this deck? This cannot be undone.",
+    "deleting": "Deleting...",
+    "deletedSuccess": "Deck deleted",
+    "deleteFailed": "Failed to delete deck"
   }
 }
