@@ -130,21 +130,23 @@ export default function DecksListClient({
     setSavingDeckName(deck.deckName);
 
     try {
-      // Aggregate all cards from highlight and all players into cardId + quantity format
+      // Get the currently showing card list (based on currentCardListIndices)
+      const cardLists = Object.values(deck.cardList);
+      const currentListIndex = currentCardListIndices[deck.deckName] || 0;
+      const currentPlayerCards = cardLists[currentListIndex] || [];
+
+      // Aggregate cards from highlight + current player card list
       const cardMap = new Map<string, number>();
 
       // Include highlight cards
       deck.highlight.forEach((card) => {
-        const existing = cardMap.get(card.cardId) || 0;
-        cardMap.set(card.cardId, existing + card.cardCount);
+        cardMap.set(card.cardId, card.cardCount);
       });
 
-      // Include all player cards
-      Object.values(deck.cardList).forEach((playerCards) => {
-        (playerCards as Card[]).forEach((card) => {
-          const existing = cardMap.get(card.cardId) || 0;
-          cardMap.set(card.cardId, existing + card.cardCount);
-        });
+      // Include current player cards
+      currentPlayerCards.forEach((card) => {
+        const existing = cardMap.get(card.cardId) || 0;
+        cardMap.set(card.cardId, existing + card.cardCount);
       });
 
       const cards = Array.from(cardMap.entries()).map(([cardId, quantity]) => ({
