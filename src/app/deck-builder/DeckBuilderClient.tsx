@@ -172,6 +172,7 @@ export default function DeckBuilderClient() {
         body: JSON.stringify({
           name: deck.name,
           cards: deck.cards,
+          source: "builder",
         }),
       });
 
