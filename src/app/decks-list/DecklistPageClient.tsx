@@ -1,4 +1,6 @@
 "use client";
+import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
 import { useLanguage } from "@/components/provider/LanguageProvider";
 import AnimatedCard from "@/components/AnimatedCard";
 import { useEffect, useState, useRef } from "react";
@@ -48,6 +50,9 @@ export default function DecksListClient({
   >({});
   const [hasLoadedFromSSR, setHasLoadedFromSSR] = useState(false);
   const observerRef = useRef<HTMLDivElement>(null);
+  const [savingDeckName, setSavingDeckName] = useState<string | null>(null);
+  const router = useRouter();
+  const { data: session } = useSession();
 
   // Fetch packages only when language changes
   useEffect(() => {
@@ -111,6 +116,75 @@ export default function DecksListClient({
   }, [deckList, packages]);
 
   const hasMore = visibleCount < deckList.length;
+
+  const handleSaveDeck = async (deck: IDeckList) => {
+    if (!session?.user?.email) {
+      toast.error(
+        currentLanguageLookup?.DECK_BUILDER?.loginRequired ||
+          "Please login to save decks",
+      );
+      router.push("/login?callbackUrl=/decks-list");
+      return;
+    }
+
+    setSavingDeckName(deck.deckName);
+
+    try {
+      // Aggregate all cards from all players into cardId + quantity format
+      const cardMap = new Map<string, number>();
+      Object.values(deck.cardList).forEach((playerCards) => {
+        (playerCards as Card[]).forEach((card) => {
+          const existing = cardMap.get(card.cardId) || 0;
+          cardMap.set(card.cardId, existing + card.cardCount);
+        });
+      });
+
+      const cards = Array.from(cardMap.entries()).map(([cardId, quantity]) => ({
+        cardId,
+        quantity: Math.min(quantity, 2), // Cap at 2 copies like the validation
+      }));
+
+      if (cards.length === 0) {
+        toast.error("No cards to save");
+        return;
+      }
+
+      const toastId = toast.loading(
+        currentLanguageLookup?.DECK_BUILDER?.saving || "Saving...",
+      );
+
+      const res = await fetch("/api/user-decks", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: deck.deckName,
+          cards,
+        }),
+      });
+
+      if (res.status === 401) {
+        toast.error("Session expired", { id: toastId });
+        router.push("/login?callbackUrl=/decks-list");
+        return;
+      }
+
+      if (res.ok) {
+        toast.success(
+          currentLanguageLookup?.DECK_BUILDER?.savedSuccess ||
+            "Deck saved to your collection!",
+          { id: toastId },
+        );
+      } else {
+        const data = await res.json();
+        toast.error(data.error || "Failed to save deck", { id: toastId });
+      }
+    } catch (error) {
+      console.error("[Decklist] Save failed:", error);
+      toast.error("Failed to save deck");
+    } finally {
+      setSavingDeckName(null);
+    }
+  };
 
   const handleLoadMore = () => {
     setVisibleCount((prev) => prev + 5);
@@ -217,7 +291,13 @@ export default function DecksListClient({
                         {deck.package.split("_")[0]}
                       </div>
                       {/* Save Button */}
-                      <button className="decklist-button">SAVE</button>
+                      <button
+                        className="decklist-button"
+                        onClick={() => handleSaveDeck(deck)}
+                        disabled={savingDeckName === deck.deckName}
+                      >
+                        {savingDeckName === deck.deckName ? "..." : "SAVE"}
+                      </button>
                     </div>
                   </div>
 
@@ -292,7 +372,13 @@ export default function DecksListClient({
                         {deck.package.split("_")[0]}
                       </div>
                       {/* Save Button */}
-                      <button className="decklist-button">SAVE</button>
+                      <button
+                        className="decklist-button"
+                        onClick={() => handleSaveDeck(deck)}
+                        disabled={savingDeckName === deck.deckName}
+                      >
+                        {savingDeckName === deck.deckName ? "..." : "SAVE"}
+                      </button>
                     </div>
                   </div>
                 </div>
