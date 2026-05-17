@@ -167,6 +167,7 @@ export default function DecksListClient({
         body: JSON.stringify({
           name: deck.deckName,
           cards,
+          source: "decklist",
         }),
       });
 
