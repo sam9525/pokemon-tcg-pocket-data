@@ -17,29 +17,43 @@ test.describe("Security Tests", () => {
 
   test.describe("Profile API - IDOR Prevention", () => {
     /**
-     * Verify that regular (non-admin) users cannot access other users' profiles
-     * by passing an _id parameter. The API should either:
-     * - Return 401 (Unauthorized) - no session
-     * - Return the user's own profile (ignoring the _id param) - correct behavior
+     * IDOR (Insecure Direct Object Reference) Prevention Tests
      *
-     * It should NEVER return another user's profile data.
+     * AUTHENTICATION REQUIREMENTS:
+     * These tests require a pre-configured test environment with:
+     * - Authenticated session cookies/tokens
+     * - Test users with known credentials (regular user + admin user)
+     * - Session management setup
+     *
+     * Without proper auth setup, these tests will receive 401 and cannot
+     * fully verify IDOR protection. They serve as documentation of the
+     * expected security behavior.
+     *
+     * EXPECTED BEHAVIOR:
+     * - Unauthenticated requests: 401 Unauthorized
+     * - Authenticated regular user + _id param: Return own profile (ignore _id)
+     * - Authenticated admin + _id param: Return requested profile (elevated access)
+     * - NEVER return another user's data to a non-admin user
      */
+
     test("regular users cannot access other profiles via _id param", async ({
       request,
     }) => {
-      // First, create a request as an authenticated regular user
+      // SECURITY: This test verifies that the API checks authentication FIRST
+      // before processing the _id parameter.
+      //
+      // Without auth setup, this will return 401 (correct behavior).
+      // With proper auth, it should return the authenticated user's own profile,
+      // completely ignoring the _id parameter for non-admin users.
       const response = await request.get(
         `${BASE_URL}/api/profile?_id=someOtherUserId`,
         {
-          // This test verifies the security boundary:
-          // - If no auth: 401
-          // - If auth but not admin + _id provided: should return own profile or 403
-          // - Should NEVER expose other user's data via _id
+          // TODO: Set authenticated user cookie/token here for full testing
+          // Example: { headers: { Cookie: `session=${userSession}` } }
         },
       );
 
-      // The key security check: if the user is authenticated but not admin,
-      // they should NOT be able to access arbitrary profiles
+      // The key security check: authentication must be verified first
       if (response.status() === 200) {
         // If we get 200, verify it returned the authenticated user's profile, not the requested _id
         const data = await response.json();
@@ -47,21 +61,20 @@ test.describe("Security Tests", () => {
         // and returns the authenticated user's profile based on session
         expect(data).toBeDefined();
       } else {
-        // 401 is acceptable - no session provided
+        // 401 is acceptable - no session provided (correct security boundary)
         expect(response.status()).toBe(401);
       }
     });
 
-    /**
-     * Verify that regular users cannot modify other users' profiles
-     * by passing an _id in the PUT request body. The API should:
-     * - Return 401 if unauthenticated
-     * - Ignore the _id param and update own profile if authenticated but not admin
-     * - NOT allow modification of other users' profiles
-     */
     test("regular users cannot modify other profiles via _id param", async ({
       request,
     }) => {
+      // SECURITY: This test verifies that the API ignores _id in PUT request body
+      // for non-admin users, preventing profile modification attacks.
+      //
+      // Without auth setup, this will return 401 (correct behavior).
+      // With proper auth, it should update the authenticated user's own profile,
+      // completely ignoring the _id parameter for non-admin users.
       const response = await request.put(`${BASE_URL}/api/profile`, {
         data: {
           _id: "someOtherUserId",
@@ -83,15 +96,16 @@ test.describe("Security Tests", () => {
       }
     });
 
-    /**
-     * Verify that admin users CAN access any profile via _id parameter.
-     * This is the positive test case - admins should have elevated access.
-     */
     test("admin users can access any profile via _id param", async ({
       request,
     }) => {
-      // This test requires an admin-authenticated session
-      // In a real test environment, you would set up an admin cookie/token
+      // SECURITY: This is the positive test case - admins SHOULD have elevated access.
+      //
+      // REQUIREMENTS: This test requires an admin-authenticated session setup.
+      // Without admin auth, this will return 401 (expected for unauthorized users).
+      //
+      // TODO: Set admin cookie/token for full admin privilege testing
+      // Example: { headers: { Cookie: `session=${adminSession}` } }
       const response = await request.get(
         `${BASE_URL}/api/profile?_id=adminTargetId`,
         {
@@ -111,6 +125,17 @@ test.describe("Security Tests", () => {
 
   test.describe("/api/users Endpoint Security", () => {
     /**
+     * AUTHENTICATION REQUIREMENTS:
+     * These tests require a pre-configured test environment with:
+     * - Authenticated session cookies/tokens
+     * - Test users with known credentials (regular user + admin user)
+     * - Session management setup
+     *
+     * Without proper auth setup, the "authenticated non-admin" test cannot
+     * fully verify role-based access control.
+     */
+
+    /**
      * Verify that the /api/users endpoint returns 401 for unauthenticated requests.
      * This endpoint should NEVER be accessible without authentication.
      */
@@ -129,12 +154,19 @@ test.describe("Security Tests", () => {
     /**
      * Verify that authenticated non-admin users receive 403 Forbidden.
      * The /api/users endpoint should only be accessible by administrators.
+     *
+     * NOTE: This test requires proper authentication setup to verify that
+     * a logged-in regular user (non-admin) receives403 Forbidden.
+     * Without auth setup, this test will receive 401 which is also correct behavior.
      */
     test("requires admin role - returns 403 for authenticated non-admin users", async ({
       request,
     }) => {
       // Make authenticated request as regular user (non-admin)
       // In test environment, this would use a pre-configured regular user session
+      //
+      // TODO: Set regular user authentication headers for full RBAC testing
+      // Example: { headers: { Cookie: `session=${regularUserSession}` } }
       const response = await request.get(`${BASE_URL}/api/users`, {
         // Regular user authentication headers would go here
       });
@@ -241,11 +273,16 @@ test.describe("Security Tests", () => {
      * be treated as literal search terms, not regex patterns.
      *
      * The API should escape these characters using: cardName.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")
+     *
+     * IMPORTANT: These tests verify that metacharacters DON'T expand results.
+     * If ".*" is properly escaped, it should return 0 results (no card literally named ".*")
+     * or very few results - NOT thousands of cards as a regex match would return.
      */
     test("special regex characters are escaped - .* pattern", async ({
       request,
     }) => {
       // This regex pattern would match ALL cards if not escaped
+      // A properly escaped search for ".*" should return 0 or very few results
       const response = await request.post(
         `${BASE_URL}/api/search/searchCardName`,
         {
@@ -256,23 +293,20 @@ test.describe("Security Tests", () => {
       expect(response.status()).toBe(200);
       const data = await response.json();
 
-      // Should search for literal ".*" not match all cards
-      // A properly escaped search should return 0 or very few results
       expect(Array.isArray(data.results)).toBe(true);
 
-      // If results exist, verify they're NOT returning ALL cards
-      // (which would indicate regex injection vulnerability)
-      if (data.total > 0) {
-        // The results should contain cards with ".*" literally in the name
-        // or have pagination limiting results
-        expect(data.results.length).toBeLessThanOrEqual(100);
-      }
-    });
+      // KEY SECURITY CHECK: If metacharacters are properly escaped,
+      // searching for ".*" should NOT return thousands of cards.
+      // It should return 0 (no card named ".*") or a very limited set.
+      // If this returns hundreds/thousands of results, regex injection exists.
+      expect(data.results.length).toBeLessThan(10);
+ });
 
     test("special regex characters are escaped - OR pattern", async ({
       request,
     }) => {
       // This would try to match pikachu OR charizard if not escaped
+      // A properly escaped search should look for the literal string "(pikachu|charizard)"
       const response = await request.post(
         `${BASE_URL}/api/search/searchCardName`,
         {
@@ -283,14 +317,18 @@ test.describe("Security Tests", () => {
       expect(response.status()).toBe(200);
       const data = await response.json();
 
-      // Should search for literal string, not execute regex
       expect(Array.isArray(data.results)).toBe(true);
+
+      // KEY SECURITY CHECK: If OR pattern is properly escaped, results should be
+      // very limited. Without escaping, this would return all cards matching either name.
+      // With proper escaping, it searches for the literal string (0 results expected).
+      expect(data.results.length).toBeLessThan(10);
     });
 
     test("special regex characters are escaped - wildcard pattern", async ({
       request,
     }) => {
-      // Dot-star pattern
+      // Dot-star pattern: .+pokemon.+ would match any card with "pokemon" if not escaped
       const response = await request.post(
         `${BASE_URL}/api/search/searchCardName`,
         {
@@ -303,14 +341,16 @@ test.describe("Security Tests", () => {
 
       expect(Array.isArray(data.results)).toBe(true);
 
-      // Verify results are limited (pagination enforced)
-      expect(data.total).toBeLessThanOrEqual(1000);
+      // KEY SECURITY CHECK: If wildcard is properly escaped, results should be
+      // very limited. Without escaping, this could return all Pokemon cards.
+      // With proper escaping, it searches for the literal string (0 results expected).
+      expect(data.results.length).toBeLessThan(10);
     });
 
     test("special regex characters are escaped - character class", async ({
       request,
     }) => {
-      // Character class pattern
+      // Character class pattern: [aeiou] would match any card with vowels if not escaped
       const response = await request.post(
         `${BASE_URL}/api/search/searchCardName`,
         {
@@ -322,6 +362,32 @@ test.describe("Security Tests", () => {
       const data = await response.json();
 
       expect(Array.isArray(data.results)).toBe(true);
+
+      // KEY SECURITY CHECK: If character class is properly escaped, results should be
+      // very limited. Without escaping, this could match most card names.
+      // With proper escaping, it searches for the literal string (0 results expected).
+      expect(data.results.length).toBeLessThan(10);
+    });
+
+    test("special regex characters are escaped - quantifier pattern", async ({
+      request,
+    }) => {
+      // Quantifier pattern: a{3} would match cards with 3 a's if not escaped
+      const response = await request.post(
+        `${BASE_URL}/api/search/searchCardName`,
+        {
+          data: { cardName: "a{3}" },
+        },
+      );
+
+      expect(response.status()).toBe(200);
+      const data = await response.json();
+
+      expect(Array.isArray(data.results)).toBe(true);
+
+      // KEY SECURITY CHECK: If quantifier is properly escaped, results should be
+      // very limited. Without escaping, this could match many card names.
+      expect(data.results.length).toBeLessThan(10);
     });
   });
 
