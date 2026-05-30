@@ -77,6 +77,15 @@ export async function PUT(
       return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
 
+    // Check existence first to distinguish not-found from version conflict
+    const existingDeck = await UserDeck.findOne({
+      _id: id,
+      userId: user._id,
+    }).lean();
+    if (!existingDeck) {
+      return NextResponse.json({ error: "Deck not found" }, { status: 404 });
+    }
+
     // Optimistic locking: only update if version matches
     const deck = await UserDeck.findOneAndUpdate(
       { _id: id, userId: user._id, version },
