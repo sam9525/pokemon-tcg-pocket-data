@@ -257,7 +257,12 @@ function DeckCardComponent({
                 className="px-6 py-2 bg-red-500 text-white font-bold rounded-lg hover:opacity-90 transition-opacity"
                 onClick={() => onDelete(deck._id)}
               >
-                {(currentLanguageLookup?.DECK_COLLECTION as Record<string, string>)?.delete || "Delete"}
+                {(
+                  currentLanguageLookup?.DECK_COLLECTION as Record<
+                    string,
+                    string
+                  >
+                )?.delete || "Delete"}
               </button>
             </div>
           </div>
@@ -316,7 +321,12 @@ function DeckCardComponent({
                 className="flex-1 py-2 bg-red-500 text-white font-bold rounded-lg hover:opacity-90 transition-opacity"
                 onClick={() => onDelete(deck._id)}
               >
-                {(currentLanguageLookup?.DECK_COLLECTION as Record<string, string>)?.delete || "Delete"}
+                {(
+                  currentLanguageLookup?.DECK_COLLECTION as Record<
+                    string,
+                    string
+                  >
+                )?.delete || "Delete"}
               </button>
             </div>
           </div>

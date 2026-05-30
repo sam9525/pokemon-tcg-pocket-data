@@ -53,6 +53,10 @@ export default function SearchPageClient({
   initialSpecificEffect: FilterItem[];
 }) {
   const hasLoaded = useRef(false);
+  const filteringRef = useRef<[string, string][]>([]);
+  const currentPageRef = useRef(1);
+  const languageRef = useRef(language);
+  const abortControllerRef = useRef<AbortController | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [types, setTypes] = useState<FilterItem[]>(initialTypes);
   const [rarity, setRarity] = useState<FilterItem[]>(initialRarity);
@@ -131,6 +135,26 @@ export default function SearchPageClient({
       };
     }
   }, [isLoading, currentLanguageLookup]);
+
+  // Sync refs with state
+  useEffect(() => {
+    filteringRef.current = filtering;
+  }, [filtering]);
+
+  useEffect(() => {
+    currentPageRef.current = currentPage;
+  }, [currentPage]);
+
+  useEffect(() => {
+    languageRef.current = language;
+  }, [language]);
+
+  // Abort previous request on filter/language change
+  useEffect(() => {
+    abortControllerRef.current?.abort();
+    abortControllerRef.current = new AbortController();
+    return () => abortControllerRef.current?.abort();
+  }, [filtering, language]);
 
   useEffect(() => {
     const fetchSearchResult = async (
@@ -229,14 +253,19 @@ export default function SearchPageClient({
         try {
           setIsLoadingMore(true);
 
+          // Use refs for fresh values to avoid stale closure
+          const currentFiltering = filteringRef.current;
+          const currentLang = languageRef.current;
+          const nextPage = currentPageRef.current + 1;
+
           // If filtering array is empty, return
-          if (filtering.length === 0) {
+          if (currentFiltering.length === 0) {
             return;
           }
 
           // Convert filtering array to structured object
           const filterObject: Record<string, string[]> = {};
-          filtering.forEach(([filterName, id]) => {
+          currentFiltering.forEach(([filterName, id]) => {
             if (!filterObject[filterName]) {
               filterObject[filterName] = [];
             }
@@ -247,11 +276,12 @@ export default function SearchPageClient({
             method: "POST",
             headers: {
               "Content-Type": "application/json",
-              language: language,
+              language: currentLang,
             },
+            signal: abortControllerRef.current?.signal,
             body: JSON.stringify({
               ...filterObject,
-              page: currentPage + 1,
+              page: nextPage,
               limit: 100,
             }),
           });
@@ -259,8 +289,12 @@ export default function SearchPageClient({
 
           setSearchResult((prev) => [...prev, ...data.results]);
           setHasMore(data.hasMore);
-          setCurrentPage(currentPage + 1);
+          setCurrentPage(nextPage);
         } catch (error) {
+          // Ignore abort errors
+          if (error instanceof Error && error.name === "AbortError") {
+            return;
+          }
           console.error(error);
         } finally {
           setIsLoadingMore(false);
@@ -269,7 +303,7 @@ export default function SearchPageClient({
 
       fetchMoreResults();
     }
-  }, [isLoadingMore, hasMore, filtering, language, currentPage]);
+  }, [isLoadingMore, hasMore]);
 
   const mouseClick = (filterName: string, id: string) => {
     setFiltering((prevFiltering) => {

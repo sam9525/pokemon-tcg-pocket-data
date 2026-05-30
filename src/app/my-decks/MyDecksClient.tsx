@@ -154,8 +154,7 @@ function DeckCardComponent({
   onDelete: (id: string) => void;
   currentLanguageLookup: Record<string, unknown> | null;
 }) {
-  const t =
-    (currentLanguageLookup?.MY_DECKS as Record<string, string>) || {};
+  const t = (currentLanguageLookup?.MY_DECKS as Record<string, string>) || {};
   const totalCards = deck.cards.reduce((sum, c) => sum + c.quantity, 0);
   const [currentPage, setCurrentPage] = useState(0);
   const cardsPerPage = 10;

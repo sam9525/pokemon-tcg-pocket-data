@@ -44,7 +44,8 @@ export async function GET(request: NextRequest) {
     cards.forEach((card) => {
       // Find the original cardId that maps to this translated cardId
       const originalIdx = translatedCardIds.indexOf(card.cardId);
-      const originalCardId = originalIdx >= 0 ? cardIds[originalIdx] : card.cardId;
+      const originalCardId =
+        originalIdx >= 0 ? cardIds[originalIdx] : card.cardId;
       // Use original cardId as key for frontend compatibility
       images[originalCardId] = card.imageUrl || "";
       // Extract booster pack code from package (e.g., "A1_genetic-apex" -> "A1")
