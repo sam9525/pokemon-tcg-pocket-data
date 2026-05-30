@@ -1,6 +1,8 @@
 import { GoogleGenAI } from "@google/genai";
 import type { NextRequest } from "next/server";
 
+const AI_TIMEOUT_MS = 30000;
+
 const ai = new GoogleGenAI({
   apiKey: process.env.GOOGLE_GENAI as string,
 });
@@ -16,18 +18,23 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    // Create AbortController with 30-second timeout
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), AI_TIMEOUT_MS);
+
     // Create a ReadableStream for SSE
     const stream = new ReadableStream({
-      async start(controller) {
+      async start(streamController) {
         const encoder = new TextEncoder();
 
         try {
-          // Get streaming response from Gemini
-          const response = await ai.models.generateContentStream({
-            model: "gemini-3-pro-preview",
-            contents: msg,
-            config: {
-              systemInstruction: `You are an expert Pokémon TCG Pocket strategist and deck builder. Your goal is to provide precise, tournament-level deck lists based on the current game meta.
+          // Get streaming response from Gemini with timeout signal
+          const response = await ai.models.generateContentStream(
+            {
+              model: "gemini-3-pro-preview",
+              contents: msg,
+              config: {
+                systemInstruction: `You are an expert Pokémon TCG Pocket strategist and deck builder. Your goal is to provide precise, tournament-level deck lists based on the current game meta.
 
               Whenever the user asks for a deck recommendation or specific deck details, you must follow these strict guidelines:
 
@@ -41,17 +48,19 @@ export async function POST(req: NextRequest) {
               5.  **Strategy Summary:** Immediately following the table, provide a brief 1-2 sentence explanation of the deck's core strategy or win condition.
 
               If you do not know the specific set a card belongs to, use your tools to verify it before generating the table to ensure 100% accuracy.`,
-              temperature: 0.7,
-              topP: 0.95,
-              topK: 40,
-              maxOutputTokens: 60000,
-              tools: [
-                {
-                  googleSearch: {},
-                },
-              ],
+                temperature: 0.7,
+                topP: 0.95,
+                topK: 40,
+                maxOutputTokens: 60000,
+                tools: [
+                  {
+                    googleSearch: {},
+                  },
+                ],
+              },
             },
-          });
+            { signal: controller.signal },
+          );
 
           // Stream each chunk in SSE format
           for await (const chunk of response) {
@@ -63,26 +72,37 @@ export async function POST(req: NextRequest) {
             if (text) {
               // Send chunk in SSE format: "data: {json}\n\n"
               const data = `data: ${JSON.stringify({ text })}\n\n`;
-              controller.enqueue(encoder.encode(data));
+              streamController.enqueue(encoder.encode(data));
             }
 
             if (links != undefined) {
               const data = `links: ${JSON.stringify({ links })}\n\n`;
-              controller.enqueue(encoder.encode(data));
+              streamController.enqueue(encoder.encode(data));
             }
           }
 
           // Send completion signal
-          controller.enqueue(encoder.encode("data: [DONE]\n\n"));
+          streamController.enqueue(encoder.encode("data: [DONE]\n\n"));
         } catch (error) {
-          // Send error in SSE format
-          const errorData = `data: ${JSON.stringify({
-            error: "Streaming failed",
-            details: error instanceof Error ? error.message : String(error),
-          })}\n\n`;
-          controller.enqueue(encoder.encode(errorData));
+          // Check if error is due to timeout (AbortError)
+          if (error instanceof Error && error.name === "AbortError") {
+            const errorData = `data: ${JSON.stringify({
+              error: "Request timeout",
+              details:
+                "The AI request timed out after 30 seconds. Please try again.",
+            })}\n\n`;
+            streamController.enqueue(encoder.encode(errorData));
+          } else {
+            // Send error in SSE format
+            const errorData = `data: ${JSON.stringify({
+              error: "Streaming failed",
+              details: error instanceof Error ? error.message : String(error),
+            })}\n\n`;
+            streamController.enqueue(encoder.encode(errorData));
+          }
         } finally {
-          controller.close();
+          clearTimeout(timeoutId);
+          streamController.close();
         }
       },
     });
