@@ -10,6 +10,7 @@ export interface IUserDeck {
   name: string;
   cards: IDeckCard[];
   source?: "decklist" | "builder";
+  version: number;
 }
 
 const DeckCardSchema = new Schema<IDeckCard>(
@@ -35,6 +36,7 @@ const UserDeckSchema = new Schema<IUserDeck>(
       enum: ["decklist", "builder"],
       default: "builder",
     },
+    version: { type: Number, default: 0 },
   },
   { timestamps: true },
 );

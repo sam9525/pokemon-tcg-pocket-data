@@ -58,7 +58,14 @@ export async function PUT(
 
     const { id } = await params;
     const body = await request.json();
-    const { name, cards } = body;
+    const { name, cards, version } = body;
+
+    if (version === undefined) {
+      return NextResponse.json(
+        { error: "Version is required for updates", code: "VERSION_REQUIRED" },
+        { status: 400 },
+      );
+    }
 
     await connectDB();
 
@@ -70,21 +77,34 @@ export async function PUT(
       return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
 
-    const deck = await UserDeck.findOne({ _id: id, userId: user._id });
+    // Optimistic locking: only update if version matches
+    const deck = await UserDeck.findOneAndUpdate(
+      { _id: id, userId: user._id, version },
+      {
+        $set: {
+          ...(name !== undefined && { name: name.trim() }),
+          ...(cards !== undefined && {
+            cards: cards.map((c: { cardId: string; quantity: number }) => ({
+              cardId: c.cardId,
+              quantity: Math.min(c.quantity, 2),
+            })),
+          }),
+        },
+        $inc: { version: 1 },
+      },
+      { new: true },
+    );
 
     if (!deck) {
-      return NextResponse.json({ error: "Deck not found" }, { status: 404 });
+      return NextResponse.json(
+        {
+          error: "Conflict: deck was modified by another user",
+          code: "VERSION_MISMATCH",
+        },
+        { status: 409 },
+      );
     }
 
-    if (name !== undefined) deck.name = name.trim();
-    if (cards !== undefined) {
-      deck.cards = cards.map((c: { cardId: string; quantity: number }) => ({
-        cardId: c.cardId,
-        quantity: Math.min(c.quantity, 2),
-      }));
-    }
-
-    await deck.save();
     return NextResponse.json({ deck });
   } catch (error) {
     console.error("[user-decks/[id]:PUT]", error);

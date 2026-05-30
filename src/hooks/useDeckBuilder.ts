@@ -13,6 +13,7 @@ export interface DeckState {
   name: string;
   cards: DeckCard[];
   id?: string; // Set when editing an existing deck
+  version?: number; // Used for optimistic locking
 }
 
 interface UseDeckBuilderReturn {

@@ -114,6 +114,7 @@ export default function DeckBuilderClient() {
           id: data.deck._id,
           name: data.deck.name,
           cards: data.deck.cards,
+          version: data.deck.version,
         });
         // Pre-fetch images for all deck cards so they render immediately
         const deckCardIds = data.deck.cards.map(
@@ -201,6 +202,7 @@ export default function DeckBuilderClient() {
           name: deck.name,
           cards: deck.cards,
           source: "builder",
+          ...(isUpdate && { version: deck.version }),
         }),
       });
 
@@ -211,6 +213,15 @@ export default function DeckBuilderClient() {
       }
 
       const data = await res.json();
+
+      if (res.status === 409) {
+        toast.error(
+          data.error ||
+            "Deck was modified by another user. Please reload and try again.",
+          { id: toastId },
+        );
+        return;
+      }
 
       if (res.ok) {
         toast.success(t.savedSuccess || "Deck saved successfully", {
