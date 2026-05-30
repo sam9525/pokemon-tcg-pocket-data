@@ -14,23 +14,24 @@ export async function GET(req: NextRequest) {
     return rateLimitResult.response;
   }
 
+  // Auth check first - before any _id parameter handling
+  const session = await auth();
+  if (!session?.user?.email) {
+    return Response.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
   // Connect to MongoDB
   await connectDB();
 
   const url = new URL(req.url);
-  const _id = url.searchParams.get("_id");
-  let filterUser = {};
+  const requestedId = url.searchParams.get("_id");
 
-  // If _id is provided, update the user with the given _id otherwise use the email from the session
-  if (_id) {
-    filterUser = { _id };
+  // Admin can view any profile via _id, otherwise only own profile
+  let filterUser: Record<string, string>;
+  if (requestedId && session.user.isAdmin) {
+    filterUser = { _id: requestedId };
   } else {
-    const session = await auth();
-    const email = session?.user?.email;
-    if (!email) {
-      return Response.json({ error: "User not found" }, { status: 404 });
-    }
-    filterUser = { email };
+    filterUser = { email: session.user.email };
   }
 
   // Get the user with the given filter
@@ -46,24 +47,24 @@ export async function PUT(req: NextRequest) {
     return rateLimitResult.response;
   }
 
+  // Auth check first - before any _id parameter handling
+  const session = await auth();
+  if (!session?.user?.email) {
+    return Response.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
   // Connect to MongoDB
   await connectDB();
 
   const data = await req.json();
   const { _id, name, image } = data;
 
-  let filterUser = {};
-
-  // If _id is provided, update the user with the given _id otherwise use the email from the session
-  if (_id) {
+  // Admin can update any profile via _id, otherwise only own profile
+  let filterUser: Record<string, string>;
+  if (_id && session.user.isAdmin) {
     filterUser = { _id };
   } else {
-    const session = await auth();
-    const email = session?.user?.email;
-    if (!email) {
-      return Response.json({ error: "User not found" }, { status: 404 });
-    }
-    filterUser = { email };
+    filterUser = { email: session.user.email };
   }
 
   // Update the user with the given name and image
