@@ -16,8 +16,11 @@ export async function GET(request: NextRequest) {
   }
 
   const session = await auth();
-  if (!session?.user?.isAdmin) {
-    return Response.json({ error: "Unauthorized" }, { status: 403 });
+  if (!session) {
+    return Response.json({ error: "Unauthorized" }, { status: 401 });
+  }
+  if (!session.user?.isAdmin) {
+    return Response.json({ error: "Forbidden" }, { status: 403 });
   }
 
   // Connect to MongoDB
