@@ -3,6 +3,7 @@ import connectDB from "@/lib/mongodb";
 import { NextRequest } from "next/server";
 import { rateLimit } from "@/lib/rateLimit";
 import { RESOURCE_INTENSIVE_RATE_LIMIT } from "@/utils/rateLimitConfig";
+import { auth } from "@/auth";
 
 export async function GET(request: NextRequest) {
   // Rate limiting to users list endpoint
@@ -12,6 +13,11 @@ export async function GET(request: NextRequest) {
   );
   if (!rateLimitResult.success) {
     return rateLimitResult.response;
+  }
+
+  const session = await auth();
+  if (!session?.user?.isAdmin) {
+    return Response.json({ error: "Unauthorized" }, { status: 403 });
   }
 
   // Connect to MongoDB
