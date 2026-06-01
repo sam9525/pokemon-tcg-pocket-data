@@ -38,7 +38,7 @@ describe("GET /api/decks-list packages param validation (C4)", () => {
     const res = await GET(
       makeRequest("http://localhost/api/decks-list?packages=.*"),
     );
-    expect(res.status).toBe(400);
+    expect(res!.status).toBe(400);
   });
 
   it("rejects packages longer than 64 chars", async () => {
@@ -46,14 +46,14 @@ describe("GET /api/decks-list packages param validation (C4)", () => {
     const res = await GET(
       makeRequest(`http://localhost/api/decks-list?packages=${long}`),
     );
-    expect(res.status).toBe(400);
+    expect(res!.status).toBe(400);
   });
 
   it("rejects packages with regex metacharacters", async () => {
     const res = await GET(
       makeRequest("http://localhost/api/decks-list?packages=A1%5B%5D"), // A1[]
     );
-    expect(res.status).toBe(400);
+    expect(res!.status).toBe(400);
   });
 
   it("accepts a normal package name and returns 200", async () => {
@@ -63,7 +63,7 @@ describe("GET /api/decks-list packages param validation (C4)", () => {
     const res = await GET(
       makeRequest("http://localhost/api/decks-list?packages=A1"),
     );
-    expect(res.status).toBe(200);
+    expect(res!.status).toBe(200);
   });
 
   it("anchors the packages regex to prevent substring-scan DoS", async () => {
@@ -75,7 +75,7 @@ describe("GET /api/decks-list packages param validation (C4)", () => {
     const res = await GET(
       makeRequest("http://localhost/api/decks-list?packages=A1") as any,
     );
-    expect(res.status).toBe(200);
+    expect(res!.status).toBe(200);
     expect(findMock).toHaveBeenCalledWith({
       package: { $regex: "^A1$", $options: "i" },
     });

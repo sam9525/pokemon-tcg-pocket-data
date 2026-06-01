@@ -24,31 +24,39 @@ describe("GET /api/decks-list null-safety (C5)", () => {
     ["undefined", undefined],
     ["null", null],
     ["empty array", []],
-  ])("does not crash on a deck with highlight = %s", async (_label, highlightValue) => {
-    (DeckList.find as any).mockReturnValue({
-      limit: () => ({
-        lean: () =>
-          Promise.resolve([
-            { _id: "1", package: "A1", highlight: highlightValue, cardList: {} },
-          ]),
-      }),
-    } as any);
-    (Card.find as any).mockReturnValue({
-      collation: () => ({
-        select: () => ({ lean: () => Promise.resolve([]) }),
-      }),
-    } as any);
+  ])(
+    "does not crash on a deck with highlight = %s",
+    async (_label, highlightValue) => {
+      (DeckList.find as any).mockReturnValue({
+        limit: () => ({
+          lean: () =>
+            Promise.resolve([
+              {
+                _id: "1",
+                package: "A1",
+                highlight: highlightValue,
+                cardList: {},
+              },
+            ]),
+        }),
+      } as any);
+      (Card.find as any).mockReturnValue({
+        collation: () => ({
+          select: () => ({ lean: () => Promise.resolve([]) }),
+        }),
+      } as any);
 
-    const res = await GET(
-      makeRequest("http://localhost/api/decks-list?packages=A1") as any,
-    );
-    expect(res.status).toBe(200);
-    const body = await res.json();
-    expect(body.decklists).toBeDefined();
-    expect(Array.isArray(body.decklists)).toBe(true);
-    expect(body.decklists[0].highlight).toEqual([]);
-    expect(body.decklists[0].cardList).toEqual({});
-  });
+      const res = await GET(
+        makeRequest("http://localhost/api/decks-list?packages=A1") as any,
+      );
+      expect(res!.status).toBe(200);
+      const body = await res!.json();
+      expect(body.decklists).toBeDefined();
+      expect(Array.isArray(body.decklists)).toBe(true);
+      expect(body.decklists[0].highlight).toEqual([]);
+      expect(body.decklists[0].cardList).toEqual({});
+    },
+  );
 
   it("does not crash when cardList is null", async () => {
     (DeckList.find as any).mockReturnValue({
@@ -68,8 +76,8 @@ describe("GET /api/decks-list null-safety (C5)", () => {
     const res = await GET(
       makeRequest("http://localhost/api/decks-list?packages=A1") as any,
     );
-    expect(res.status).toBe(200);
-    const body = await res.json();
+    expect(res!.status).toBe(200);
+    const body = await res!.json();
     expect(body.decklists[0].highlight).toEqual([]);
     expect(body.decklists[0].cardList).toEqual({});
   });
@@ -92,8 +100,8 @@ describe("GET /api/decks-list null-safety (C5)", () => {
     const res = await GET(
       makeRequest("http://localhost/api/decks-list?packages=A1") as any,
     );
-    expect(res.status).toBe(200);
-    const body = await res.json();
+    expect(res!.status).toBe(200);
+    const body = await res!.json();
     expect(body.decklists[0].highlight).toEqual([]);
     expect(body.decklists[0].cardList).toEqual({});
   });

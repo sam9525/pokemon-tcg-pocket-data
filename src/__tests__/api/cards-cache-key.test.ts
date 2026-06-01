@@ -40,7 +40,7 @@ describe("GET /api/cards/[id] query param validation (C2)", () => {
       req as any,
       toRouteCtx(params),
     );
-    expect(res.status).toBe(400);
+    expect(res!.status).toBe(400);
   });
 
   it("rejects filter param with disallowed characters", async () => {
@@ -50,7 +50,7 @@ describe("GET /api/cards/[id] query param validation (C2)", () => {
       req as any,
       toRouteCtx(params),
     );
-    expect(res.status).toBe(400);
+    expect(res!.status).toBe(400);
   });
 
   it("rejects language param not in allowlist", async () => {
@@ -62,7 +62,7 @@ describe("GET /api/cards/[id] query param validation (C2)", () => {
       req as any,
       toRouteCtx(params),
     );
-    expect(res.status).toBe(400);
+    expect(res!.status).toBe(400);
   });
 
   it("rejects language param longer than 16 chars", async () => {
@@ -74,7 +74,7 @@ describe("GET /api/cards/[id] query param validation (C2)", () => {
       req as any,
       toRouteCtx(params),
     );
-    expect(res.status).toBe(400);
+    expect(res!.status).toBe(400);
   });
 
   it("accepts valid language and bounded filter, hashes the cache key", async () => {
@@ -87,7 +87,7 @@ describe("GET /api/cards/[id] query param validation (C2)", () => {
       req as any,
       toRouteCtx(params),
     );
-    expect(res.status).toBe(200);
+    expect(res!.status).toBe(200);
     const setCalls = mockedCacheSet.mock.calls;
     expect(setCalls.length).toBe(1);
     // Cache key must be a deterministic hash, not the raw inputs concatenated
@@ -116,10 +116,9 @@ describe("GET /api/cards/[id] query param validation (C2)", () => {
       makeRequest(url) as any,
       toRouteCtx(params),
     );
-    const setCalls = (
+    const setCalls =
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      cacheManager.set as any
-    ).mock.calls;
+      (cacheManager.set as any).mock.calls;
     expect(setCalls.length).toBe(2);
     expect(setCalls[0][0]).toBe(setCalls[1][0]);
   });

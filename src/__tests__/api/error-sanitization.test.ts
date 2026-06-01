@@ -24,7 +24,9 @@ vi.mock("@aws-sdk/client-s3", () => {
   };
 });
 vi.mock("@/lib/s3Client", async () => {
-  const { __sendMock } = await import("@aws-sdk/client-s3");
+  const { __sendMock } = (await import("@aws-sdk/client-s3")) as unknown as {
+    __sendMock: ReturnType<typeof vi.fn>;
+  };
   return {
     getS3Client: vi.fn().mockImplementation(() => ({ send: __sendMock })),
     S3_BUCKET: "pokemon-tcg-pocket-data",
@@ -58,7 +60,9 @@ describe("error responses do not leak internal details (C3)", () => {
     });
     // Reset the S3 send mock between tests; default to a rejected error so the
     // search route's catch block is exercised deterministically.
-    const { __sendMock } = await import("@aws-sdk/client-s3");
+    const { __sendMock } = (await import("@aws-sdk/client-s3")) as unknown as {
+      __sendMock: ReturnType<typeof vi.fn>;
+    };
     __sendMock.mockReset();
   });
 
@@ -69,8 +73,8 @@ describe("error responses do not leak internal details (C3)", () => {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       { params } as any,
     );
-    expect(res.status).toBe(500);
-    const body = await res.json();
+    expect(res!.status).toBe(500);
+    const body = await res!.json();
     expect(JSON.stringify(body)).not.toMatch(/internal-host-1234/);
     expect(JSON.stringify(body)).not.toMatch(/mongodb/);
   });
@@ -81,23 +85,27 @@ describe("error responses do not leak internal details (C3)", () => {
     });
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const res = await filteringPost(req as any);
-    expect(res.status).toBe(500);
-    const body = await res.json();
+    expect(res!.status).toBe(500);
+    const body = await res!.json();
     expect(JSON.stringify(body)).not.toMatch(/internal-host-1234/);
   });
 
   it("search route does not echo error.message to client", async () => {
     // Mock S3 to throw an error with a unique sentinel. This forces the
     // route's catch block to be the source of the 500 response.
-    const { __sendMock } = await import("@aws-sdk/client-s3");
+    const { __sendMock } = (await import("@aws-sdk/client-s3")) as unknown as {
+      __sendMock: ReturnType<typeof vi.fn>;
+    };
     __sendMock.mockRejectedValue(
       new Error("__search_route_internal_sentinel__"),
     );
     const res = await searchGet(
       new NextRequest("http://localhost/api/search?language=en_US"),
     );
-    expect(res.status).toBe(500);
-    const body = await res.json();
-    expect(JSON.stringify(body)).not.toMatch(/__search_route_internal_sentinel__/);
+    expect(res!.status).toBe(500);
+    const body = await res!.json();
+    expect(JSON.stringify(body)).not.toMatch(
+      /__search_route_internal_sentinel__/,
+    );
   });
 });
