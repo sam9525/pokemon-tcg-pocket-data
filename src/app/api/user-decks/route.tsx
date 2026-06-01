@@ -5,6 +5,10 @@ import connectDB from "@/lib/mongodb";
 import { UserDeck } from "@/models/UserDeck";
 import { User } from "@/models/User";
 import { validateDeck } from "@/lib/deckValidation";
+import { rateLimit } from "@/lib/rateLimit";
+import { DECK_CREATE_RATE_LIMIT } from "@/utils/rateLimitConfig";
+
+const MAX_DECKS_PER_USER = 30;
 
 // GET /api/user-decks - Get all decks for current user
 export async function GET() {
@@ -56,6 +60,11 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
+    const rateLimitResult = await rateLimit(request, DECK_CREATE_RATE_LIMIT);
+    if (!rateLimitResult.success && rateLimitResult.response) {
+      return rateLimitResult.response;
+    }
+
     const body = await request.json();
     const { name, cards, source } = body;
 
@@ -88,6 +97,14 @@ export async function POST(request: NextRequest) {
     }).lean()) as any;
     if (!user?._id) {
       return NextResponse.json({ error: "User not found" }, { status: 404 });
+    }
+
+    const deckCount = await UserDeck.countDocuments({ userId: user._id });
+    if (deckCount >= MAX_DECKS_PER_USER) {
+      return NextResponse.json(
+        { error: `Maximum deck limit (${MAX_DECKS_PER_USER}) reached` },
+        { status: 400 },
+      );
     }
 
     const newDeck = await UserDeck.create({

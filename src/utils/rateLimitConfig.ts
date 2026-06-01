@@ -59,3 +59,13 @@ export const PROFILE_RATE_LIMIT: RateLimitConfig = {
   windowMs: 60 * 1000, // 1 minute
   message: "Too many profile requests. Please try again shortly.",
 };
+
+/**
+ * Deck creation operations
+ * 5 creates per minute per user
+ */
+export const DECK_CREATE_RATE_LIMIT: RateLimitConfig = {
+  maxRequests: 5,
+  windowMs: 60 * 1000,
+  message: "Too many deck creations. Please slow down.",
+};
