@@ -8,6 +8,11 @@ const UserSchema = new Schema(
     image: { type: String },
     provider: { type: String, default: "credentials" },
     isAdmin: { type: Boolean, default: false },
+    deckCount: {
+      type: Number,
+      default: 0,
+      min: 0,
+    },
   },
   { timestamps: true },
 );
