@@ -4,6 +4,7 @@ import { auth } from "@/auth";
 import connectDB from "@/lib/mongodb";
 import { UserDeck } from "@/models/UserDeck";
 import { User } from "@/models/User";
+import { validateDeck } from "@/lib/deckValidation";
 
 // GET /api/user-decks/[id] - Get a single deck
 export async function GET(
@@ -84,6 +85,17 @@ export async function PUT(
     }).lean();
     if (!existingDeck) {
       return NextResponse.json({ error: "Deck not found" }, { status: 404 });
+    }
+
+    // Merge incoming fields with existing deck to validate the FINAL state.
+    const finalCards = cards ?? existingDeck.cards;
+    const finalName = name !== undefined ? name.trim() : existingDeck.name;
+    const validation = validateDeck(finalCards, finalName);
+    if (!validation.canSave) {
+      return NextResponse.json(
+        { error: validation.saveErrors[0] ?? "Invalid deck" },
+        { status: 400 },
+      );
     }
 
     // Optimistic locking: only update if version matches

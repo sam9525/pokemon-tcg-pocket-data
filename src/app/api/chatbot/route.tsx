@@ -96,7 +96,7 @@ export async function POST(req: NextRequest) {
             // Send error in SSE format
             const errorData = `data: ${JSON.stringify({
               error: "Streaming failed",
-              details: error instanceof Error ? error.message : String(error),
+              details: "An error occurred. Please try again.",
             })}\n\n`;
             streamController.enqueue(encoder.encode(errorData));
           }
@@ -120,7 +120,7 @@ export async function POST(req: NextRequest) {
     return Response.json(
       {
         error: "Failed to get response from AI.",
-        details: error instanceof Error ? error.message : String(error),
+        details: "An error occurred. Please try again.",
       },
       { status: 500 },
     );
