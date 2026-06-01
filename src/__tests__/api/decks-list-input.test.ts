@@ -1,6 +1,8 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { describe, it, expect, vi } from "vitest";
 import { NextRequest } from "next/server";
 import { GET } from "@/app/api/decks-list/route";
+import { DeckList } from "@/models/DeckList";
 
 vi.mock("@/lib/rateLimit", () => ({
   rateLimit: vi.fn().mockResolvedValue({ success: true, response: null }),
@@ -54,12 +56,28 @@ describe("GET /api/decks-list packages param validation (C4)", () => {
     expect(res.status).toBe(400);
   });
 
-  it("accepts a normal package name", async () => {
-    // We don't mock DeckList.find here, but a valid param should not be rejected
-    // at the validation layer (it may 500 due to no DB, but the validation passes).
+  it("accepts a normal package name and returns 200", async () => {
+    // Ensure a valid param flows through the full validation → DB → response pipeline.
+    // The top-level mocks already wire DeckList.find and Card.find into chainable
+    // promises that resolve to [], so a valid package should reach the final response.
     const res = await GET(
       makeRequest("http://localhost/api/decks-list?packages=A1"),
     );
-    expect([200, 500]).toContain(res.status); // not 400
+    expect(res.status).toBe(200);
+  });
+
+  it("anchors the packages regex to prevent substring-scan DoS", async () => {
+    const findMock = vi.fn().mockReturnValue({
+      limit: () => ({ lean: () => Promise.resolve([]) }),
+    });
+    (DeckList as any).find = findMock;
+
+    const res = await GET(
+      makeRequest("http://localhost/api/decks-list?packages=A1") as any,
+    );
+    expect(res.status).toBe(200);
+    expect(findMock).toHaveBeenCalledWith({
+      package: { $regex: "^A1$", $options: "i" },
+    });
   });
 });
