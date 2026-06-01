@@ -1,6 +1,8 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
+import { NextRequest } from "next/server";
 import { GET as cardsGet } from "@/app/api/cards/[id]/route";
 import { POST as filteringPost } from "@/app/api/search/filtering/route";
+import { GET as searchGet } from "@/app/api/search/route";
 import { Card } from "@/models/Card";
 
 vi.mock("@/lib/rateLimit", () => ({
@@ -13,6 +15,21 @@ vi.mock("@/lib/mongodb", () => ({ default: vi.fn() }));
 vi.mock("@/models/Card", () => ({
   Card: { find: vi.fn(), countDocuments: vi.fn() },
 }));
+vi.mock("@aws-sdk/client-s3", () => {
+  const send = vi.fn();
+  return {
+    S3Client: vi.fn().mockImplementation(() => ({ send })),
+    ListObjectsCommand: vi.fn(),
+    __sendMock: send,
+  };
+});
+vi.mock("@/lib/s3Client", async () => {
+  const { __sendMock } = await import("@aws-sdk/client-s3");
+  return {
+    getS3Client: vi.fn().mockImplementation(() => ({ send: __sendMock })),
+    S3_BUCKET: "pokemon-tcg-pocket-data",
+  };
+});
 
 const params = Promise.resolve({ id: "A1_001" });
 
@@ -29,7 +46,7 @@ function makeRequest(
 }
 
 describe("error responses do not leak internal details (C3)", () => {
-  beforeEach(() => {
+  beforeEach(async () => {
     // Force an internal-looking error to be thrown when the route hits MongoDB.
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (Card.find as any).mockImplementation(() => {
@@ -39,6 +56,10 @@ describe("error responses do not leak internal details (C3)", () => {
     (Card.countDocuments as any).mockImplementation(() => {
       throw new Error("mongodb://internal-host-1234/db: connection refused");
     });
+    // Reset the S3 send mock between tests; default to a rejected error so the
+    // search route's catch block is exercised deterministically.
+    const { __sendMock } = await import("@aws-sdk/client-s3");
+    __sendMock.mockReset();
   });
 
   it("cards/[id] does not echo error.message to client", async () => {
@@ -63,5 +84,20 @@ describe("error responses do not leak internal details (C3)", () => {
     expect(res.status).toBe(500);
     const body = await res.json();
     expect(JSON.stringify(body)).not.toMatch(/internal-host-1234/);
+  });
+
+  it("search route does not echo error.message to client", async () => {
+    // Mock S3 to throw an error with a unique sentinel. This forces the
+    // route's catch block to be the source of the 500 response.
+    const { __sendMock } = await import("@aws-sdk/client-s3");
+    __sendMock.mockRejectedValue(
+      new Error("__search_route_internal_sentinel__"),
+    );
+    const res = await searchGet(
+      new NextRequest("http://localhost/api/search?language=en_US"),
+    );
+    expect(res.status).toBe(500);
+    const body = await res.json();
+    expect(JSON.stringify(body)).not.toMatch(/__search_route_internal_sentinel__/);
   });
 });
