@@ -134,7 +134,7 @@ export async function GET(
     return Response.json(
       {
         error: "Failed to fetch cards",
-        details: error instanceof Error ? error.message : String(error),
+        details: "An error occurred. Please try again.",
       },
       { status: 500 },
     );

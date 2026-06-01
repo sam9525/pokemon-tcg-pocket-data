@@ -83,7 +83,7 @@ export async function GET(request: NextRequest) {
     return Response.json(
       {
         error: "Failed to fetch types icon",
-        details: error instanceof Error ? error.message : String(error),
+        details: "An error occurred. Please try again.",
       },
       { status: 500 },
     );
