@@ -1,11 +1,14 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { NextRequest } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { rateLimit } from "@/lib/rateLimit";
 import { API_RATE_LIMIT } from "@/utils/rateLimitConfig";
 import connectDB from "@/lib/mongodb";
 import { DeckList } from "@/models/DeckList";
 import { Card } from "@/models/Card";
 import { getBoosterToPackageMapping } from "@/lib/boosterToPackage";
+
+const PACKAGE_PATTERN = /^[A-Za-z0-9_-]+$/;
+const MAX_PACKAGE_LEN = 64;
 
 function getPackageFromBoosterPack(
   boosterPack: string,
@@ -21,6 +24,20 @@ export async function GET(request: NextRequest) {
   const packages = searchParams.get("packages") as string;
   const language = (searchParams.get("language") as string) || "en_US";
 
+  // C4: bound and validate the packages param to prevent regex DoS
+  if (!packages || packages.length === 0) {
+    return NextResponse.json(
+      { error: "packages param is required" },
+      { status: 400 },
+    );
+  }
+  if (packages.length > MAX_PACKAGE_LEN || !PACKAGE_PATTERN.test(packages)) {
+    return NextResponse.json(
+      { error: "packages param is invalid" },
+      { status: 400 },
+    );
+  }
+
   // Rate limiting to decklist queries
   const rateLimitResult = await rateLimit(request, API_RATE_LIMIT);
   if (!rateLimitResult.success) {
@@ -35,8 +52,10 @@ export async function GET(request: NextRequest) {
 
   // Get the specific packages' deck lists first
   const decklists = (await DeckList.find({
-    package: { $regex: packages, $options: "i" },
-  }).lean()) as any[];
+    package: { $regex: `^${packages}$`, $options: "i" },
+  })
+    .limit(500) // Defense in depth
+    .lean()) as any[];
 
   // Extract all unique card names from the deck lists
   const cardNamesSet = new Set<string>();
