@@ -5,6 +5,25 @@ import connectDB from "@/lib/mongodb";
 import { NextRequest } from "next/server";
 import { rateLimit } from "@/lib/rateLimit";
 import { API_RATE_LIMIT } from "@/utils/rateLimitConfig";
+import { createHash } from "crypto";
+
+const ALLOWED_LANGUAGES = new Set([
+  "en_US",
+  "ja_JP",
+  "zh_TW",
+  "zh_CN",
+  "ko_KR",
+  "fr_FR",
+  "de_DE",
+  "es_ES",
+  "it_IT",
+  "pt_BR",
+  "th_TH",
+]);
+
+const FILTER_PATTERN = /^[a-zA-Z0-9,_-]+$/;
+const MAX_FILTER_LEN = 128;
+const MAX_LANGUAGE_LEN = 16;
 
 export async function GET(
   request: NextRequest,
@@ -19,13 +38,36 @@ export async function GET(
   try {
     // Get filter from URL search params
     const url = new URL(request.url);
-    const filterParam = url.searchParams.get("filter");
-    const filters = filterParam ? filterParam.split(",") : [];
-    const language = url.searchParams.get("language");
+    const filterParam = url.searchParams.get("filter") ?? "";
+    const language = url.searchParams.get("language") ?? "";
 
-    const cachePrefix = `cards_${(await params).id}_${filters.join(
-      "_",
-    )}_${language}`;
+    // C2: bound and validate input to prevent cache key thrashing
+    if (filterParam.length > MAX_FILTER_LEN) {
+      return Response.json({ error: "filter param too long" }, { status: 400 });
+    }
+    if (filterParam.length > 0 && !FILTER_PATTERN.test(filterParam)) {
+      return Response.json(
+        { error: "filter param contains invalid characters" },
+        { status: 400 },
+      );
+    }
+    if (language.length > MAX_LANGUAGE_LEN) {
+      return Response.json(
+        { error: "language param too long" },
+        { status: 400 },
+      );
+    }
+    if (language.length > 0 && !ALLOWED_LANGUAGES.has(language)) {
+      return Response.json({ error: "unsupported language" }, { status: 400 });
+    }
+
+    const filters = filterParam ? filterParam.split(",") : [];
+    const { id } = await params;
+
+    // Hash the cache key so unique long inputs cannot bloat Map keys
+    const cachePrefix = `cards_${createHash("sha1")
+      .update(`${id}|${filters.join(",")}|${language}`)
+      .digest("hex")}`;
 
     // Get the response from the cache
     const cached = cacheManager.get(cachePrefix);
@@ -54,7 +96,6 @@ export async function GET(
       ),
     ];
 
-    const { id } = await params;
     const parts = id.split("_");
     const isExtended = parts.length >= 3;
     const isPromo = parts[0] === "promo";
