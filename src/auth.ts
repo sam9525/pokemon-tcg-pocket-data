@@ -123,4 +123,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     },
   },
   debug: true, // Enable debug mode to get more detailed error information
+  authorizedParties: process.env.AUTH_URL
+    ? [process.env.AUTH_URL.replace(/\/$/, "")]
+    : undefined,
 });
