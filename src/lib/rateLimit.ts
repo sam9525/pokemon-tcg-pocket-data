@@ -23,6 +23,14 @@ interface RateLimitEntry {
 }
 
 /**
+ * Maximum number of distinct keys held in the rate-limit store.
+ * Caps memory usage against attackers that flood with unique identifiers
+ * (e.g. unique spoofed X-Forwarded-For values). When the cap is reached,
+ * the oldest entry is evicted on the next insertion of a new key.
+ */
+const MAX_KEYS = 10_000;
+
+/**
  * In-memory store for rate limiting
  * Uses Map for O(1) lookups and automatic cleanup
  */
@@ -68,6 +76,12 @@ class RateLimitStore {
   }
 
   set(key: string, entry: RateLimitEntry): void {
+    // Cap store size to prevent memory exhaustion via unique-key flooding.
+    // When the cap is reached and a new key arrives, evict the oldest entry.
+    if (!this.store.has(key) && this.store.size >= MAX_KEYS) {
+      const oldestKey = this.store.keys().next().value;
+      if (oldestKey !== undefined) this.store.delete(oldestKey);
+    }
     this.store.set(key, entry);
   }
 

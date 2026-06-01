@@ -61,3 +61,33 @@ describe("rateLimit IP spoofing prevention (C1)", () => {
     expect(rateLimitStore.keys()).toEqual(["8.8.8.8"]);
   });
 });
+
+describe("rateLimit store size cap (C2)", () => {
+  beforeEach(() => rateLimitStore.clear());
+
+  it("caps the store at MAX_KEYS by evicting the oldest entry", async () => {
+    const config = { ...API_RATE_LIMIT, maxRequests: 1, windowMs: 60_000 };
+    // Add MAX_KEYS + 100 unique keys. The store should never exceed the cap.
+    const totalRequests = 10_100;
+    for (let i = 0; i < totalRequests; i++) {
+      // Use 10.x.y.z to stay within valid IPv4 range and avoid collision with
+      // the defaults in other tests. 256^3 = 16.7M unique IPs, more than enough.
+      const ip = `10.${(i >> 16) & 0xff}.${(i >> 8) & 0xff}.${i & 0xff}`;
+      const req = makeRequest({ ip });
+      await rateLimit(req, config);
+    }
+    // After 10,100 inserts, the store should still be at or below the cap.
+    expect(rateLimitStore.size()).toBeLessThanOrEqual(10_000);
+  });
+
+  it("does not evict when updating an existing key", async () => {
+    const config = { ...API_RATE_LIMIT, maxRequests: 100, windowMs: 60_000 };
+    // Same IP multiple times — should not trigger eviction logic.
+    for (let i = 0; i < 50; i++) {
+      const req = makeRequest({ ip: "4.4.4.4" });
+      await rateLimit(req, config);
+    }
+    expect(rateLimitStore.size()).toBe(1);
+    expect(rateLimitStore.keys()).toEqual(["4.4.4.4"]);
+  });
+});
