@@ -13,7 +13,7 @@ import CardImage from "@/components/CardImage";
 export default function DeckBuilderClient() {
   const searchParams = useSearchParams();
   const router = useRouter();
-  const { currentLanguageLookup } = useLanguage();
+  const { language, currentLanguageLookup } = useLanguage();
   const {
     deck,
     validation,
@@ -67,7 +67,7 @@ export default function DeckBuilderClient() {
   const fetchImagesForCardIds = useCallback(
     async (cardIds: string[]) => {
       if (cardIds.length === 0) return;
-      const lang = currentLanguageLookup?.LANGUAGE || "en_US";
+      const lang = language || "en_US";
       try {
         const res = await fetch(
           `/api/cards/images?cardIds=${cardIds.join(",")}&language=${lang}`,
@@ -83,7 +83,7 @@ export default function DeckBuilderClient() {
         console.error("[DeckBuilder] Failed to fetch deck card images:", err);
       }
     },
-    [currentLanguageLookup],
+    [language],
   );
 
   // Load deck from URL param on mount
@@ -142,7 +142,7 @@ export default function DeckBuilderClient() {
     // Fetch card metadata (boosterPack, rarity) for these cards
     if (cards.length > 0) {
       const cardIds = cards.map((c) => c.cardId);
-      const lang = currentLanguageLookup?.LANGUAGE || "en_US";
+      const lang = language || "en_US";
       fetch(`/api/cards/images?cardIds=${cardIds.join(",")}&language=${lang}`)
         .then((res) => res.json())
         .then((data) => {
