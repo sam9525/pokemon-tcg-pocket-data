@@ -91,33 +91,41 @@ export async function POST(request: NextRequest) {
 
     await connectDB();
 
-    // Look up userId from email
-    const user = (await User.findOne({
-      email: session.user.email,
-    }).lean()) as any;
-    if (!user?._id) {
-      return NextResponse.json({ error: "User not found" }, { status: 404 });
-    }
+    // Look up userId from email and atomically reserve a deck slot.
+    // The conditional filter (`deckCount: { $lt: 30 }`) ensures only one
+    // concurrent POST can pass the gate, even under race conditions.
+    const updatedUser = (await User.findOneAndUpdate(
+      { email: session.user.email, deckCount: { $lt: MAX_DECKS_PER_USER } },
+      { $inc: { deckCount: 1 } },
+      { new: true },
+    )) as any;
 
-    const deckCount = await UserDeck.countDocuments({ userId: user._id });
-    if (deckCount >= MAX_DECKS_PER_USER) {
+    if (!updatedUser?._id) {
       return NextResponse.json(
         { error: `Maximum deck limit (${MAX_DECKS_PER_USER}) reached` },
         { status: 400 },
       );
     }
 
-    const newDeck = await UserDeck.create({
-      userId: user._id,
-      name: name.trim(),
-      cards: cards.map((c: { cardId: string; quantity: number }) => ({
-        cardId: c.cardId,
-        quantity: Math.min(c.quantity, 2), // Cap at 2 copies
-      })),
-      source: source || "builder",
-    });
-
-    return NextResponse.json({ deck: newDeck }, { status: 201 });
+    try {
+      const newDeck = await UserDeck.create({
+        userId: updatedUser._id,
+        name: name.trim(),
+        cards: cards.map((c: { cardId: string; quantity: number }) => ({
+          cardId: c.cardId,
+          quantity: Math.min(c.quantity, 2), // Cap at 2 copies
+        })),
+        source: source || "builder",
+      });
+      return NextResponse.json({ deck: newDeck }, { status: 201 });
+    } catch (createError) {
+      // Compensate for the failed insert by rolling back the counter.
+      await User.findOneAndUpdate(
+        { _id: updatedUser._id },
+        { $inc: { deckCount: -1 } },
+      );
+      throw createError;
+    }
   } catch (error) {
     console.error("[user-decks:POST]", error);
     return NextResponse.json(
