@@ -39,6 +39,14 @@ export default function DeckBuilderClient() {
     y: 200,
   });
 
+  // Reset card images/data maps. Used at deck transition points (clear, load,
+  // language change) to prevent stale entries from prior decks leaking into
+  // the current deck's image and metadata caches.
+  const resetCardMaps = useCallback(() => {
+    setCardImages({});
+    setCardData({});
+  }, []);
+
   useEffect(() => {
     const updatePosition = () => {
       // Get the deck area element (first .flex-col container with bg-search-background)
@@ -91,6 +99,9 @@ export default function DeckBuilderClient() {
     const deckId = searchParams.get("deckId");
     if (!deckId) return;
 
+    // Clear any stale card image/metadata from a prior deck before loading.
+    resetCardMaps();
+
     const fetchAndLoadDeck = async () => {
       try {
         const toastId = toast.loading("Loading deck...");
@@ -130,7 +141,17 @@ export default function DeckBuilderClient() {
     };
 
     fetchAndLoadDeck();
-  }, [searchParams, loadDeck, router, fetchImagesForCardIds]);
+  }, [searchParams, loadDeck, router, fetchImagesForCardIds, resetCardMaps]);
+
+  // Refetch card images/metadata when the user switches language so any
+  // cached entries from the prior language are replaced.
+  useEffect(() => {
+    if (deck.cards.length === 0) return;
+    resetCardMaps();
+    const deckCardIds = deck.cards.map((c) => c.cardId);
+    fetchImagesForCardIds(deckCardIds);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [language]);
 
   const handleCardsLoaded = (cards: { cardId: string; imageUrl: string }[]) => {
     const images: Record<string, string> = {};
@@ -177,6 +198,7 @@ export default function DeckBuilderClient() {
       t.clearConfirm || "Clear all cards from deck?",
     );
     if (confirmed) {
+      resetCardMaps();
       clearDeck();
     }
   };
@@ -227,6 +249,7 @@ export default function DeckBuilderClient() {
         toast.success(t.savedSuccess || "Deck saved successfully", {
           id: toastId,
         });
+        resetCardMaps();
         clearDeck();
       } else {
         toast.error(data.error || t.saveFailed || "Failed to save deck", {
