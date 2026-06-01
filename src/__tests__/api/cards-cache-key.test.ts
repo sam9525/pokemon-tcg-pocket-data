@@ -92,5 +92,35 @@ describe("GET /api/cards/[id] query param validation (C2)", () => {
     expect(setCalls.length).toBe(1);
     // Cache key must be a deterministic hash, not the raw inputs concatenated
     expect(setCalls[0][0]).toMatch(/^cards_[a-f0-9]{40}$/);
+    // Cache value must be the expected shape; a regression writing the wrong
+    // payload would otherwise pass the key assertion alone.
+    expect(setCalls[0][1]).toEqual({ cards: [] });
+  });
+
+  it("produces a deterministic cache key for identical inputs", async () => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (cacheManager.set as any).mockClear();
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (Card.find as any).mockResolvedValue([]);
+    const url =
+      "http://localhost/api/cards/A1_001?language=en_US&filter=pokemon-ex";
+    // First call
+    await GET(
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      makeRequest(url) as any,
+      toRouteCtx(params),
+    );
+    // Second call (cache is mocked to always miss, so both reach the set path)
+    await GET(
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      makeRequest(url) as any,
+      toRouteCtx(params),
+    );
+    const setCalls = (
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      cacheManager.set as any
+    ).mock.calls;
+    expect(setCalls.length).toBe(2);
+    expect(setCalls[0][0]).toBe(setCalls[1][0]);
   });
 });
