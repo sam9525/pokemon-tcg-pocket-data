@@ -1,3 +1,4 @@
+import { isIP } from "node:net";
 import { NextRequest, NextResponse } from "next/server";
 
 /**
@@ -81,32 +82,41 @@ class RateLimitStore {
   size(): number {
     return this.store.size;
   }
+
+  keys(): string[] {
+    return Array.from(this.store.keys());
+  }
 }
 
 // Singleton instance
 const rateLimitStore = new RateLimitStore();
 
+function isValidIp(s: string): boolean {
+  return isIP(s) !== 0;
+}
+
 /**
- * Get client identifier from request
- * Uses IP address, X-Forwarded-For header, or X-Real-IP header
+ * Get client identifier from request.
+ * Trust order: X-Forwarded-For (first valid IP) → X-Real-IP (if valid) → request.ip → host.
+ * Each header is rejected if it does not parse as a valid IPv4/IPv6 address,
+ * preventing spoofing of untrusted headers to bypass rate limits.
  */
-function getClientIdentifier(request: NextRequest): string {
-  // Check X-Forwarded-For header
+function getClientIdentifier(request: NextRequest & { ip?: string }): string {
   const forwardedFor = request.headers.get("x-forwarded-for");
   if (forwardedFor) {
-    // Take the first IP in the list
-    return forwardedFor.split(",")[0].trim();
+    const first = forwardedFor.split(",")[0].trim();
+    if (isValidIp(first)) return first;
   }
 
-  // Check X-Real-IP header
   const realIp = request.headers.get("x-real-ip");
-  if (realIp) {
-    return realIp;
+  if (realIp && isValidIp(realIp.trim())) {
+    return realIp.trim();
   }
 
-  // Fallback to host header or unknown
-  const host = request.headers.get("host") || "unknown";
-  return host;
+  const connIp = request.ip;
+  if (connIp && isValidIp(connIp)) return connIp;
+
+  return request.headers.get("host") || "unknown";
 }
 
 /**
