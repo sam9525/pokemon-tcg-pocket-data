@@ -150,6 +150,9 @@ export default function DeckBuilderClient() {
     resetCardMaps();
     const deckCardIds = deck.cards.map((c) => c.cardId);
     fetchImagesForCardIds(deckCardIds);
+    // Intentionally only run on language change. deck.cards is read from the
+    // current closure to avoid re-running the effect on every deck edit;
+    // fetchImagesForCardIds and resetCardMaps are stable references from useCallback.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [language]);
 

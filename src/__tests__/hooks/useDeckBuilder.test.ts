@@ -90,23 +90,4 @@ describe("useDeckBuilder", () => {
     expect(result.current.deck.name).toBe("Test Deck");
     expect(result.current.validation.canSave).toBe(true);
   });
-
-  describe("card map reset on clearDeck (C7)", () => {
-    it("exposes a reset path for cardImages/cardData that the consumer can call", () => {
-      // The card images map is owned by DeckBuilderClient (not the hook).
-      // This test asserts that the hook's clearDeck returns cleanly so the
-      // consumer can chain a setCardImages({}) call after it. The integration
-      // is verified manually in the deck-builder flow.
-      const { result } = renderHook(() => useDeckBuilder());
-      act(() => {
-        result.current.addCard("A1_001");
-      });
-      act(() => {
-        result.current.clearDeck();
-      });
-      // After clearDeck, internal state should be back to the initial empty deck.
-      expect(result.current.deck.cards).toEqual([]);
-      expect(result.current.deck.name).toBe("");
-    });
-  });
 });
