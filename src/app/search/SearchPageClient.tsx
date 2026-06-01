@@ -57,6 +57,7 @@ export default function SearchPageClient({
   const currentPageRef = useRef(1);
   const languageRef = useRef(language);
   const abortControllerRef = useRef<AbortController | null>(null);
+  const lastRequestIdRef = useRef<symbol | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [types, setTypes] = useState<FilterItem[]>(initialTypes);
   const [rarity, setRarity] = useState<FilterItem[]>(initialRarity);
@@ -157,6 +158,8 @@ export default function SearchPageClient({
   }, [filtering, language]);
 
   useEffect(() => {
+    const requestId = Symbol("search-request");
+    lastRequestIdRef.current = requestId;
     const fetchSearchResult = async (
       page: number = 1,
       append: boolean = false,
@@ -204,6 +207,7 @@ export default function SearchPageClient({
               "Content-Type": "application/json",
               language: language,
             },
+            signal: abortControllerRef.current?.signal,
             body: JSON.stringify({
               ...filterObject,
               page: page,
@@ -211,6 +215,8 @@ export default function SearchPageClient({
             }),
           });
           const data = await res.json();
+
+          if (lastRequestIdRef.current !== requestId) return; // stale, ignore
 
           if (append) {
             setSearchResult((prev) => [...prev, ...data.results]);
