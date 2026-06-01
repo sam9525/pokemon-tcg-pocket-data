@@ -120,10 +120,20 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ deck: newDeck }, { status: 201 });
     } catch (createError) {
       // Compensate for the failed insert by rolling back the counter.
-      await User.findOneAndUpdate(
-        { _id: updatedUser._id },
-        { $inc: { deckCount: -1 } },
-      );
+      // If the rollback itself fails, log both errors so operators can
+      // reconcile the drift; still re-throw the original cause to the outer catch.
+      try {
+        await User.findOneAndUpdate(
+          { _id: updatedUser._id },
+          { $inc: { deckCount: -1 } },
+        );
+      } catch (rollbackError) {
+        console.error("[user-decks:POST] rollback failed", {
+          userId: String(updatedUser._id),
+          createError,
+          rollbackError,
+        });
+      }
       throw createError;
     }
   } catch (error) {

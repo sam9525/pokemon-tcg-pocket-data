@@ -114,4 +114,24 @@ describe("POST /api/user-decks atomic deck limit (C1)", () => {
     expect(rollbackArgs[0]).toMatchObject({ _id: "userId123" });
     expect(rollbackArgs[1]).toEqual({ $inc: { deckCount: -1 } });
   });
+
+  it("logs rollback failure and still returns 500 when create + rollback both fail", async () => {
+    const consoleErrorSpy = vi.spyOn(console, "error").mockImplementation(() => {});
+    mockedUser.findOneAndUpdate
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      .mockResolvedValueOnce({ _id: "userId123", deckCount: 5 } as any) // first call: increment
+      .mockRejectedValueOnce(new Error("rollback connection lost"));    // second call: rollback fails
+    mockedUserDeck.create.mockRejectedValue(new Error("DB error"));
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const res = await POST(makeRequest(VALID_BODY) as any);
+    expect(res.status).toBe(500);
+
+    // The outer catch should have logged the rollback failure
+    const rollbackLog = consoleErrorSpy.mock.calls.find((call) =>
+      String(call[0] ?? "").includes("rollback failed"),
+    );
+    expect(rollbackLog).toBeDefined();
+    consoleErrorSpy.mockRestore();
+  });
 });
