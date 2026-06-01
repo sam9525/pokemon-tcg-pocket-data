@@ -4,6 +4,7 @@ import { auth } from "@/auth";
 import connectDB from "@/lib/mongodb";
 import { UserDeck } from "@/models/UserDeck";
 import { User } from "@/models/User";
+import { validateDeck } from "@/lib/deckValidation";
 
 // GET /api/user-decks - Get all decks for current user
 export async function GET() {
@@ -67,6 +68,14 @@ export async function POST(request: NextRequest) {
     if (!cards?.length) {
       return NextResponse.json(
         { error: "Deck must have at least one card" },
+        { status: 400 },
+      );
+    }
+
+    const validation = validateDeck(cards, name);
+    if (!validation.canSave) {
+      return NextResponse.json(
+        { error: validation.saveErrors[0] ?? "Invalid deck" },
         { status: 400 },
       );
     }
