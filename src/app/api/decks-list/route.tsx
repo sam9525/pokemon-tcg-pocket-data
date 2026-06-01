@@ -162,43 +162,48 @@ export async function GET(request: NextRequest) {
 
   // Enrich decklists with cardId and imageUrl
   const enrichedDecklists = decklists.map((deck: any) => {
-    const enrichedHighlight = deck.highlight.map((card: any) => {
-      const cardData = getCardData(card.cardName);
-      if (!cardData) {
-        console.log(
-          `Failed to find card: "${card.cardName}" boosterPack: "${card.boosterPack}"`,
-        );
-      }
-      const result = { ...card, ...cardData };
-      if (result?.cardId && language !== "en_US") {
-        result.cardId = result.cardId.replace(/en_US/gi, language);
-      }
-      if (result?.imageUrl && language !== "en_US") {
-        result.imageUrl = result.imageUrl.replace(/en_US/gi, language);
-      }
-      return result;
-    });
+    const enrichedHighlight = Array.isArray(deck.highlight)
+      ? deck.highlight.map((card: any) => {
+          const cardData = getCardData(card.cardName);
+          if (!cardData) {
+            console.log(
+              `Failed to find card: "${card.cardName}" boosterPack: "${card.boosterPack}"`,
+            );
+          }
+          const result = { ...card, ...cardData };
+          if (result?.cardId && language !== "en_US") {
+            result.cardId = result.cardId.replace(/en_US/gi, language);
+          }
+          if (result?.imageUrl && language !== "en_US") {
+            result.imageUrl = result.imageUrl.replace(/en_US/gi, language);
+          }
+          return result;
+        })
+      : [];
 
     const enrichedCardList: Record<string, any[]> = {};
-    Object.entries(deck.cardList).forEach(([player, playerCards]) => {
-      enrichedCardList[player] = (playerCards as any[]).map((card: any) => {
-        const cardData = getCardData(card.cardName);
-        if (!cardData) {
-          console.log(
-            `Failed to find card: "${card.cardName}" boosterPack: "${card.boosterPack}"`,
-          );
-        }
-        const result = { ...card, ...cardData };
-        if (result?.cardId && language !== "en_US") {
-          result.cardId = result.cardId.replace(/en_US/gi, language);
-        }
-        if (result?.imageUrl && language !== "en_US") {
-          result.imageUrl = result.imageUrl.replace(/en_US/gi, language);
-        }
-        return result;
+    if (deck.cardList && typeof deck.cardList === "object") {
+      Object.entries(deck.cardList).forEach(([player, playerCards]) => {
+        enrichedCardList[player] = Array.isArray(playerCards)
+          ? (playerCards as any[]).map((card: any) => {
+              const cardData = getCardData(card.cardName);
+              if (!cardData) {
+                console.log(
+                  `Failed to find card: "${card.cardName}" boosterPack: "${card.boosterPack}"`,
+                );
+              }
+              const result = { ...card, ...cardData };
+              if (result?.cardId && language !== "en_US") {
+                result.cardId = result.cardId.replace(/en_US/gi, language);
+              }
+              if (result?.imageUrl && language !== "en_US") {
+                result.imageUrl = result.imageUrl.replace(/en_US/gi, language);
+              }
+              return result;
+            })
+          : [];
       });
-    });
-
+    }
     return {
       ...deck,
       highlight: enrichedHighlight,
