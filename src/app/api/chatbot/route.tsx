@@ -1,13 +1,34 @@
 import { GoogleGenAI } from "@google/genai";
 import type { NextRequest } from "next/server";
+import { auth } from "@/auth";
+import { rateLimit } from "@/lib/rateLimit";
+import { API_RATE_LIMIT } from "@/utils/rateLimitConfig";
 
-const AI_TIMEOUT_MS = 30000;
+const AI_TIMEOUT_MS = 30_000;
+const MAX_BODY_SIZE = 64 * 1024; // 64 KB
+const MAX_MSG_LENGTH = 4000;
 
 const ai = new GoogleGenAI({
   apiKey: process.env.GOOGLE_GENAI as string,
 });
 
 export async function POST(req: NextRequest) {
+  // Body-size cap: reject oversize requests before parsing JSON.
+  const contentLength = parseInt(req.headers.get("content-length") ?? "0", 10);
+  if (contentLength > MAX_BODY_SIZE) {
+    return Response.json({ error: "Request body too large" }, { status: 413 });
+  }
+
+  // Rate-limit before any work.
+  const rl = await rateLimit(req, API_RATE_LIMIT);
+  if (!rl.success) return rl.response;
+
+  // Require an authenticated session.
+  const session = await auth();
+  if (!session?.user?.email) {
+    return Response.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
   try {
     const { msg } = await req.json();
 
@@ -17,18 +38,20 @@ export async function POST(req: NextRequest) {
         { status: 400 },
       );
     }
+    if (msg.length > MAX_MSG_LENGTH) {
+      return Response.json(
+        { error: `Message exceeds ${MAX_MSG_LENGTH} characters` },
+        { status: 400 },
+      );
+    }
 
-    // Create AbortController with 30-second timeout
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), AI_TIMEOUT_MS);
 
-    // Create a ReadableStream for SSE
     const stream = new ReadableStream({
       async start(streamController) {
         const encoder = new TextEncoder();
-
         try {
-          // Get streaming response from Gemini with timeout signal
           const response = await ai.models.generateContentStream(
             {
               model: "gemini-3-pro-preview",
@@ -52,39 +75,27 @@ export async function POST(req: NextRequest) {
                 topP: 0.95,
                 topK: 40,
                 maxOutputTokens: 60000,
-                tools: [
-                  {
-                    googleSearch: {},
-                  },
-                ],
+                tools: [{ googleSearch: {} }],
               },
             },
             { signal: controller.signal },
           );
 
-          // Stream each chunk in SSE format
           for await (const chunk of response) {
             const links =
               chunk.candidates?.[0]?.groundingMetadata?.groundingChunks;
-
             const text = chunk.candidates?.[0]?.content?.parts?.[0]?.text ?? "";
-
             if (text) {
-              // Send chunk in SSE format: "data: {json}\n\n"
               const data = `data: ${JSON.stringify({ text })}\n\n`;
               streamController.enqueue(encoder.encode(data));
             }
-
             if (links != undefined) {
               const data = `links: ${JSON.stringify({ links })}\n\n`;
               streamController.enqueue(encoder.encode(data));
             }
           }
-
-          // Send completion signal
           streamController.enqueue(encoder.encode("data: [DONE]\n\n"));
         } catch (error) {
-          // Check if error is due to timeout (AbortError)
           if (error instanceof Error && error.name === "AbortError") {
             const errorData = `data: ${JSON.stringify({
               error: "Request timeout",
@@ -93,7 +104,6 @@ export async function POST(req: NextRequest) {
             })}\n\n`;
             streamController.enqueue(encoder.encode(errorData));
           } else {
-            // Send error in SSE format
             const errorData = `data: ${JSON.stringify({
               error: "Streaming failed",
               details: "An error occurred. Please try again.",
@@ -107,7 +117,6 @@ export async function POST(req: NextRequest) {
       },
     });
 
-    // Return stream with SSE headers
     return new Response(stream, {
       headers: {
         "Content-Type": "text/event-stream",
@@ -118,10 +127,7 @@ export async function POST(req: NextRequest) {
   } catch (error) {
     console.error("Chatbot API error:", error);
     return Response.json(
-      {
-        error: "Failed to get response from AI.",
-        details: "An error occurred. Please try again.",
-      },
+      { error: "Failed to get response from AI." },
       { status: 500 },
     );
   }
