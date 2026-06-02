@@ -14,18 +14,29 @@ export async function POST(request: NextRequest) {
   await connectDB();
 
   const body = await request.json();
-  const { cardName } = body;
-  let limit = body.limit ?? 100;
-  let skip = body.skip ?? 0;
+
+  // Validate cardName: must be a string if provided. Reject other types
+  // outright rather than letting .replace throw a 500.
+  if (body.cardName !== undefined && typeof body.cardName !== "string") {
+    return Response.json(
+      { error: "cardName must be a string" },
+      { status: 400 },
+    );
+  }
+  const cardName: string = body.cardName ?? "";
+
+  // Coerce pagination; ignore non-finite values by falling back to defaults.
+  const rawLimit = Number(body.limit);
+  const rawSkip = Number(body.skip);
+  let limit = Number.isFinite(rawLimit) ? rawLimit : 100;
+  let skip = Number.isFinite(rawSkip) ? rawSkip : 0;
 
   // 2. Enforce pagination limits
   limit = Math.min(Math.max(1, limit), 100);
   skip = Math.max(0, skip);
 
   // 3. Escape regex special characters
-  const escapedCardName = cardName
-    ? cardName.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")
-    : "";
+  const escapedCardName = cardName.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 
   // 4. Get total count for pagination
   const totalCount = await Card.countDocuments({
