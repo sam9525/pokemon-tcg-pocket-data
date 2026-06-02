@@ -116,11 +116,13 @@ describe("POST /api/user-decks atomic deck limit (C1)", () => {
   });
 
   it("logs rollback failure and still returns 500 when create + rollback both fail", async () => {
-    const consoleErrorSpy = vi.spyOn(console, "error").mockImplementation(() => {});
+    const consoleErrorSpy = vi
+      .spyOn(console, "error")
+      .mockImplementation(() => {});
     mockedUser.findOneAndUpdate
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       .mockResolvedValueOnce({ _id: "userId123", deckCount: 5 } as any) // first call: increment
-      .mockRejectedValueOnce(new Error("rollback connection lost"));    // second call: rollback fails
+      .mockRejectedValueOnce(new Error("rollback connection lost")); // second call: rollback fails
     mockedUserDeck.create.mockRejectedValue(new Error("DB error"));
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any

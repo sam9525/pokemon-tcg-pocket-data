@@ -5,14 +5,12 @@ import { NextRequest } from "next/server";
 
 // Mocks — must be declared before importing the route.
 const validateDeckMock = vi.hoisted(() =>
-  vi
-    .fn()
-    .mockReturnValue({
-      canSave: true,
-      saveErrors: [],
-      warnings: [],
-      totalCards: 0,
-    }),
+  vi.fn().mockReturnValue({
+    canSave: true,
+    saveErrors: [],
+    warnings: [],
+    totalCards: 0,
+  }),
 );
 vi.mock("@/lib/deckValidation", () => ({ validateDeck: validateDeckMock }));
 
