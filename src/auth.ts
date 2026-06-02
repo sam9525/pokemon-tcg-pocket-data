@@ -40,8 +40,9 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           const user = await User.findOne({ email });
 
           if (!user) {
-            // No user found, so this is their first attempt to login
-            throw new Error("Invalid credentials.");
+            // Uniform null response — do NOT distinguish "no user" from
+            // "wrong password" to prevent user enumeration via timing or logs.
+            return null;
           }
 
           const passwordOk = verifyPassword(password, user.password);
@@ -57,7 +58,9 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
             // Return `null` to indicate that the credentials are invalid
             return null;
           }
-          console.error("Login error:", error);
+          // Log a sanitized message only — never the raw error object,
+          // which may include partial credentials or driver internals.
+          console.error("Login failed");
           return null;
         }
       },
@@ -122,7 +125,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       return session;
     },
   },
-  debug: true, // Enable debug mode to get more detailed error information
+  debug: process.env.NODE_ENV !== "production", // Enable debug mode to get more detailed error information
   authorizedParties: process.env.AUTH_URL
     ? [process.env.AUTH_URL.replace(/\/$/, "")]
     : undefined,
