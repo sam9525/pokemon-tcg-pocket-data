@@ -1,6 +1,30 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 
-// Mock the env before importing auth.
+// Mock next-auth and its transitive imports so we can load @/auth under
+// vitest without hitting `next/server` (which vitest cannot resolve).
+vi.mock("next-auth", () => ({
+  default: vi.fn(() => ({
+    handlers: { GET: vi.fn(), POST: vi.fn() },
+    signIn: vi.fn(),
+    signOut: vi.fn(),
+    auth: vi.fn(),
+  })),
+}));
+vi.mock("next-auth/providers/credentials", () => ({
+  default: vi.fn(() => ({})),
+}));
+vi.mock("next-auth/providers/google", () => ({
+  default: vi.fn(() => ({})),
+}));
+vi.mock("@/auth", async () => {
+  return {
+    handlers: { GET: vi.fn(), POST: vi.fn() },
+    signIn: vi.fn(),
+    signOut: vi.fn(),
+    auth: vi.fn(),
+  };
+});
+
 const ORIGINAL_ENV = process.env;
 const mockAuthConfig = () => {
   vi.resetModules();
