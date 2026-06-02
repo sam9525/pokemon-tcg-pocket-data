@@ -1,5 +1,7 @@
 import { describe, it, expect, vi } from "vitest";
+import { NextRequest } from "next/server";
 import { GET } from "@/app/api/cards/[id]/route";
+import { GET as CardByIdGET } from "@/app/api/cards/[id]/[cardId]/route";
 import { cacheManager } from "@/utils/cache";
 import { Card } from "@/models/Card";
 
@@ -121,5 +123,44 @@ describe("GET /api/cards/[id] query param validation (C2)", () => {
       (cacheManager.set as any).mock.calls;
     expect(setCalls.length).toBe(2);
     expect(setCalls[0][0]).toBe(setCalls[1][0]);
+  });
+});
+
+describe("/api/cards/[id]/[cardId] hardening (Confirmed A)", () => {
+  it("returns 400 when id has fewer than 3 underscore-separated parts", async () => {
+    const req = new NextRequest(
+      new Request("http://localhost/api/cards/x/y?language=en_US"),
+    );
+    const res = await CardByIdGET(req, {
+      params: Promise.resolve({ id: "x" }),
+    });
+    expect(res.status).toBe(400);
+  });
+
+  it("returns 400 when id contains invalid characters", async () => {
+    const req = new NextRequest(
+      new Request("http://localhost/api/cards/A1!@#_B_C?language=en_US"),
+    );
+    const res = await CardByIdGET(req, {
+      params: Promise.resolve({ id: "A1!@#_B_C" }),
+    });
+    expect(res.status).toBe(400);
+  });
+
+  it("does not include error details in the 500 response", async () => {
+    const longId = "a".repeat(300) + "_b_c";
+    const req = new NextRequest(
+      new Request(`http://localhost/api/cards/${longId}/y?language=en_US`),
+    );
+    const res = await CardByIdGET(req, {
+      params: Promise.resolve({ id: longId }),
+    });
+    if (res.status === 500) {
+      const body = await res.json();
+      expect(body).not.toHaveProperty("details");
+      expect(body.error).toBe("Failed to fetch cards");
+    } else {
+      expect(res.status).toBe(400);
+    }
   });
 });
