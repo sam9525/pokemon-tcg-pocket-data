@@ -15,6 +15,13 @@ export interface RateLimitConfig {
   skip?: (request: NextRequest) => boolean;
   /** Custom key generator for rate limiting (default: IP address) */
   keyGenerator?: (request: NextRequest) => string;
+  /**
+   * List of proxy IPs allowed to set X-Forwarded-For / X-Real-IP.
+   * If empty or undefined, those headers are IGNORED and only the
+   * connection IP (request.ip) is used. This prevents attackers from
+   * spoofing their identifier to bypass per-IP rate limits.
+   */
+  trustedProxies?: string[];
 }
 
 interface RateLimitEntry {
@@ -111,25 +118,42 @@ function isValidIp(s: string): boolean {
 
 /**
  * Get client identifier from request.
- * Trust order: X-Forwarded-For (first valid IP) → X-Real-IP (if valid) → request.ip → host.
- * Each header is rejected if it does not parse as a valid IPv4/IPv6 address,
- * preventing spoofing of untrusted headers to bypass rate limits.
+ *
+ * Trust is conditional: X-Forwarded-For and X-Real-IP are honored ONLY when
+ * the connection IP (request.ip) is in the configured trustedProxies list.
+ * Without that, both headers are ignored and the connection IP is used.
+ * This is the standard defense against X-Forwarded-For spoofing.
  */
-function getClientIdentifier(request: NextRequest & { ip?: string }): string {
-  const forwardedFor = request.headers.get("x-forwarded-for");
-  if (forwardedFor) {
-    const first = forwardedFor.split(",")[0].trim();
-    if (isValidIp(first)) return first;
-  }
-
-  const realIp = request.headers.get("x-real-ip");
-  if (realIp && isValidIp(realIp.trim())) {
-    return realIp.trim();
-  }
-
+function getClientIdentifier(
+  request: NextRequest & { ip?: string },
+  trustedProxies: ReadonlySet<string>,
+): string {
   const connIp = request.ip;
-  if (connIp && isValidIp(connIp)) return connIp;
+  const connIpValid = connIp && isValidIp(connIp);
 
+  if (connIpValid && trustedProxies.has(connIp)) {
+    const forwardedFor = request.headers.get("x-forwarded-for");
+    if (forwardedFor) {
+      // Walk the chain right-to-left: the rightmost IP is the one
+      // closest to us. Stop at the first invalid (non-IP) entry.
+      const parts = forwardedFor
+        .split(",")
+        .map((p) => p.trim())
+        .filter(Boolean);
+      for (let i = parts.length - 1; i >= 0; i--) {
+        if (isValidIp(parts[i])) {
+          return parts[i];
+        }
+      }
+    }
+
+    const realIp = request.headers.get("x-real-ip");
+    if (realIp && isValidIp(realIp.trim())) {
+      return realIp.trim();
+    }
+  }
+
+  if (connIpValid) return connIp;
   return request.headers.get("host") || "unknown";
 }
 
@@ -145,7 +169,8 @@ export async function rateLimit(
     windowMs,
     message = "Too many requests, please try again later.",
     skip,
-    keyGenerator = getClientIdentifier,
+    keyGenerator,
+    trustedProxies = [],
   } = config;
 
   // Skip rate limiting if configured
@@ -153,7 +178,10 @@ export async function rateLimit(
     return { success: true };
   }
 
-  const key = keyGenerator(request);
+  const trustedSet = new Set(trustedProxies);
+  const key = keyGenerator
+    ? keyGenerator(request)
+    : getClientIdentifier(request, trustedSet);
   const now = Date.now();
 
   // Get or create rate limit entry

@@ -40,16 +40,22 @@ describe("rateLimit IP spoofing prevention (C1)", () => {
     expect(rateLimitStore.keys()).not.toContain("<script>alert(1)</script>");
   });
 
-  it("accepts valid X-Forwarded-For IPv4", async () => {
-    const req = makeRequest({ forwardedFor: "203.0.113.5" });
-    const result = await rateLimit(req, API_RATE_LIMIT);
+  it("accepts valid X-Forwarded-For IPv4 when proxy is trusted", async () => {
+    const req = makeRequest({ forwardedFor: "203.0.113.5", ip: "10.0.0.1" });
+    const result = await rateLimit(req, {
+      ...API_RATE_LIMIT,
+      trustedProxies: ["10.0.0.1"],
+    });
     expect(result.success).toBe(true);
     expect(rateLimitStore.keys()).toEqual(["203.0.113.5"]);
   });
 
-  it("accepts valid X-Forwarded-For IPv6 ::1", async () => {
-    const req = makeRequest({ forwardedFor: "::1" });
-    const result = await rateLimit(req, API_RATE_LIMIT);
+  it("accepts valid X-Forwarded-For IPv6 ::1 when proxy is trusted", async () => {
+    const req = makeRequest({ forwardedFor: "::1", ip: "10.0.0.1" });
+    const result = await rateLimit(req, {
+      ...API_RATE_LIMIT,
+      trustedProxies: ["10.0.0.1"],
+    });
     expect(result.success).toBe(true);
     expect(rateLimitStore.keys()).toEqual(["::1"]);
   });
@@ -89,5 +95,47 @@ describe("rateLimit store size cap (C2)", () => {
     }
     expect(rateLimitStore.size()).toBe(1);
     expect(rateLimitStore.keys()).toEqual(["4.4.4.4"]);
+  });
+});
+
+describe("rateLimit trusted-proxy enforcement (C4 / Confirmed D)", () => {
+  beforeEach(() => rateLimitStore.clear());
+
+  it("ignores X-Forwarded-For when no trusted proxies are configured", async () => {
+    // Default config: no trustedProxies → XFF must be ignored.
+    const req = makeRequest({ forwardedFor: "1.2.3.4", ip: "5.6.7.8" });
+    const result = await rateLimit(req, API_RATE_LIMIT);
+    expect(result.success).toBe(true);
+    // Key should be the connection IP, not the spoofed XFF.
+    expect(rateLimitStore.keys()).toEqual(["5.6.7.8"]);
+    expect(rateLimitStore.keys()).not.toContain("1.2.3.4");
+  });
+
+  it("honors X-Forwarded-For when request.ip is in trustedProxies", async () => {
+    const trustedConfig = {
+      ...API_RATE_LIMIT,
+      trustedProxies: ["10.0.0.1"],
+    };
+    const req = makeRequest({
+      ip: "10.0.0.1",
+      forwardedFor: "203.0.113.5",
+    });
+    const result = await rateLimit(req, trustedConfig);
+    expect(result.success).toBe(true);
+    expect(rateLimitStore.keys()).toEqual(["203.0.113.5"]);
+  });
+
+  it("falls back to connection IP when XFF chain is malformed", async () => {
+    const trustedConfig = {
+      ...API_RATE_LIMIT,
+      trustedProxies: ["10.0.0.1"],
+    };
+    const req = makeRequest({
+      ip: "10.0.0.1",
+      forwardedFor: "not-an-ip",
+    });
+    const result = await rateLimit(req, trustedConfig);
+    expect(result.success).toBe(true);
+    expect(rateLimitStore.keys()).toEqual(["10.0.0.1"]);
   });
 });
