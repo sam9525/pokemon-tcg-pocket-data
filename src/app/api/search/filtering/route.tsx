@@ -1,5 +1,7 @@
 import { Card } from "@/models/Card";
-import connectDB from "@/lib/mongodb";
+import { connectDB } from "@/lib/mongodb";
+import { rateLimit } from "@/lib/rateLimit";
+import { API_RATE_LIMIT } from "@/utils/rateLimitConfig";
 import {
   TYPE_MAPPINGS,
   RARITY_MAPPINGS,
@@ -10,18 +12,43 @@ import {
   WEAKNESS_MAPPINGS,
 } from "@/utils/constants";
 
+const MAX_LIMIT = 500;
+const MAX_PAGE = 10_000;
+
 export async function POST(request: Request) {
+  // Rate-limit FIRST.
+  const rl = await rateLimit(
+    request as unknown as import("next/server").NextRequest,
+    API_RATE_LIMIT,
+  );
+  if (!rl.success) return rl.response;
+
   try {
-    // Connect to MongoDB
     await connectDB();
 
-    // Get filters from request body
     const filters = await request.json();
     const language = request.headers.get("language") as string;
+    if (!language || !/^[A-Za-z0-9_-]{1,20}$/.test(language)) {
+      return Response.json({ error: "Invalid language" }, { status: 400 });
+    }
 
-    // Extract pagination parameters
-    const page = parseInt(filters.page) || 1;
-    const limit = parseInt(filters.limit) || 100;
+    // Parse and validate pagination.
+    const rawPage = parseInt(filters.page);
+    const rawLimit = parseInt(filters.limit);
+    if (Number.isNaN(rawPage) || rawPage < 1 || rawPage > MAX_PAGE) {
+      return Response.json({ error: "Invalid page" }, { status: 400 });
+    }
+    if (Number.isNaN(rawLimit) || rawLimit < 1) {
+      return Response.json({ error: "Invalid limit" }, { status: 400 });
+    }
+    if (rawLimit > MAX_LIMIT) {
+      return Response.json(
+        { error: `limit exceeds maximum of ${MAX_LIMIT}` },
+        { status: 400 },
+      );
+    }
+    const page = rawPage;
+    const limit = rawLimit;
     const skip = (page - 1) * limit;
 
     // Build MongoDB query based on filters
