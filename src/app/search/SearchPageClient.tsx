@@ -55,7 +55,6 @@ export default function SearchPageClient({
   const hasLoaded = useRef(false);
   const filteringRef = useRef<[string, string][]>([]);
   const currentPageRef = useRef(1);
-  const languageRef = useRef(language);
   const abortControllerRef = useRef<AbortController | null>(null);
   const lastRequestIdRef = useRef<symbol | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -75,6 +74,7 @@ export default function SearchPageClient({
   const [hasMore, setHasMore] = useState(false);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
   const { language, currentLanguageLookup } = useLanguage();
+  const languageRef = useRef(language);
   const [searchCardName, setSearchCardName] = useState("");
 
   useEffect(() => {
