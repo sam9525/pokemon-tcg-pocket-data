@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 import { useLanguage } from "@/components/provider/LanguageProvider";
@@ -32,6 +32,13 @@ export default function DeckBuilderClient() {
     Record<string, { boosterPack?: string; rarity?: string }>
   >({});
   const [isSaving, setIsSaving] = useState(false);
+
+  // Abort controller for in-flight /api/cards/images requests, plus a
+  // monotonically increasing requestId used to discard stale responses
+  // (Confirmed F: race condition clobbering state on rapid deck/language
+  // switches).
+  const abortControllerRef = useRef<AbortController | null>(null);
+  const imageRequestIdRef = useRef(0);
 
   // Track dynamic deck area position for card animation destination
   const [deckAreaPosition, setDeckAreaPosition] = useState({
@@ -76,11 +83,24 @@ export default function DeckBuilderClient() {
     async (cardIds: string[]) => {
       if (cardIds.length === 0) return;
       const lang = language || "en_US";
+
+      // Abort any in-flight request and bump the request id so any
+      // older pending response is ignored.
+      abortControllerRef.current?.abort();
+      const controller = new AbortController();
+      abortControllerRef.current = controller;
+      const myRequestId = ++imageRequestIdRef.current;
+
       try {
         const res = await fetch(
-          `/api/cards/images?cardIds=${cardIds.join(",")}&language=${lang}`,
+          `/api/cards/images?cardIds=${encodeURIComponent(
+            cardIds.join(","),
+          )}&language=${encodeURIComponent(lang)}`,
+          { signal: controller.signal },
         );
         const data = await res.json();
+        // Guard: only apply state if this is still the most recent request.
+        if (myRequestId !== imageRequestIdRef.current) return;
         if (data.images) {
           setCardImages((prev) => ({ ...prev, ...data.images }));
         }
@@ -88,6 +108,8 @@ export default function DeckBuilderClient() {
           setCardData((prev) => ({ ...prev, ...data.cardData }));
         }
       } catch (err) {
+        // Aborted requests are expected on rapid navigation/language switches.
+        if (err instanceof DOMException && err.name === "AbortError") return;
         console.error("[DeckBuilder] Failed to fetch deck card images:", err);
       }
     },
@@ -99,7 +121,10 @@ export default function DeckBuilderClient() {
     const deckId = searchParams.get("deckId");
     if (!deckId) return;
 
-    // Clear any stale card image/metadata from a prior deck before loading.
+    // Abort any in-flight image fetch and bump the request id, then
+    // clear state before loading a new deck.
+    abortControllerRef.current?.abort();
+    imageRequestIdRef.current++;
     resetCardMaps();
 
     const fetchAndLoadDeck = async () => {
@@ -147,6 +172,8 @@ export default function DeckBuilderClient() {
   // cached entries from the prior language are replaced.
   useEffect(() => {
     if (deck.cards.length === 0) return;
+    abortControllerRef.current?.abort();
+    imageRequestIdRef.current++;
     resetCardMaps();
     const deckCardIds = deck.cards.map((c) => c.cardId);
     fetchImagesForCardIds(deckCardIds);
@@ -163,16 +190,26 @@ export default function DeckBuilderClient() {
     });
     setCardImages((prev) => ({ ...prev, ...images }));
 
-    // Fetch card metadata (boosterPack, rarity) for these cards
     if (cards.length > 0) {
       const cardIds = cards.map((c) => c.cardId);
       const lang = language || "en_US";
-      fetch(`/api/cards/images?cardIds=${cardIds.join(",")}&language=${lang}`)
+      abortControllerRef.current?.abort();
+      const controller = new AbortController();
+      abortControllerRef.current = controller;
+      const myRequestId = ++imageRequestIdRef.current;
+      fetch(
+        `/api/cards/images?cardIds=${encodeURIComponent(
+          cardIds.join(","),
+        )}&language=${encodeURIComponent(lang)}`,
+        { signal: controller.signal },
+      )
         .then((res) => res.json())
         .then((data) => {
+          if (myRequestId !== imageRequestIdRef.current) return;
           setCardData((prev) => ({ ...prev, ...(data.cardData || {}) }));
         })
         .catch((err) => {
+          if (err instanceof DOMException && err.name === "AbortError") return;
           console.error("[DeckBuilder] Failed to load card metadata:", err);
         });
     }
@@ -194,6 +231,8 @@ export default function DeckBuilderClient() {
   };
 
   const handleClear = () => {
+    abortControllerRef.current?.abort();
+    imageRequestIdRef.current++;
     if (deck.cards.length === 0) return;
     const t =
       (currentLanguageLookup?.DECK_BUILDER as Record<string, string>) || {};
