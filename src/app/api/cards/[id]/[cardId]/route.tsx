@@ -1,7 +1,7 @@
 import { Card } from "@/models/Card";
 import { cacheManager } from "@/utils/cache";
 import { CACHE_CONFIG } from "@/utils/cacheConfig";
-import { connectDB } from "@/lib/mongodb";
+import connectDB from "@/lib/mongodb";
 import { NextRequest } from "next/server";
 import { rateLimit } from "@/lib/rateLimit";
 import { API_RATE_LIMIT } from "@/utils/rateLimitConfig";

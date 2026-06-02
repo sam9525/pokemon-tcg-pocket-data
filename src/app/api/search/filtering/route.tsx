@@ -1,7 +1,7 @@
 import type { NextRequest } from "next/server";
 
 import { Card } from "@/models/Card";
-import { connectDB } from "@/lib/mongodb";
+import connectDB from "@/lib/mongodb";
 import { rateLimit } from "@/lib/rateLimit";
 import { API_RATE_LIMIT } from "@/utils/rateLimitConfig";
 import {
