@@ -11,7 +11,7 @@ vi.mock("@/lib/rateLimit", () => ({
 vi.mock("@/utils/cache", () => ({
   cacheManager: { get: vi.fn().mockReturnValue(null), set: vi.fn() },
 }));
-vi.mock("@/lib/mongodb", () => ({ default: vi.fn() }));
+vi.mock("@/lib/mongodb", () => ({ default: vi.fn(), connectDB: vi.fn() }));
 vi.mock("@/models/Card", () => ({ Card: { find: vi.fn() } }));
 
 const mockedCardFind = Card.find as unknown as ReturnType<typeof vi.fn>;
