@@ -13,15 +13,8 @@ export interface RateLimitConfig {
   message?: string;
   /** Skip rate limiting based on request */
   skip?: (request: NextRequest) => boolean;
-  /** Custom key generator for rate limiting (default: IP address) */
+  /** Custom key generator for rate limiting (default: client IP) */
   keyGenerator?: (request: NextRequest) => string;
-  /**
-   * List of proxy IPs allowed to set X-Forwarded-For / X-Real-IP.
-   * If empty or undefined, those headers are IGNORED and only the
-   * connection IP (request.ip) is used. This prevents attackers from
-   * spoofing their identifier to bypass per-IP rate limits.
-   */
-  trustedProxies?: string[];
 }
 
 interface RateLimitEntry {
@@ -117,43 +110,28 @@ function isValidIp(s: string): boolean {
 }
 
 /**
- * Get client identifier from request.
+ * Get the client identifier (IP) from the request.
  *
- * Trust is conditional: X-Forwarded-For and X-Real-IP are honored ONLY when
- * the connection IP (request.ip) is in the configured trustedProxies list.
- * Without that, both headers are ignored and the connection IP is used.
- * This is the standard defense against X-Forwarded-For spoofing.
+ * On Vercel, `x-forwarded-for` is set to the real client IP by the platform
+ * and external IPs are stripped to prevent spoofing, so it can be trusted
+ * directly (https://vercel.com/docs/headers/request-headers). `x-real-ip`
+ * is identical and used as a fallback. `request.ip` was removed in Next.js
+ * 15 and is intentionally not used. Falls back to the host header only when
+ * no IP header is present (e.g. local dev).
  */
-function getClientIdentifier(
-  request: NextRequest & { ip?: string },
-  trustedProxies: ReadonlySet<string>,
-): string {
-  const connIp = request.ip;
-  const connIpValid = connIp && isValidIp(connIp);
-
-  if (connIpValid && trustedProxies.has(connIp)) {
-    const forwardedFor = request.headers.get("x-forwarded-for");
-    if (forwardedFor) {
-      // Walk the chain right-to-left: the rightmost IP is the one
-      // closest to us. Stop at the first invalid (non-IP) entry.
-      const parts = forwardedFor
-        .split(",")
-        .map((p) => p.trim())
-        .filter(Boolean);
-      for (let i = parts.length - 1; i >= 0; i--) {
-        if (isValidIp(parts[i])) {
-          return parts[i];
-        }
-      }
-    }
-
-    const realIp = request.headers.get("x-real-ip");
-    if (realIp && isValidIp(realIp.trim())) {
-      return realIp.trim();
+function getClientIdentifier(request: NextRequest): string {
+  const forwardedFor = request.headers.get("x-forwarded-for");
+  if (forwardedFor) {
+    // Vercel sets a single client IP; defensively take the first valid entry.
+    for (const part of forwardedFor.split(",")) {
+      const candidate = part.trim();
+      if (candidate && isValidIp(candidate)) return candidate;
     }
   }
 
-  if (connIpValid) return connIp;
+  const realIp = request.headers.get("x-real-ip");
+  if (realIp && isValidIp(realIp.trim())) return realIp.trim();
+
   return request.headers.get("host") || "unknown";
 }
 
@@ -170,7 +148,6 @@ export async function rateLimit(
     message = "Too many requests, please try again later.",
     skip,
     keyGenerator,
-    trustedProxies = [],
   } = config;
 
   // Skip rate limiting if configured
@@ -178,10 +155,9 @@ export async function rateLimit(
     return { success: true };
   }
 
-  const trustedSet = new Set(trustedProxies);
   const key = keyGenerator
     ? keyGenerator(request)
-    : getClientIdentifier(request, trustedSet);
+    : getClientIdentifier(request);
   const now = Date.now();
 
   // Get or create rate limit entry
