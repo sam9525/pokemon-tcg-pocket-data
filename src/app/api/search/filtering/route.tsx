@@ -1,3 +1,5 @@
+import type { NextRequest } from "next/server";
+
 import { Card } from "@/models/Card";
 import { connectDB } from "@/lib/mongodb";
 import { rateLimit } from "@/lib/rateLimit";
@@ -15,19 +17,16 @@ import {
 const MAX_LIMIT = 500;
 const MAX_PAGE = 10_000;
 
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
   // Rate-limit FIRST.
-  const rl = await rateLimit(
-    request as unknown as import("next/server").NextRequest,
-    API_RATE_LIMIT,
-  );
+  const rl = await rateLimit(request, API_RATE_LIMIT);
   if (!rl.success) return rl.response;
 
   try {
     await connectDB();
 
     const filters = await request.json();
-    const language = request.headers.get("language") as string;
+    const language = request.headers.get("language");
     if (!language || !/^[A-Za-z0-9_-]{1,20}$/.test(language)) {
       return Response.json({ error: "Invalid language" }, { status: 400 });
     }
