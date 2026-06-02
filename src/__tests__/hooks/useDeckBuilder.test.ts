@@ -32,9 +32,12 @@ describe("useDeckBuilder", () => {
     const { result } = renderHook(() => useDeckBuilder());
     act(() => result.current.addCard("A1_001"));
     act(() => result.current.addCard("A1_001"));
-    const addResult = act(() => result.current.addCard("A1_001"));
-    expect(addResult.success).toBe(false);
-    expect(addResult.reason).toContain("2 copies");
+    let addResult: { success: boolean; reason?: string } | undefined;
+    act(() => {
+      addResult = result.current.addCard("A1_001");
+    });
+    expect(addResult?.success).toBe(false);
+    expect(addResult?.reason).toContain("2 copies");
     expect(result.current.deck.cards[0].quantity).toBe(2);
   });
 
