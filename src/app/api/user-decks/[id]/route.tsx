@@ -168,6 +168,14 @@ export async function DELETE(
       return NextResponse.json({ error: "Deck not found" }, { status: 404 });
     }
 
+    // Keep the user's deckCount in sync with actual ownership so the deck
+    // limit reflects reality. The `deckCount: { $gt: 0 }` guard prevents the
+    // counter from going negative if pre-existing drift left it at 0.
+    await User.updateOne(
+      { _id: user._id, deckCount: { $gt: 0 } },
+      { $inc: { deckCount: -1 } },
+    );
+
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error("[user-decks/[id]:DELETE]", error);
