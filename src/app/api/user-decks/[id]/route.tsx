@@ -87,8 +87,17 @@ export async function PUT(
       return NextResponse.json({ error: "Deck not found" }, { status: 404 });
     }
 
-    // Merge incoming fields with existing deck to validate the FINAL state.
-    const finalCards = cards ?? existingDeck.cards;
+    // Cap incoming quantities FIRST so validateDeck sees the persisted shape.
+    // Without this, validateDeck would pass on uncapped data and we'd store
+    // a different (capped) shape, creating drift between validation and storage.
+    const incomingCards = Array.isArray(cards)
+      ? cards.map((c: { cardId: string; quantity: number }) => ({
+          cardId: c.cardId,
+          quantity: Math.min(c.quantity, 2),
+        }))
+      : existingDeck.cards;
+
+    const finalCards = cards !== undefined ? incomingCards : existingDeck.cards;
     const finalName = name !== undefined ? name.trim() : existingDeck.name;
     const validation = validateDeck(finalCards, finalName);
     if (!validation.canSave) {
@@ -104,12 +113,7 @@ export async function PUT(
       {
         $set: {
           ...(name !== undefined && { name: name.trim() }),
-          ...(cards !== undefined && {
-            cards: cards.map((c: { cardId: string; quantity: number }) => ({
-              cardId: c.cardId,
-              quantity: Math.min(c.quantity, 2),
-            })),
-          }),
+          ...(cards !== undefined && { cards: incomingCards }),
         },
         $inc: { version: 1 },
       },
