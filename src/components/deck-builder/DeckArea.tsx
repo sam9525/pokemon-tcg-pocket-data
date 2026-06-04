@@ -57,6 +57,7 @@ export default function DeckArea({
       <div className="flex flex-row flex-wrap justify-between items-center gap-2 mb-3">
         <input
           type="text"
+          data-testid="deck-name-input"
           value={name}
           onChange={(e) => onNameChange(e.target.value)}
           placeholder={(t.deckName as string) || "Deck Name"}
@@ -64,6 +65,7 @@ export default function DeckArea({
         />
         <div className="flex gap-2">
           <button
+            data-testid="save-deck-button"
             onClick={onSave}
             disabled={!validation.canSave || isSaving}
             className={`px-4 py-2 rounded-lg font-bold transition-colors ${
@@ -79,6 +81,7 @@ export default function DeckArea({
                 : (t.save as string) || "Save"}
           </button>
           <button
+            data-testid="clear-deck-button"
             onClick={onClear}
             disabled={cards.length === 0}
             className={`px-4 py-2 rounded-lg font-bold transition-colors ${
@@ -108,7 +111,10 @@ export default function DeckArea({
       </div>
 
       {/* Card list - scrollable when more than 10 cards */}
-      <div className="flex flex-row gap-3 overflow-x-auto pb-2 py-2 -mr-3 scrollbar">
+      <div
+        data-testid="deck-card-list"
+        className="flex flex-row gap-3 overflow-x-auto pb-2 py-2 -mr-3 scrollbar"
+      >
         {cards.map((card) => (
           <DeckCard
             key={card.cardId}

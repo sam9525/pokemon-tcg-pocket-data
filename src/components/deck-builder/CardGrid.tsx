@@ -169,6 +169,7 @@ export default function CardGrid({
             return (
               <div
                 key={card.cardId}
+                data-testid="grid-card"
                 className="relative group cursor-pointer"
                 onClick={(e) => handleCardClick(card, e)}
                 title={

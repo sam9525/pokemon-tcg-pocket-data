@@ -21,6 +21,7 @@ export default function DeckCard({
 }: DeckCardProps) {
   return (
     <div
+      data-testid="deck-card"
       className="relative group cursor-pointer flex-shrink-0"
       onClick={() => onRemoveOne(cardId)}
       title={`${cardId} (tap to remove)`}
