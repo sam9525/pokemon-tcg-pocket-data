@@ -1,6 +1,7 @@
 // tests/e2e/deck-builder-journey.spec.ts
 import { test, expect } from "@playwright/test";
 import { USER_STATE } from "./support/auth";
+import { readSeed } from "./support/db";
 import { forceResponse } from "./support/override";
 
 test.use({ storageState: USER_STATE });
@@ -56,4 +57,29 @@ test("redirects to login when save returns 401", async ({ page }) => {
   await page.getByTestId("save-deck-button").click();
 
   await expect(page).toHaveURL(/\/login\?callbackUrl=\/deck-builder/);
+});
+
+test("loads the seeded deck via ?deckId and updates it (PUT)", async ({
+  page,
+}) => {
+  const seed = readSeed();
+  await page.goto(`/deck-builder?deckId=${seed.deckId}`);
+
+  await expect(page.getByTestId("deck-name-input")).toHaveValue("Seeded Deck");
+  // Seeded deck has 2 distinct cards (qty 2 + 1 = 3 total).
+  await expect(page.locator('[data-testid="deck-card"]')).toHaveCount(2);
+  await expect(page.getByText("3/20")).toBeVisible();
+
+  await page.getByTestId("save-deck-button").click();
+  await expect(page.getByText("Deck saved successfully")).toBeVisible();
+
+  // Version incremented in the DB → re-PUT with the OLD version must 409.
+  const stale = await page.request.put(`/api/user-decks/${seed.deckId}`, {
+    data: {
+      name: "Seeded Deck",
+      cards: [{ cardId: "E2E-001", quantity: 1 }],
+      version: seed.deckVersion,
+    },
+  });
+  expect(stale.status()).toBe(409);
 });
