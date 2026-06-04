@@ -335,6 +335,7 @@ export default function Chatbot() {
     <>
       <div
         ref={buttonRef}
+        data-testid="chatbot-toggle"
         className="w-15 h-15 rounded-full fixed bottom-10 right-10 flex items-center justify-center cursor-pointer transition-all duration-300 hover:scale-110"
         onClick={handleToggle}
       >
@@ -364,6 +365,7 @@ export default function Chatbot() {
           </div>
           <textarea
             id="ask"
+            data-testid="chatbot-input"
             ref={textareaRef}
             value={inputMessage}
             placeholder="Ask pokebot"
