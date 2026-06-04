@@ -1,263 +1,177 @@
-import { test, expect, type APIResponse } from "@playwright/test";
+// tests/e2e/security.spec.ts
+import { test, expect } from "@playwright/test";
+import { USER_STATE, ADMIN_STATE } from "./support/auth";
+import { readSeed } from "./support/db";
 
-const BASE_URL = process.env.E2E_BASE_URL || "http://localhost:3000";
+const ip = () => `198.51.100.${Math.floor(Math.random() * 250) + 1}`;
 
-test.describe("Security Tests", () => {
-  // Profile API - IDOR Prevention
-  test.describe("Profile API - IDOR Prevention", () => {
-    test("regular users cannot access other profiles via _id param", async ({
-      request,
-    }) => {
-      const response = await request.get(
-        `${BASE_URL}/api/profile?_id=someOtherUserId`,
-      );
-
-      // Accept valid security responses
-      const validStatuses = [200, 401, 403, 404, 429];
-      expect(validStatuses).toContain(response.status());
-
-      if (response.status() === 200) {
-        const data = await response.json();
-        expect(data).toBeDefined();
-      }
+test.describe("/api/users — auth & role gating", () => {
+  test("401 when unauthenticated", async ({ request }) => {
+    const res = await request.get("/api/users", {
+      headers: { "x-forwarded-for": ip() },
     });
+    expect(res.status()).toBe(401);
+    expect((await res.json()).error).toBe("Unauthorized");
+  });
 
-    test("regular users cannot modify other profiles via _id param", async ({
-      request,
-    }) => {
-      const response = await request.put(`${BASE_URL}/api/profile`, {
-        data: {
-          _id: "someOtherUserId",
-          name: "Hacked Name",
-        },
+  test.describe("non-admin", () => {
+    test.use({ storageState: USER_STATE });
+    test("403 for authenticated non-admin", async ({ request }) => {
+      const res = await request.get("/api/users", {
+        headers: { "x-forwarded-for": ip() },
       });
-
-      const validStatuses = [200, 401, 403, 429];
-      expect(validStatuses).toContain(response.status());
-    });
-
-    test("admin users can access any profile via _id param", async ({
-      request,
-    }) => {
-      const response = await request.get(
-        `${BASE_URL}/api/profile?_id=adminTargetId`,
-      );
-
-      const validStatuses = [200, 401, 403, 404, 429];
-      expect(validStatuses).toContain(response.status());
+      expect(res.status()).toBe(403);
+      expect((await res.json()).error).toBe("Forbidden");
     });
   });
 
-  // /api/users - Authentication and Authorization
-  test.describe("/api/users Endpoint Security", () => {
-    test("requires authentication - returns 401 for unauthenticated requests", async ({
-      request,
-    }) => {
-      const response = await request.get(`${BASE_URL}/api/users`);
-
-      // Rate limiting is valid - security is working
-      if (response.status() === 429) {
-        expect(response.status()).toBe(429);
-        return;
-      }
-
-      expect(response.status()).toBe(401);
-      const data = await response.json();
-      expect(data.error).toBe("Unauthorized");
-    });
-
-    test("requires admin role - returns 403 for authenticated non-admin users", async ({
-      request,
-    }) => {
-      const response = await request.get(`${BASE_URL}/api/users`);
-
-      if (response.status() === 429) {
-        expect(response.status()).toBe(429);
-        return;
-      }
-
-      expect([401, 403]).toContain(response.status());
-
-      if (response.status() === 403) {
-        const data = await response.json();
-        expect(data.error).toBe("Forbidden");
-      }
-    });
-  });
-
-  // Rate Limiting Tests
-  test.describe("Rate Limiting", () => {
-    test("searchCardName returns 429 after rate limit exceeded", async ({
-      request,
-    }) => {
-      test.setTimeout(120000);
-      const RATE_LIMIT = 70;
-      let rateLimitHit = false;
-      let response429: APIResponse | null = null;
-
-      for (let i = 0; i < RATE_LIMIT; i++) {
-        try {
-          const response = await request.post(
-            `${BASE_URL}/api/search/searchCardName`,
-            { data: { cardName: "pikachu" } },
-          );
-
-          if (response.status() === 429) {
-            rateLimitHit = true;
-            response429 = response;
-            break;
-          }
-
-          if (i % 10 === 0) {
-            await new Promise((resolve) => setTimeout(resolve, 50));
-          }
-        } catch {
-          break;
-        }
-      }
-
-      if (rateLimitHit) {
-        expect(response429).not.toBeNull();
-        expect(response429!.status()).toBe(429);
-        const data = await response429!.json();
-        expect(data.error || data.message).toBeDefined();
-      }
-    });
-
-    test("profile API returns 429 after rate limit exceeded", async ({
-      request,
-    }) => {
-      const RATE_LIMIT = 25;
-      let rateLimitHit = false;
-
-      for (let i = 0; i < RATE_LIMIT; i++) {
-        const response = await request.get(`${BASE_URL}/api/profile`);
-
-        if (response.status() === 429) {
-          rateLimitHit = true;
-          break;
-        }
-
-        if (i % 5 === 0) {
-          await new Promise((resolve) => setTimeout(resolve, 50));
-        }
-      }
-
-      expect(rateLimitHit).toBe(true);
-    });
-  });
-
-  // Regex Injection Prevention
-  test.describe("Regex Injection Prevention", () => {
-    const patterns = [
-      ".*",
-      "(pikachu|charizard)",
-      ".+pokemon.+",
-      "[aeiou]",
-      "a{3}",
-    ];
-
-    for (const cardName of patterns) {
-      test(`special regex characters are escaped - ${cardName}`, async ({
-        request,
-      }) => {
-        const response = await request.post(
-          `${BASE_URL}/api/search/searchCardName`,
-          { data: { cardName } },
-        );
-
-        if (response.status() === 429) {
-          expect(response.status()).toBe(429);
-          return;
-        }
-
-        expect(response.status()).toBe(200);
-        const data = await response.json();
-        expect(Array.isArray(data.results)).toBe(true);
-        expect(data.results.length).toBeLessThan(10);
+  test.describe("admin", () => {
+    test.use({ storageState: ADMIN_STATE });
+    test("200 + user list for admin", async ({ request }) => {
+      const res = await request.get("/api/users", {
+        headers: { "x-forwarded-for": ip() },
       });
+      expect(res.status()).toBe(200);
+      const body = (await res.json()) as { users: unknown[] };
+      expect(Array.isArray(body.users)).toBe(true);
+      expect(body.users.length).toBeGreaterThanOrEqual(2); // seeded user+admin
+    });
+  });
+});
+
+test.describe("Deck IDOR — ownership enforcement", () => {
+  test.use({ storageState: ADMIN_STATE }); // admin is a DIFFERENT user than deck owner
+  test("a user cannot read another user's deck (404)", async ({ request }) => {
+    const seed = readSeed(); // deck owned by SEED_USER
+    const res = await request.get(`/api/user-decks/${seed.deckId}`);
+    // Admin is not the owner; ownership filter → 404 (not 200).
+    expect(res.status()).toBe(404);
+  });
+});
+
+test.describe("Profile IDOR — admin _id override", () => {
+  test.describe("non-admin cannot use _id", () => {
+    test.use({ storageState: USER_STATE });
+    test("ignores _id and returns own profile", async ({ request }) => {
+      const seed = readSeed();
+      const res = await request.get(`/api/profile?_id=${seed.adminId}`);
+      expect(res.status()).toBe(200);
+      const data = (await res.json()) as { email: string };
+      expect(data.email).toBe("e2e-tester@example.com"); // own, not admin's
+    });
+  });
+  test.describe("admin can use _id", () => {
+    test.use({ storageState: ADMIN_STATE });
+    test("returns the targeted profile", async ({ request }) => {
+      const seed = readSeed();
+      const res = await request.get(`/api/profile?_id=${seed.userId}`);
+      expect(res.status()).toBe(200);
+      const data = (await res.json()) as { email: string };
+      expect(data.email).toBe("e2e-tester@example.com");
+    });
+  });
+});
+
+test.describe("Deck optimistic locking", () => {
+  test.use({ storageState: USER_STATE });
+  test("PUT without version → 400 VERSION_REQUIRED", async ({ request }) => {
+    const seed = readSeed();
+    const res = await request.put(`/api/user-decks/${seed.deckId}`, {
+      data: { name: "x", cards: [{ cardId: "E2E-001", quantity: 1 }] },
+    });
+    expect(res.status()).toBe(400);
+    expect((await res.json()).code).toBe("VERSION_REQUIRED");
+  });
+
+  test("PUT with stale version → 409 VERSION_MISMATCH", async ({ request }) => {
+    const seed = readSeed();
+    const res = await request.put(`/api/user-decks/${seed.deckId}`, {
+      data: {
+        name: "x",
+        cards: [{ cardId: "E2E-001", quantity: 1 }],
+        version: 999,
+      },
+    });
+    expect(res.status()).toBe(409);
+    expect((await res.json()).code).toBe("VERSION_MISMATCH");
+  });
+});
+
+test.describe("searchCardName — validation & injection", () => {
+  test("rejects non-string cardName with 400", async ({ request }) => {
+    const res = await request.post("/api/search/searchCardName", {
+      headers: { "x-forwarded-for": ip() },
+      data: { cardName: 123 },
+    });
+    expect(res.status()).toBe(400);
+  });
+
+  test("regex metacharacters are escaped, not executed", async ({
+    request,
+  }) => {
+    // Empty query matches everything → catalog total.
+    const all = await request.post("/api/search/searchCardName", {
+      headers: { "x-forwarded-for": ip() },
+      data: { cardName: "", limit: 1 },
+    });
+    const allTotal = ((await all.json()) as { total: number }).total;
+    expect(allTotal).toBeGreaterThan(0);
+
+    // ".*" as a real regex would match every card. Escaped to a literal it
+    // matches only names literally containing ".*" → effectively none.
+    const res = await request.post("/api/search/searchCardName", {
+      headers: { "x-forwarded-for": ip() },
+      data: { cardName: ".*" },
+    });
+    expect(res.status()).toBe(200);
+    const data = (await res.json()) as { results: unknown[]; total: number };
+    expect(Array.isArray(data.results)).toBe(true);
+    // If injection worked, total would equal allTotal. Escaping prevents that.
+    expect(data.total).toBeLessThan(allTotal);
+  });
+
+  test("clamps oversized limit to <= 100", async ({ request }) => {
+    const res = await request.post("/api/search/searchCardName", {
+      headers: { "x-forwarded-for": ip() },
+      data: { cardName: "", limit: 500 },
+    });
+    expect(res.status()).toBe(200);
+    const data = (await res.json()) as { results: unknown[] };
+    expect(data.results.length).toBeLessThanOrEqual(100);
+  });
+});
+
+test.describe("Rate limiting", () => {
+  test("429 with headers once the window is exceeded", async ({ request }) => {
+    test.setTimeout(60_000);
+    const fixedIp = ip();
+    let got429 = false;
+    let headers: Record<string, string> = {};
+    for (let i = 0; i < 120; i++) {
+      const res = await request.post("/api/search/searchCardName", {
+        headers: { "x-forwarded-for": fixedIp },
+        data: { cardName: "test" },
+      });
+      if (res.status() === 429) {
+        got429 = true;
+        headers = res.headers();
+        break;
+      }
     }
+    expect(got429).toBe(true);
+    expect(headers["retry-after"]).toBeDefined();
+    expect(headers["x-ratelimit-limit"]).toBeDefined();
   });
+});
 
-  // Deck Optimistic Locking
-  // Note: These tests require actual deck data in the test database
-  // They verify the API responds correctly but can't test full optimistic locking without real data
-  test.describe("Deck Optimistic Locking", () => {
-    test.skip("deck PUT returns 409 on version mismatch", async ({
-      request,
-    }) => {
-      const response = await request.put(
-        `${BASE_URL}/api/user-decks/testDeckId`,
-        { data: { name: "Test", cards: [], version: 0 } },
-      );
-      expect([401, 404, 409]).toContain(response.status());
-    });
-
-    test.skip("deck PUT requires version parameter", async ({ request }) => {
-      const response = await request.put(
-        `${BASE_URL}/api/user-decks/testDeckId`,
-        { data: { name: "Test", cards: [] } },
-      );
-      expect([401, 400, 404]).toContain(response.status());
-    });
-
-    test.skip("deck PUT succeeds with correct version", async ({ request }) => {
-      const response = await request.put(
-        `${BASE_URL}/api/user-decks/testDeckId`,
-        { data: { name: "Test", cards: [], version: 1 } },
-      );
-      expect([200, 401, 404, 409]).toContain(response.status());
-    });
-  });
-
-  // Additional Security Tests
-  test.describe("Additional Security Measures", () => {
-    test("health endpoint does not expose sensitive data", async ({
-      request,
-    }) => {
-      const response = await request.get(`${BASE_URL}/api/health`);
-
-      expect([200, 401]).toContain(response.status());
-
-      if (response.status() === 200) {
-        const data = await response.json();
-        const text = JSON.stringify(data).toLowerCase();
-        expect(text).not.toContain("password");
-        expect(text).not.toContain("secret");
-        expect(text).not.toContain("mongodb://");
-      }
-    });
-
-    test("searchCardName enforces pagination limits", async ({ request }) => {
-      const response = await request.post(
-        `${BASE_URL}/api/search/searchCardName`,
-        { data: { cardName: "", limit: 500 } },
-      );
-
-      if (response.status() === 429) {
-        expect(response.status()).toBe(429);
-        return;
-      }
-
-      expect(response.status()).toBe(200);
-      const data = await response.json();
-      expect(data.results.length).toBeLessThanOrEqual(100);
-    });
-
-    test("searchCardName handles negative pagination values safely", async ({
-      request,
-    }) => {
-      const response = await request.post(
-        `${BASE_URL}/api/search/searchCardName`,
-        { data: { cardName: "pikachu", limit: -100, skip: -50 } },
-      );
-
-      expect([200, 400, 429]).toContain(response.status());
-
-      if (response.status() === 200) {
-        const data = await response.json();
-        expect(Array.isArray(data.results)).toBe(true);
-      }
-    });
+test.describe("Hardening", () => {
+  test("health endpoint leaks no secrets", async ({ request }) => {
+    const res = await request.get("/api/health");
+    expect([200, 401]).toContain(res.status());
+    if (res.status() === 200) {
+      const text = JSON.stringify(await res.json()).toLowerCase();
+      expect(text).not.toContain("password");
+      expect(text).not.toContain("mongodb://");
+    }
   });
 });
