@@ -3,6 +3,8 @@ import Link from "next/link";
 import type { Metadata } from "next";
 import CardImage from "@/components/CardImage";
 
+export const dynamic = "force-dynamic";
+
 export const metadata: Metadata = {
   title: "Package List",
   description: "Browse all available Pokemon TCG Pocket packages.",
