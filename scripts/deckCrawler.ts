@@ -75,6 +75,33 @@ function generateDeckListHash(deck: {
   return crypto.createHash("md5").update(str).digest("hex");
 }
 
+/**
+ * Build the Mongo bulkWrite operations for a set's decks. The upsert filter is
+ * `deckListHash` alone — the field's true identity and the only unique index
+ * (see src/models/DeckList.ts). Matching on the hash means a decklist that
+ * already exists (even under a different package/deckName from a prior crawl)
+ * is UPDATED in place instead of triggering an E11000 duplicate-key insert.
+ * `package` and `deckName` therefore move into `$set` so upserted inserts still
+ * populate those required fields. Extracted as a pure function for unit testing.
+ */
+export function buildBulkOperations(decks: IDeckList[]) {
+  return decks.map((deck) => ({
+    updateOne: {
+      filter: { deckListHash: deck.deckListHash },
+      update: {
+        $set: {
+          package: deck.package,
+          deckName: deck.deckName,
+          count: deck.count,
+          highlight: deck.highlight,
+          cardList: deck.cardList,
+        },
+      },
+      upsert: true,
+    },
+  }));
+}
+
 async function crawlWebsite() {
   const webUrl = "https://play.limitlesstcg.com/decks?game=POCKET";
 
@@ -286,23 +313,7 @@ async function crawlWebsite() {
     if (currentSetDeckList.length > 0) {
       await DeckList.createIndexes();
 
-      const bulkOperations = currentSetDeckList.map((deck) => ({
-        updateOne: {
-          filter: {
-            package: deck.package,
-            deckName: deck.deckName,
-            deckListHash: deck.deckListHash,
-          },
-          update: {
-            $set: {
-              count: deck.count,
-              highlight: deck.highlight,
-              cardList: deck.cardList,
-            },
-          },
-          upsert: true,
-        },
-      }));
+      const bulkOperations = buildBulkOperations(currentSetDeckList);
 
       await DeckList.bulkWrite(bulkOperations);
     }
@@ -314,8 +325,11 @@ async function crawlWebsite() {
   await browser.close();
 }
 
-crawlWebsite().then(() => {
-  console.log("Crawler completed successfully");
-  // Force exit
-  process.exit(0);
-});
+// Only run when invoked directly (not when imported by tests).
+if (process.argv[1] && process.argv[1].includes("deckCrawler")) {
+  crawlWebsite().then(() => {
+    console.log("Crawler completed successfully");
+    // Force exit
+    process.exit(0);
+  });
+}
