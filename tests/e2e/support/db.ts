@@ -1,4 +1,5 @@
 // tests/e2e/support/db.ts
+import fsSync from "node:fs";
 import mongoose from "mongoose";
 import { GetObjectCommand, S3Client } from "@aws-sdk/client-s3";
 import { User } from "../../../src/models/User";
@@ -135,4 +136,10 @@ export async function disconnectTestDb(): Promise<void> {
   if (mongoose.connection.readyState !== 0) {
     await mongoose.disconnect();
   }
+}
+
+/** Read the seed snapshot written by global-setup. */
+export function readSeed(): SeedResult {
+  const p = `${process.cwd()}/tests/e2e/.auth/seed.json`;
+  return JSON.parse(fsSync.readFileSync(p, "utf-8")) as SeedResult;
 }
