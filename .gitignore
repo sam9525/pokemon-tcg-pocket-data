@@ -58,3 +58,10 @@ package-metadata.json
 docs/
 
 .gitignore
+
+CONTEXT.md
+
+# Playwright
+/test-results/
+/playwright-report/
+/tests/e2e/.auth/
