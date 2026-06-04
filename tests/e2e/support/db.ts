@@ -97,7 +97,7 @@ export async function seedTestDb(): Promise<SeedResult> {
   const realCards = (await Card.find({ package: pkg, language: SEED_LANGUAGE })
     .select("cardId")
     .limit(2)
-    .lean()) as { cardId: string }[];
+    .lean()) as unknown as { cardId: string }[];
   if (realCards.length < 2) {
     throw new Error(
       `Test catalog missing: found ${realCards.length} cards for package ` +
