@@ -80,8 +80,12 @@ describe("error responses do not leak internal details (C3)", () => {
   });
 
   it("search/filtering does not echo error.message to client", async () => {
-    const req = makeRequest("http://localhost/api/search/filtering", "POST", {
-      language: "en_US",
+    // language is read from the header and page/limit are validated, so the
+    // request must satisfy both to reach the DB call that throws (the 500 path).
+    const req = new Request("http://localhost/api/search/filtering", {
+      method: "POST",
+      headers: { "content-type": "application/json", language: "en_US" },
+      body: JSON.stringify({ page: 1, limit: 10 }),
     });
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const res = await filteringPost(req as any);
