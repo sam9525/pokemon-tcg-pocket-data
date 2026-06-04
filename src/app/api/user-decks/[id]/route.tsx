@@ -79,10 +79,10 @@ export async function PUT(
     }
 
     // Check existence first to distinguish not-found from version conflict
-    const existingDeck = await UserDeck.findOne({
+    const existingDeck = (await UserDeck.findOne({
       _id: id,
       userId: user._id,
-    }).lean();
+    }).lean()) as any;
     if (!existingDeck) {
       return NextResponse.json({ error: "Deck not found" }, { status: 404 });
     }
