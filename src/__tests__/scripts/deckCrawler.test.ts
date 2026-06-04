@@ -27,6 +27,10 @@ describe("buildBulkOperations", () => {
       highlight: deck.highlight,
       cardList: deck.cardList,
     });
+  });
+
+  it("sets upsert true so new decks are inserted", () => {
+    const [op] = buildBulkOperations([deck]);
     expect(op.updateOne.upsert).toBe(true);
   });
 
@@ -36,5 +40,6 @@ describe("buildBulkOperations", () => {
       { ...deck, deckListHash: "hash-def" },
     ]);
     expect(ops).toHaveLength(2);
+    expect(ops[1].updateOne.filter).toEqual({ deckListHash: "hash-def" });
   });
 });
