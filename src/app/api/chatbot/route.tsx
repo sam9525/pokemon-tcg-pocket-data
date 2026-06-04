@@ -52,12 +52,11 @@ export async function POST(req: NextRequest) {
       async start(streamController) {
         const encoder = new TextEncoder();
         try {
-          const response = await ai.models.generateContentStream(
-            {
-              model: "gemini-3-pro-preview",
-              contents: msg,
-              config: {
-                systemInstruction: `You are an expert Pokémon TCG Pocket strategist and deck builder. Your goal is to provide precise, tournament-level deck lists based on the current game meta.
+          const response = await ai.models.generateContentStream({
+            model: "gemini-3-pro-preview",
+            contents: msg,
+            config: {
+              systemInstruction: `You are an expert Pokémon TCG Pocket strategist and deck builder. Your goal is to provide precise, tournament-level deck lists based on the current game meta.
 
               Whenever the user asks for a deck recommendation or specific deck details, you must follow these strict guidelines:
 
@@ -71,15 +70,13 @@ export async function POST(req: NextRequest) {
               5.  **Strategy Summary:** Immediately following the table, provide a brief 1-2 sentence explanation of the deck's core strategy or win condition.
 
               If you do not know the specific set a card belongs to, use your tools to verify it before generating the table to ensure 100% accuracy.`,
-                temperature: 0.7,
-                topP: 0.95,
-                topK: 40,
-                maxOutputTokens: 60000,
-                tools: [{ googleSearch: {} }],
-              },
+              temperature: 0.7,
+              topP: 0.95,
+              topK: 40,
+              maxOutputTokens: 60000,
+              tools: [{ googleSearch: {} }],
             },
-            { signal: controller.signal },
-          );
+          });
 
           for await (const chunk of response) {
             const links =
