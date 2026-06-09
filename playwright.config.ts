@@ -16,7 +16,7 @@ export default defineConfig({
   retries: 0,
   reporter: process.env.CI ? "github" : "list",
   use: {
-    baseURL: "http://localhost:3000",
+    baseURL: "http://127.0.0.1:3000",
     trace: "on-first-retry",
   },
   projects: [{ name: "chromium", use: { ...devices["Desktop Chrome"] } }],
@@ -24,12 +24,14 @@ export default defineConfig({
     // Production build for full fidelity. To iterate faster locally, run
     // `npm run build` once yourself, then change command to "npm run start".
     command: "npm run build && npm run start",
-    url: "http://localhost:3000/login",
+    url: "http://127.0.0.1:3000/login",
     reuseExistingServer: !process.env.CI,
     timeout: 300_000, // build can be slow
     env: {
       // Override ONLY the DB; AUTH_SECRET/AUTH_URL/AWS creds inherit from env.
       MONGO_URL: TEST_MONGO_URL,
+      AUTH_URL: "http://127.0.0.1:3000/",
+      NODE_OPTIONS: "--dns-result-order=ipv4first",
     },
   },
 });

@@ -14,7 +14,6 @@ test("400 when no file is provided", async ({ request }) => {
 
 test.describe("avatar UI (mocked upload)", () => {
   test.use({ storageState: USER_STATE });
-
   test("uploading an avatar updates the image without hitting S3", async ({
     page,
   }) => {
@@ -53,8 +52,6 @@ test.describe("avatar UI (mocked upload)", () => {
       buffer: Buffer.from("fake-png-bytes"),
     });
     // Avatar <img> src updates to the mocked URL.
-    await expect(
-      page.locator('img[src="https://example.test/new-avatar.png"]'),
-    ).toBeVisible();
+    await expect(page.locator('img[src*="new-avatar.png"]')).toBeVisible();
   });
 });

@@ -37,7 +37,7 @@ function stateFor(token: string) {
       {
         name: SESSION_COOKIE_NAME,
         value: token,
-        domain: "localhost",
+        domain: "127.0.0.1",
         path: "/",
         httpOnly: true,
         secure: false,

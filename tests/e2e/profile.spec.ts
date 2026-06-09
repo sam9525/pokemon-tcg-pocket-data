@@ -30,7 +30,9 @@ test("updates the username and persists via PUT", async ({ page }) => {
 });
 
 test("redirects unauthenticated visitors to login", async ({ browser }) => {
-  const ctx = await browser.newContext(); // no storageState
+  const ctx = await browser.newContext({
+    storageState: { cookies: [], origins: [] },
+  }); // override storageState
   const page = await ctx.newPage();
   await page.goto("/profile");
   await expect(page).toHaveURL(/\/login/);

@@ -149,7 +149,7 @@ test.describe("Rate limiting", () => {
     let headers: Record<string, string> = {};
     for (let i = 0; i < 120; i++) {
       const res = await request.post("/api/search/searchCardName", {
-        headers: { "x-forwarded-for": fixedIp },
+        headers: { "x-forwarded-for": fixedIp, "x-test-rate-limit": "true" },
         data: { cardName: "test" },
       });
       if (res.status() === 429) {

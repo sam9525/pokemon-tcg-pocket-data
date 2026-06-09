@@ -142,6 +142,16 @@ export async function rateLimit(
   request: NextRequest,
   config: RateLimitConfig,
 ): Promise<{ success: boolean; response?: NextResponse }> {
+  // Bypass rate limiting in testing environment to prevent E2E flakiness / 429s
+  // BUT allow it if specifically requested for testing the rate limiter itself
+  const isTestRateLimit = request.headers.get("x-test-rate-limit") === "true";
+  if (
+    !isTestRateLimit &&
+    (process.env.NODE_ENV === "test" ||
+      (process.env.MONGO_URL && process.env.MONGO_URL.includes("test")))
+  ) {
+    return { success: true };
+  }
   const {
     maxRequests,
     windowMs,

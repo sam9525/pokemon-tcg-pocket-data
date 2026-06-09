@@ -16,41 +16,43 @@ export default function UsersPage() {
   const { currentLanguageLookup } = useLanguage();
 
   useEffect(() => {
-    if (hasLoaded.current) return;
+    if (status !== "authenticated" || hasLoaded.current) return;
     hasLoaded.current = true;
 
-    if (status === "authenticated") {
-      const toastPromise = new Promise(async (resolve, reject) => {
-        fetch("/api/users")
-          .then((res) => {
-            res.json().then((data) => {
-              setUsers(data.users);
-              resolve(res);
-            });
-          })
-          .catch((err) => {
-            reject(err);
+    const toastPromise = new Promise(async (resolve, reject) => {
+      fetch("/api/users")
+        .then((res) => {
+          res.json().then((data) => {
+            setUsers(data.users);
+            resolve(res);
           });
-      });
+        })
+        .catch((err) => {
+          reject(err);
+        });
+    });
 
-      toast.promise(toastPromise, {
-        loading: currentLanguageLookup.NOTIFICATIONS.loadingUsers,
-        error: currentLanguageLookup.NOTIFICATIONS.failedToLoadUsers,
-        success: currentLanguageLookup.NOTIFICATIONS.usersLoadedSuccessfully,
-      });
-    }
+    toast.promise(toastPromise, {
+      loading: currentLanguageLookup.NOTIFICATIONS.loadingUsers,
+      error: currentLanguageLookup.NOTIFICATIONS.failedToLoadUsers,
+      success: currentLanguageLookup.NOTIFICATIONS.usersLoadedSuccessfully,
+    });
   }, [status, currentLanguageLookup]);
 
   interface UserRowProps {
     index: number;
+    style?: React.CSSProperties;
     users: UserDocument[];
   }
-  const UserRow = ({ index, users }: UserRowProps) => {
+  const UserRow = ({ index, style, users }: UserRowProps) => {
     const user = users[index];
     if (!user) return null;
 
     return (
-      <div className="flex flex-row items-center gap-2 px-2 text-center p-2 border-b-1">
+      <div
+        style={style}
+        className="flex flex-row items-center gap-2 px-2 text-center p-2 border-b-1"
+      >
         <div className="flex-1 border-r-1">{user.name}</div>
         <div className="flex-2 border-r-1">{user.email}</div>
         <div className="flex-1 border-r-1 flex justify-center">
@@ -90,9 +92,12 @@ export default function UsersPage() {
           <div className="flex-1">{currentLanguageLookup.USERS.admin}</div>
         </div>
         <List
+          style={{ height: 500 }}
           rowCount={users.length}
-          rowHeight={0}
-          rowComponent={({ index }) => <UserRow index={index} users={users} />}
+          rowHeight={50}
+          rowComponent={({ index, style }) => (
+            <UserRow index={index} style={style} users={users} />
+          )}
           rowProps={{}}
           className="scrollbar"
         />
