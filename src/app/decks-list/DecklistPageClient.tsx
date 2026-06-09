@@ -140,13 +140,15 @@ export default function DecksListClient({
 
       // Include highlight cards
       deck.highlight.forEach((card) => {
-        cardMap.set(card.cardId, card.cardCount);
+        const id = card.cardId || card.cardName;
+        cardMap.set(id, card.cardCount);
       });
 
       // Include current player cards
       currentPlayerCards.forEach((card) => {
-        const existing = cardMap.get(card.cardId) || 0;
-        cardMap.set(card.cardId, existing + card.cardCount);
+        const id = card.cardId || card.cardName;
+        const existing = cardMap.get(id) || 0;
+        cardMap.set(id, existing + card.cardCount);
       });
 
       const cards = Array.from(cardMap.entries()).map(([cardId, quantity]) => ({

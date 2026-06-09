@@ -8,7 +8,7 @@ import { API_RATE_LIMIT } from "@/utils/rateLimitConfig";
 import { buildCacheKey } from "@/utils/cacheKey";
 
 const MAX_CARD_IDS = 500;
-const CARD_ID_REGEX = /^[A-Za-z0-9_:.\-]{1,80}$/;
+const CARD_ID_REGEX = /^[A-Za-z0-9_:.\-\s'♀♂()]{1,100}$/;
 const LANGUAGE_REGEX = /^[A-Za-z0-9_-]{1,20}$/;
 
 export async function GET(request: NextRequest) {

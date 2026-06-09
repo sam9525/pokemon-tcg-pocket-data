@@ -206,10 +206,10 @@ function DeckCardComponent({
           <div className="grid grid-cols-3 sm:grid-cols-4 lg:grid-cols-5 gap-2">
             {visibleCards.map((card, idx) => (
               <div key={`${card.cardId}-${idx}`} className="relative group">
-                {cardImages[card.cardId] ? (
+                {card.cardId ? (
                   <AnimatedCard
                     cardId={card.cardId}
-                    imageUrl={cardImages[card.cardId]}
+                    imageUrl={cardImages[card.cardId] || ""}
                     boosterPack={cardData[card.cardId]?.boosterPack}
                     cardCount={card.quantity}
                   />

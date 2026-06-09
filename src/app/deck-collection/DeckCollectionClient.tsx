@@ -230,7 +230,7 @@ function DeckCardComponent({
             {featuredCard && (
               <AnimatedCard
                 cardId={featuredCard.cardId}
-                imageUrl={cardImages[featuredCard.cardId]}
+                imageUrl={cardImages[featuredCard.cardId] || ""}
                 boosterPack={cardData[featuredCard.cardId]?.boosterPack}
                 cardCount={featuredCard.quantity}
               />
@@ -274,7 +274,7 @@ function DeckCardComponent({
               {featuredCard && (
                 <AnimatedCard
                   cardId={featuredCard.cardId}
-                  imageUrl={cardImages[featuredCard.cardId]}
+                  imageUrl={cardImages[featuredCard.cardId] || ""}
                   boosterPack={cardData[featuredCard.cardId]?.boosterPack}
                   cardCount={featuredCard.quantity}
                 />
@@ -285,10 +285,10 @@ function DeckCardComponent({
                 key={`${card.cardId}-${cardIndex}`}
                 className="relative group"
               >
-                {cardImages[card.cardId] ? (
+                {card.cardId ? (
                   <AnimatedCard
                     cardId={card.cardId}
-                    imageUrl={cardImages[card.cardId]}
+                    imageUrl={cardImages[card.cardId] || ""}
                     boosterPack={cardData[card.cardId]?.boosterPack}
                     cardCount={card.quantity}
                   />
