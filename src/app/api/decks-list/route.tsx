@@ -14,9 +14,22 @@ function getPackageFromBoosterPack(
   boosterPack: string,
   boosterToPackage: Record<string, string>,
 ): string {
-  if (!boosterPack) return "";
+  if (!boosterPack || boosterPack === "undefined") return "";
   const prefix = boosterPack.split("_")[0];
   return boosterToPackage[prefix] || prefix;
+}
+
+function resolvePackageSpelling(pkg: string): string {
+  if (!pkg) return "";
+  const p = pkg.toLowerCase().trim();
+  if (p === "a2b_shining-revelry") return "A2b_shining-rivalry";
+  if (p === "a3b_eevee-grove") return "A3b_eevee-groove";
+  if (p === "a4_wisdom-of") return "A4_wisdom-of-sea-and-sky";
+  return pkg;
+}
+
+function escapeRegex(string: string): string {
+  return string.replace(/[-\/\\^$*+?.()|[\]{}]/g, "\\$&");
 }
 
 export async function GET(request: NextRequest) {
@@ -62,14 +75,22 @@ export async function GET(request: NextRequest) {
   decklists.forEach((deck: any) => {
     if (deck.highlight) {
       deck.highlight.forEach((card: any) => {
-        if (card.cardName) cardNamesSet.add(card.cardName);
+        if (card.cardName) {
+          cardNamesSet.add(card.cardName);
+          cardNamesSet.add(card.cardName.replace(/'/g, "’"));
+          cardNamesSet.add(card.cardName.replace(/’/g, "'"));
+        }
       });
     }
     if (deck.cardList) {
       Object.values(deck.cardList).forEach((playerCards: any) => {
         if (Array.isArray(playerCards)) {
           playerCards.forEach((card: any) => {
-            if (card.cardName) cardNamesSet.add(card.cardName);
+            if (card.cardName) {
+              cardNamesSet.add(card.cardName);
+              cardNamesSet.add(card.cardName.replace(/'/g, "’"));
+              cardNamesSet.add(card.cardName.replace(/’/g, "'"));
+            }
           });
         }
       });
@@ -111,14 +132,21 @@ export async function GET(request: NextRequest) {
 
   // Fetch cards from selected packages AND fallback packages
   const allPackages = [
-    ...new Set([...[packages], ...Array.from(fallbackPackagesSet)]),
+    ...new Set(
+      [...[packages], ...Array.from(fallbackPackagesSet)]
+        .map(resolvePackageSpelling)
+        .filter(Boolean),
+    ),
   ];
+  const packageRegexes = allPackages.map(
+    (pkg) => new RegExp(`^${escapeRegex(pkg)}$`, "i"),
+  );
   const cards = (await Card.find({
-    package: { $in: allPackages },
+    package: { $in: packageRegexes },
     name: { $in: uniqueCardNames },
     language: "en_US",
     rarity: {
-      $regex: `^(Immersive Rare|Super Rare|Art Rare|Double Rare|Rare|Uncommon|Common)$`,
+      $regex: `^(Immersive Rare|Super Rare|Art Rare|Double Rare|Rare|Uncommon|Common|Super Art Rare|Shiny Super Rare|Shiny|Ultra Rare)$`,
       $options: "i",
     },
   })
@@ -152,12 +180,24 @@ export async function GET(request: NextRequest) {
         package: card.package,
       });
     }
+    const norm = card.name.replace(/’/g, "'").toLowerCase().trim();
+    if (!cardMapLower.has(norm)) {
+      cardMapLower.set(norm, {
+        cardId: card.cardId,
+        imageUrl: card.imageUrl,
+        package: card.package,
+      });
+    }
   });
 
   // Helper to get card data (case-insensitive lookup)
   const getCardData = (name: string) => {
     if (!name) return undefined;
-    return cardMap.get(name) || cardMapLower.get(name.toLowerCase().trim());
+    const lower = name.toLowerCase().trim();
+    const norm = name.replace(/’/g, "'").toLowerCase().trim();
+    return (
+      cardMap.get(name) || cardMapLower.get(norm) || cardMapLower.get(lower)
+    );
   };
 
   // Enrich decklists with cardId and imageUrl
